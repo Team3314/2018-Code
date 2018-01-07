@@ -11,7 +11,9 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.*;
-import com.ctre.CANTalon.TalonControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class Drive {
 	
@@ -31,7 +33,7 @@ public class Drive {
 	public driveMode currentDriveMode = driveMode.OPEN_LOOP;
 	
 	//Hardware
-	private CANTalon mLeftMaster, mLeftSlave1, mLeftSlave2, mRightMaster, mRightSlave1, mRightSlave2;
+	private WPI_TalonSRX mLeftMaster, mLeftSlave1, mLeftSlave2, mRightMaster, mRightSlave1, mRightSlave2;
 	private DoubleSolenoid shifter;
 	private PowerDistributionPanel pdp;
 	private AHRS navx;
@@ -104,36 +106,27 @@ public class Drive {
     	
 		
 		//Talons
-    	mLeftMaster = new CANTalon(0);
-    	mLeftMaster.changeControlMode(TalonControlMode.PercentVbus);
-    	mLeftMaster.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
-    	mLeftMaster.configEncoderCodesPerRev(2048);
-    	mLeftMaster.setCurrentLimit(50);
+    	mLeftMaster = new WPI_TalonSRX(0);
+    	//mLeftMaster.enable
+    	mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
     	mLeftMaster.setInverted(true);
-    	mLeftMaster.reverseSensor(true);
+    	mLeftMaster.setSensorPhase(true);
     	
-    	mLeftSlave1 = new CANTalon(1);
-    	mLeftSlave1.changeControlMode(TalonControlMode.Follower);
-    	mLeftSlave1.set(mLeftMaster.getDeviceID());
+    	mLeftSlave1 = new WPI_TalonSRX(1);
+    	mLeftSlave1.follow(mLeftMaster);
     	
-    	mLeftSlave2 = new CANTalon(2);
-    	mLeftSlave2.changeControlMode(TalonControlMode.Follower);
-    	mLeftSlave2.set(mLeftMaster.getDeviceID());
+    	mLeftSlave2 = new WPI_TalonSRX(2);
+    	mLeftSlave2.follow(mLeftMaster);
     	
-    	mRightMaster = new CANTalon(3);
-    	mRightMaster.changeControlMode(TalonControlMode.PercentVbus);
-    	mRightMaster.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder);
-    	mRightMaster.configEncoderCodesPerRev(2048);
-    	mRightMaster.setCurrentLimit(50);
+    	mRightMaster = new WPI_TalonSRX(3);
+    	mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
 
     	
-    	mRightSlave1 = new CANTalon(4);
-    	mRightSlave1.changeControlMode(TalonControlMode.Follower);
-    	mRightSlave1.set(mRightMaster.getDeviceID());
+    	mRightSlave1 = new WPI_TalonSRX(4);
+    	mRightSlave1.follow(mLeftMaster);
     	
-    	mRightSlave2 = new CANTalon(5);
-    	mRightSlave2.changeControlMode(TalonControlMode.Follower);
-    	mRightSlave2.set(mRightMaster.getDeviceID());
+    	mRightSlave2 = new WPI_TalonSRX(5);
+    	mRightSlave2.follow(mLeftMaster);
     	
     	resetSensors();
     	
@@ -170,21 +163,21 @@ public class Drive {
     			"Left Master Current", "Left Slave 1 Current","Left Slave 2 Current", "Right Master Current", "Right Slave 1 Current", "Right Slave 2 Current",
     			"Left Master Voltage", "Left Slave 1 Voltage","Left Slave 2 Voltage", "Right Master Voltage", "Right Slave 1 Voltage", "Right Slave 2 Voltage",
     			"Battery Voltage", "High Gear"};
-    	String[] values = {String.valueOf(mLeftMaster.getSpeed()), String.valueOf(mRightMaster.getSpeed()), String.valueOf(mLeftMaster.getPosition()), String.valueOf(mRightMaster.getPosition()),
+    	String[] values = {String.valueOf(mLeftMaster.getSelectedSensorVelocity(0)), String.valueOf(mRightMaster.getSelectedSensorVelocity(0)), String.valueOf(mLeftMaster.getSelectedSensorPosition(0)), String.valueOf(mRightMaster.getSelectedSensorPosition(0)),
     			String.valueOf(navx.getWorldLinearAccelY()), String.valueOf(navx.getWorldLinearAccelX()), String.valueOf(mLeftMaster.getOutputCurrent()),
     			String.valueOf(mLeftSlave1.getOutputCurrent()), String.valueOf(mLeftSlave2.getOutputCurrent()), String.valueOf(mRightMaster.getOutputCurrent()),
-    			String.valueOf(mRightSlave1.getOutputCurrent()), String.valueOf(mRightSlave2.getOutputCurrent()), String.valueOf(mLeftMaster.getOutputVoltage()),
-    			String.valueOf(mLeftSlave1.getOutputVoltage()),String.valueOf(mLeftSlave2.getOutputVoltage()), String.valueOf(mRightMaster.getOutputVoltage()),
-    			String.valueOf(mRightSlave1.getOutputVoltage()), String.valueOf(mRightSlave2.getOutputVoltage()),String.valueOf(pdp.getVoltage()), String.valueOf(mIsHighGear)};
+    			String.valueOf(mRightSlave1.getOutputCurrent()), String.valueOf(mRightSlave2.getOutputCurrent()), String.valueOf(mLeftMaster.getMotorOutputVoltage()),
+    			String.valueOf(mLeftSlave1.getMotorOutputVoltage()),String.valueOf(mLeftSlave2.getMotorOutputVoltage()), String.valueOf(mRightMaster.getMotorOutputVoltage()),
+    			String.valueOf(mRightSlave1.getMotorOutputVoltage()), String.valueOf(mRightSlave2.getMotorOutputVoltage()),String.valueOf(pdp.getVoltage()), String.valueOf(mIsHighGear)};
     	logger.logData(names, values);
 
     }
     
     private void outputToSmartDashboard() {
-    	SmartDashboard.putNumber("Left Encoder Position", mLeftMaster.getPosition());
-    	SmartDashboard.putNumber("Right Encoder Position", mRightMaster.getPosition());
-    	SmartDashboard.putNumber("Left Encoder Speed", mLeftMaster.getSpeed());
-    	SmartDashboard.putNumber("Right Encoder Speed", mRightMaster.getSpeed());
+    	SmartDashboard.putNumber("Left Encoder Position", mLeftMaster.getSelectedSensorPosition(0));
+    	SmartDashboard.putNumber("Right Encoder Position", mRightMaster.getSelectedSensorPosition(0));
+    	SmartDashboard.putNumber("Left Encoder Speed", mLeftMaster.getSelectedSensorVelocity(0));
+    	SmartDashboard.putNumber("Right Encoder Speed", mRightMaster.getSelectedSensorVelocity(0));
     	SmartDashboard.putNumber("Left Master Current", mLeftMaster.getOutputCurrent());
     	SmartDashboard.putNumber("Left Slave 1 Current", mLeftSlave1.getOutputCurrent());
     	SmartDashboard.putNumber("Left Slave 2 Current", mLeftSlave2.getOutputCurrent());
@@ -196,10 +189,8 @@ public class Drive {
     }
     
     private void resetDriveEncoders() {
-		mLeftMaster.setPosition(0);
-		mRightMaster.setPosition(0);
-		mLeftMaster.setEncPosition(0);
-		mRightMaster.setEncPosition(0);
+		mLeftMaster.setSelectedSensorPosition(0, 0, 0);
+		mRightMaster.setSelectedSensorPosition(0, 0, 0);
 	}
     
     public void resetSensors() {
