@@ -1,8 +1,15 @@
 package org.usfirst.frc.team3314.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import org.usfirst.frc.team3314.robot.Drive.driveMode;
+
+import com.ctre.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -11,21 +18,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
+
+
 public class Robot extends IterativeRobot {
-	final String defaultAuto = "Default";
-	final String customAuto = "My Auto";
-	String autoSelected;
-	SendableChooser<String> chooser = new SendableChooser<>();
+	
+	private Drive drive = Drive.getInstance();
+	private HumanInterface hi = HumanInterface.getInstance();
+
+	Compressor pcm1 = new Compressor();
+	
+	private boolean lastGyrolock = false;
 
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
 	@Override
-	public void robotInit() {
-		chooser.addDefault("Default Auto", defaultAuto);
-		chooser.addObject("My Auto", customAuto);
-		SmartDashboard.putData("Auto choices", chooser);
+	public void robotInit() {	
+		drive.resetSensors();
 	}
 
 	/**
@@ -41,10 +51,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		autoSelected = chooser.getSelected();
-		// autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
-		System.out.println("Auto selected: " + autoSelected);
+		
 	}
 
 	/**
@@ -52,22 +59,49 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		switch (autoSelected) {
-		case customAuto:
-			// Put custom auto code here
-			break;
-		case defaultAuto:
-		default:
-			// Put default auto code here
-			break;
-		}
+		
 	}
 
+	
+	@Override
+	public void teleopInit() {
+		drive.logger.createNewFile();
+		drive.resetSensors();
+	}
+	
 	/**
 	 * This function is called periodically during operator control
 	 */
 	@Override
 	public void teleopPeriodic() {
+		
+		drive.update();
+		if(hi.getGyrolock()) {
+			if(!lastGyrolock) {
+				drive.setDriveMode(driveMode.GYROLOCK);
+				drive.setDesiredAngle(drive.getAngle());
+			}
+			drive.setDesiredSpeed(hi.getLeftThrottle());
+		}
+		else {
+			drive.setDriveMode(driveMode.OPEN_LOOP);
+		}
+		
+		if(hi.getHighGear()) {
+			drive.setHighGear(true);
+		}
+		else if(hi.getLowGear()) {
+			drive.setHighGear(false);
+		}
+		
+		if(hi.getFullSpeedForward()) {
+			drive.setDesiredSpeed(1);
+		}
+		
+		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
+		
+		lastGyrolock = hi.getGyrolock();
+		
 	}
 
 	/**
@@ -77,4 +111,3 @@ public class Robot extends IterativeRobot {
 	public void testPeriodic() {
 	}
 }
-
