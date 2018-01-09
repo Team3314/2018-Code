@@ -7,7 +7,7 @@ to keep the robot driving straight in gyrolock. */
 
 public class GyroPIDOutput implements PIDOutput {
 	Robot robot;
-	double turnSpeed = 0;
+	public double turnSpeed = 0;
 	
 	@Override
 	public void pidWrite(double output) {
