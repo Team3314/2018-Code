@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.usfirst.frc.team3314.robot.Drive.driveMode;
+import org.usfirst.frc.team3314.robot.subsystems.Drive;
+import org.usfirst.frc.team3314.robot.subsystems.HumanInterface;
+import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 
 import com.ctre.*;
 

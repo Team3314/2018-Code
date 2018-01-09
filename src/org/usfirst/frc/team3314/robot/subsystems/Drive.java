@@ -1,4 +1,4 @@
-package org.usfirst.frc.team3314.robot;
+package org.usfirst.frc.team3314.robot.subsystems;
 
 
 import com.kauailabs.navx.frc.AHRS;
@@ -10,6 +10,11 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import org.usfirst.frc.team3314.robot.Constants;
+import org.usfirst.frc.team3314.robot.DataLogger;
+import org.usfirst.frc.team3314.robot.GyroPIDOutput;
+
 import com.ctre.*;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -19,7 +24,8 @@ public class Drive {
 	
 	public enum driveMode {
 		OPEN_LOOP,
-		GYROLOCK
+		GYROLOCK,
+		MOTION_PROFILE
 	}
 	
 	private static Drive mInstance = new Drive();
@@ -44,13 +50,15 @@ public class Drive {
     private boolean mIsBrakeMode;
     
     //Data Logging
-    DataLogger logger;
+    public DataLogger logger;
 
     //PID
 	private GyroPIDOutput gyroPIDOutput;
 	private PIDController gyroControl;
 
-    private double rawLeftSpeed, rawRightSpeed, leftStickInput, rightStickInput, desiredSpeed, desiredAngle;
+    private double rawLeftSpeed, rawRightSpeed, leftStickInput, rightStickInput, desiredLeftSpeed, desiredRightSpeed, desiredAngle;
+    
+    private int leftDrivePosition, rightDrivePosition;
     
     public void update() {
     	if(mIsHighGear) {
@@ -60,24 +68,28 @@ public class Drive {
     		shifter.set(Constants.kLowGear);
     	}
     	outputToSmartDashboard();
+    	leftDrivePosition = mLeftMaster.getSelectedSensorPosition(0);
+    	rightDrivePosition =  mRightMaster.getSelectedSensorPosition(0);
     	logSpeed();
-    	mLeftMaster.set(rawLeftSpeed);
-    	mRightMaster.set(rawRightSpeed);
     	switch(currentDriveMode) {
     		case OPEN_LOOP:
     			rawLeftSpeed = leftStickInput;
     			rawRightSpeed = rightStickInput;
-    			return;
+    			break;
     		case GYROLOCK:
     			if (!gyroControl.isEnabled()){
     				gyroControl.enable();
     			}
     			
-    			rawLeftSpeed = desiredSpeed + gyroPIDOutput.turnSpeed;
-    			rawRightSpeed = desiredSpeed - gyroPIDOutput.turnSpeed;
+    			rawLeftSpeed = desiredLeftSpeed + gyroPIDOutput.turnSpeed;
+    			rawRightSpeed = desiredRightSpeed - gyroPIDOutput.turnSpeed;
     			gyroControl.setSetpoint(desiredAngle);	
-    			return;
+    			break;
+    		case MOTION_PROFILE:
+    			break;
     	}
+    	mLeftMaster.set(rawLeftSpeed);
+    	mRightMaster.set(rawRightSpeed);
     
     }
 
@@ -146,8 +158,22 @@ public class Drive {
     	return navx.getYaw();
     }
     
+    public int getLeftPosition() {
+    	return leftDrivePosition;
+    }
+    
+    public int getRightPosition() {
+    	return rightDrivePosition;
+    }
+    
     public void setDesiredSpeed(double speed) {
-    	desiredSpeed = speed;
+    	desiredLeftSpeed = speed;
+    	desiredRightSpeed = speed;
+    }
+    
+    public void setDesiredSpeed(double leftSpeed, double rightSpeed) {
+    	rawLeftSpeed = leftSpeed;
+    	rawRightSpeed = rightSpeed;
     }
     
     public void setDriveMode(driveMode mode) {
@@ -163,7 +189,7 @@ public class Drive {
     			"Left Master Current", "Left Slave 1 Current","Left Slave 2 Current", "Right Master Current", "Right Slave 1 Current", "Right Slave 2 Current",
     			"Left Master Voltage", "Left Slave 1 Voltage","Left Slave 2 Voltage", "Right Master Voltage", "Right Slave 1 Voltage", "Right Slave 2 Voltage",
     			"Battery Voltage", "High Gear"};
-    	String[] values = {String.valueOf(mLeftMaster.getSelectedSensorVelocity(0)), String.valueOf(mRightMaster.getSelectedSensorVelocity(0)), String.valueOf(mLeftMaster.getSelectedSensorPosition(0)), String.valueOf(mRightMaster.getSelectedSensorPosition(0)),
+    	String[] values = {String.valueOf(mLeftMaster.getSelectedSensorVelocity(0)), String.valueOf(mRightMaster.getSelectedSensorVelocity(0)), String.valueOf(leftDrivePosition), String.valueOf(rightDrivePosition),
     			String.valueOf(navx.getWorldLinearAccelY()), String.valueOf(navx.getWorldLinearAccelX()), String.valueOf(mLeftMaster.getOutputCurrent()),
     			String.valueOf(mLeftSlave1.getOutputCurrent()), String.valueOf(mLeftSlave2.getOutputCurrent()), String.valueOf(mRightMaster.getOutputCurrent()),
     			String.valueOf(mRightSlave1.getOutputCurrent()), String.valueOf(mRightSlave2.getOutputCurrent()), String.valueOf(mLeftMaster.getMotorOutputVoltage()),

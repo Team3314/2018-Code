@@ -13,5 +13,13 @@ public class Constants {
 		//Gears
 		public static Value kHighGear = Value.kReverse;
 		public static Value kLowGear = Value.kForward;
+		
+		public static double kPulleyDiameter = 3.75; //inches
+		
+		public static double kMaxVelocity = 15.0; //fps
+		
+		public static double kWheelbaseWidth = 27.5; // inches
+		
+		
 
 }
