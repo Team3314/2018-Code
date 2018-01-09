@@ -44,7 +44,6 @@ public class Drive {
 	private PowerDistributionPanel pdp;
 	private AHRS navx;
 	
-	
 	//Hardware states
 	private boolean mIsHighGear;
     private boolean mIsBrakeMode;

@@ -1,4 +1,4 @@
-package org.usfirst.frc.team3314.robot.subsystems;
+package org.usfirst.frc.team3314.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 
