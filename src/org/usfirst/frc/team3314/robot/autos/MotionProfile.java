@@ -40,10 +40,7 @@ public class MotionProfile {
      
      double time = 0;
      
-     Robot robot;
-     
-     public MotionProfile(Robot r) {
-    	 robot = r;
+     public MotionProfile() {
     	 currentState = motionProfileStates.START;
      }
      	
@@ -72,7 +69,7 @@ public class MotionProfile {
     					double gyroHeading = drive.getAngle();
     					double desiredHeading = Pathfinder.r2d(left.getHeading());
     					double angleDifference = Pathfinder.boundHalfDegrees(desiredHeading - gyroHeading);
-    					double turn = 0.025 * angleDifference;
+    					double turn = Constants.kMotionProfileGyro_kP  * angleDifference;
     					
     					drive.setDesiredSpeed(l - turn, r + turn);
     					if (left.isFinished() && right.isFinished())  {
