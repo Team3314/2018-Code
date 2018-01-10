@@ -56,7 +56,7 @@ public class MotionProfile {
     		}
     		
 
-     	public void calcNext() {
+    		public void calcNext() {
     			nextState = currentState;
     			switch (currentState) {
     				case START:

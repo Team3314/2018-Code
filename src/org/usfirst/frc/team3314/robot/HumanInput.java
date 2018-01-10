@@ -2,19 +2,19 @@ package org.usfirst.frc.team3314.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 
-public class HumanInterface {
+public class HumanInput {
 	
-	private static HumanInterface mInstance = new HumanInterface();
+	private static HumanInput mInstance = new HumanInput();
 	
 	private final Joystick gamepad;
 	private final Joystick leftStick;
 	private final Joystick rightStick;
 	
-	public static HumanInterface getInstance() {
+	public static HumanInput getInstance() {
 		return mInstance;
 	}
 	
-	private HumanInterface() {
+	private HumanInput() {
 		gamepad = new Joystick(0);
 		leftStick = new Joystick(1);
 		rightStick = new Joystick(2);
@@ -42,6 +42,14 @@ public class HumanInterface {
 	
 	public boolean getFullSpeedForward() {
 		return rightStick.getRawButton(11) && rightStick.getRawButton(10);
+	}
+	
+	public boolean getIntake() {
+		return gamepad.getRawButton(1);
+	}
+	
+	public boolean getOuttake() {
+		return gamepad.getRawButton(2);
 	}
 	
 	

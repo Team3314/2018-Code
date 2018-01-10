@@ -2,15 +2,16 @@ package org.usfirst.frc.team3314.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+//import edu.wpi.first.wpilibj.Joystick;
+//import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
+import org.usfirst.frc.team3314.robot.subsystems.Intake;
 import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 
-import com.ctre.*;
+//import com.ctre.*;
+//import com.ctre.phoenix.motorcontrol.ControlMode;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -24,7 +25,8 @@ import com.ctre.*;
 public class Robot extends IterativeRobot {
 	
 	private Drive drive = Drive.getInstance();
-	private HumanInterface hi = HumanInterface.getInstance();
+	private Intake intake = Intake.getInstance();
+	private HumanInput hi = HumanInput.getInstance();
 
 	Compressor pcm1 = new Compressor();
 	
@@ -97,6 +99,14 @@ public class Robot extends IterativeRobot {
 		
 		if(hi.getFullSpeedForward()) {
 			drive.setDesiredSpeed(1);
+		}
+		
+		if(hi.getIntake()) {
+			intake.setDesiredSpeed(1);
+		}
+		
+		if(hi.getOuttake()) {
+			intake.setDesiredSpeed(-1);
 		}
 		
 		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
