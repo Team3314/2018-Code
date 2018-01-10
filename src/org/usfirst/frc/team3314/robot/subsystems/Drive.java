@@ -16,6 +16,7 @@ import org.usfirst.frc.team3314.robot.DataLogger;
 import org.usfirst.frc.team3314.robot.GyroPIDOutput;
 
 import com.ctre.*;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -37,6 +38,7 @@ public class Drive {
 	
 	//Control mode
 	public driveMode currentDriveMode = driveMode.OPEN_LOOP;
+	ControlMode controlMode = ControlMode.PercentOutput;
 	
 	//Hardware
 	private WPI_TalonSRX mLeftMaster, mLeftSlave1, mLeftSlave2, mRightMaster, mRightSlave1, mRightSlave2;
@@ -57,7 +59,9 @@ public class Drive {
 
     private double rawLeftSpeed, rawRightSpeed, leftStickInput, rightStickInput, desiredLeftSpeed, desiredRightSpeed, desiredAngle;
     
-    private int leftDrivePosition, rightDrivePosition;
+    private int leftDrivePositionTicks, rightDrivePositionTicks, leftDriveSpeedTicks, rightDriveSpeedTicks;
+    
+    private double leftDrivePositionInches, rightDrivePositionInches, leftDriveSpeedRPM, rightDriveSpeedRPM;
     
     public void update() {
     	if(mIsHighGear) {
@@ -67,13 +71,13 @@ public class Drive {
     		shifter.set(Constants.kLowGear);
     	}
     	outputToSmartDashboard();
-    	leftDrivePosition = mLeftMaster.getSelectedSensorPosition(0);
-    	rightDrivePosition =  mRightMaster.getSelectedSensorPosition(0);
+    	updateSpeedAndPosition();
     	logSpeed();
     	switch(currentDriveMode) {
     		case OPEN_LOOP:
     			rawLeftSpeed = leftStickInput;
     			rawRightSpeed = rightStickInput;
+    			controlMode = ControlMode.PercentOutput;
     			break;
     		case GYROLOCK:
     			if (!gyroControl.isEnabled()){
@@ -82,13 +86,14 @@ public class Drive {
     			
     			rawLeftSpeed = desiredLeftSpeed + gyroPIDOutput.turnSpeed;
     			rawRightSpeed = desiredRightSpeed - gyroPIDOutput.turnSpeed;
-    			gyroControl.setSetpoint(desiredAngle);	
+    			gyroControl.setSetpoint(desiredAngle);
+    			controlMode = ControlMode.PercentOutput;
     			break;
     		case MOTION_PROFILE:
     			break;
     	}
-    	mLeftMaster.set(rawLeftSpeed);
-    	mRightMaster.set(rawRightSpeed);
+    	mLeftMaster.set(controlMode, rawLeftSpeed);
+    	mRightMaster.set(controlMode, rawRightSpeed);
     
     }
 
@@ -125,19 +130,22 @@ public class Drive {
     	
     	mLeftSlave1 = new WPI_TalonSRX(1);
     	mLeftSlave1.follow(mLeftMaster);
+    	mLeftSlave1.setInverted(true);
     	
     	mLeftSlave2 = new WPI_TalonSRX(2);
     	mLeftSlave2.follow(mLeftMaster);
+    	mLeftSlave2.setInverted(true);
     	
     	mRightMaster = new WPI_TalonSRX(3);
     	mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    	mRightMaster.setSensorPhase(true);
 
     	
     	mRightSlave1 = new WPI_TalonSRX(4);
-    	mRightSlave1.follow(mLeftMaster);
+    	mRightSlave1.follow(mRightMaster);
     	
     	mRightSlave2 = new WPI_TalonSRX(5);
-    	mRightSlave2.follow(mLeftMaster);
+    	mRightSlave2.follow(mRightMaster);
     	
     	resetSensors();
     	
@@ -157,12 +165,20 @@ public class Drive {
     	return navx.getYaw();
     }
     
-    public int getLeftPosition() {
-    	return leftDrivePosition;
+    public int getLeftPositionTicks() {
+    	return leftDrivePositionTicks;
     }
     
-    public int getRightPosition() {
-    	return rightDrivePosition;
+    public int getRightPositionTicks() {
+    	return rightDrivePositionTicks;
+    }
+    
+    public double getLeftPosition() {
+    	return leftDrivePositionInches;
+    }
+    
+    public double getRightPosition() {
+    	return rightDrivePositionInches;
     }
     
     public void setDesiredSpeed(double speed) {
@@ -171,7 +187,7 @@ public class Drive {
     }
     
     public void setDesiredSpeed(double leftSpeed, double rightSpeed) {
-    	rawLeftSpeed = leftSpeed;
+    	rawLeftSpeed = leftSpeed; //makes sure 
     	rawRightSpeed = rightSpeed;
     }
     
@@ -188,7 +204,7 @@ public class Drive {
     			"Left Master Current", "Left Slave 1 Current","Left Slave 2 Current", "Right Master Current", "Right Slave 1 Current", "Right Slave 2 Current",
     			"Left Master Voltage", "Left Slave 1 Voltage","Left Slave 2 Voltage", "Right Master Voltage", "Right Slave 1 Voltage", "Right Slave 2 Voltage",
     			"Battery Voltage", "High Gear"};
-    	String[] values = {String.valueOf(mLeftMaster.getSelectedSensorVelocity(0)), String.valueOf(mRightMaster.getSelectedSensorVelocity(0)), String.valueOf(leftDrivePosition), String.valueOf(rightDrivePosition),
+    	String[] values = {String.valueOf(mLeftMaster.getSelectedSensorVelocity(0)), String.valueOf(mRightMaster.getSelectedSensorVelocity(0)), String.valueOf(leftDrivePositionInches), String.valueOf(rightDrivePositionInches),
     			String.valueOf(navx.getWorldLinearAccelY()), String.valueOf(navx.getWorldLinearAccelX()), String.valueOf(mLeftMaster.getOutputCurrent()),
     			String.valueOf(mLeftSlave1.getOutputCurrent()), String.valueOf(mLeftSlave2.getOutputCurrent()), String.valueOf(mRightMaster.getOutputCurrent()),
     			String.valueOf(mRightSlave1.getOutputCurrent()), String.valueOf(mRightSlave2.getOutputCurrent()), String.valueOf(mLeftMaster.getMotorOutputVoltage()),
@@ -199,10 +215,12 @@ public class Drive {
     }
     
     private void outputToSmartDashboard() {
-    	SmartDashboard.putNumber("Left Encoder Position", mLeftMaster.getSelectedSensorPosition(0));
-    	SmartDashboard.putNumber("Right Encoder Position", mRightMaster.getSelectedSensorPosition(0));
-    	SmartDashboard.putNumber("Left Encoder Speed", mLeftMaster.getSelectedSensorVelocity(0));
-    	SmartDashboard.putNumber("Right Encoder Speed", mRightMaster.getSelectedSensorVelocity(0));
+    	SmartDashboard.putNumber("Left Encoder Ticks", leftDrivePositionTicks);
+    	SmartDashboard.putNumber("Right Encoder Ticks", rightDrivePositionTicks);
+    	SmartDashboard.putNumber("Left Encoder Position", leftDrivePositionInches);
+    	SmartDashboard.putNumber("Right Encoder Position", rightDrivePositionInches);
+    	SmartDashboard.putNumber("Left Encoder Speed", leftDriveSpeedRPM);
+    	SmartDashboard.putNumber("Right Encoder Speed", rightDriveSpeedRPM);
     	SmartDashboard.putNumber("Left Master Current", mLeftMaster.getOutputCurrent());
     	SmartDashboard.putNumber("Left Slave 1 Current", mLeftSlave1.getOutputCurrent());
     	SmartDashboard.putNumber("Left Slave 2 Current", mLeftSlave2.getOutputCurrent());
@@ -211,6 +229,17 @@ public class Drive {
     	SmartDashboard.putNumber("Right Slave 2 Current", mRightSlave2.getOutputCurrent());
     	SmartDashboard.putString("Drive Mode", String.valueOf(currentDriveMode));
     	
+    }
+    
+    private void updateSpeedAndPosition() {
+    	leftDrivePositionTicks = mLeftMaster.getSelectedSensorPosition(0);
+    	rightDrivePositionTicks =  mRightMaster.getSelectedSensorPosition(0);
+    	leftDrivePositionInches = (double) leftDrivePositionTicks / Constants.kDriveEncoderCodesPerRev  * Constants.kRevToInConvFactor;
+    	rightDrivePositionInches =  (double) rightDrivePositionTicks / Constants.kDriveEncoderCodesPerRev * Constants.kRevToInConvFactor;
+    	leftDriveSpeedTicks = mLeftMaster.getSelectedSensorVelocity(0);
+    	rightDriveSpeedTicks =  mRightMaster.getSelectedSensorVelocity(0);
+    	leftDriveSpeedRPM = leftDriveSpeedTicks * (600.0/ Constants.kDriveEncoderCodesPerRev);
+    	rightDriveSpeedRPM =  rightDriveSpeedTicks * (600.0/ Constants.kDriveEncoderCodesPerRev);
     }
     
     private void resetDriveEncoders() {
