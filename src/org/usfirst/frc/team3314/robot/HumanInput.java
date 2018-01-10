@@ -51,8 +51,4 @@ public class HumanInput {
 	public boolean getOuttake() {
 		return gamepad.getRawButton(2);
 	}
-	
-	
-	
-
 }

@@ -110,7 +110,6 @@ public class Robot extends IterativeRobot {
 		}
 		
 		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
-		
 		lastGyrolock = hi.getGyrolock();
 		
 	}

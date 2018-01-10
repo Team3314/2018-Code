@@ -5,5 +5,4 @@ public interface Autonomous {
 		public void reset();
 	
 		public void update();
-
 }

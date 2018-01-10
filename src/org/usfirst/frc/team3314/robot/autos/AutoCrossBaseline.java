@@ -49,7 +49,6 @@ public class AutoCrossBaseline implements Autonomous {
 		case DONE:
 			break;
 		}
-		
 		SmartDashboard.putString("Auto state", currentState.toString());
 	}
 

@@ -211,7 +211,6 @@ public class Drive {
     	SmartDashboard.putNumber("Right Slave 1 Current", mRightSlave1.getOutputCurrent());
     	SmartDashboard.putNumber("Right Slave 2 Current", mRightSlave2.getOutputCurrent());
     	SmartDashboard.putString("Drive Mode", String.valueOf(currentDriveMode));
-    	
     }
     
     private void resetDriveEncoders() {
