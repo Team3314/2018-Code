@@ -13,7 +13,6 @@ public class Intake {
 	}
 	
 	public void update() {
-		
 	}
 	
 	private Intake() {
@@ -22,6 +21,5 @@ public class Intake {
 	}
 	
 	public void outputToSmartDashboard() {
-		
 	}
 }

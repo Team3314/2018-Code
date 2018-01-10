@@ -18,7 +18,7 @@ enum motionProfileStates {
 	DONE
 }
 
-public class MotionProfile implements Autonomous {
+public class MotionProfile {
 	File myFile = new File("motionprofile.csv");
 	
 	private Drive drive = Drive.getInstance();
@@ -46,21 +46,20 @@ public class MotionProfile implements Autonomous {
     	 robot = r;
     	 currentState = motionProfileStates.START;
      }
-     	@Override
+     	
     	 public void update() {
     			calcNext();
     			doTransition();
     			currentState = nextState;
     			time--;
     		}
-     	@Override
+     	
     		public void reset() {
     			currentState = motionProfileStates.START;
     		}
     		
 
-     	@Override
-    		public void calcNext() {
+     	public void calcNext() {
     			nextState = currentState;
     			switch (currentState) {
     				case START:
@@ -86,7 +85,7 @@ public class MotionProfile implements Autonomous {
     			
     			
     		}
-     	@Override
+     	
     		public void doTransition() {
     			if (currentState == motionProfileStates.START && nextState == motionProfileStates.RUNPROFILE) {	
     				left.configureEncoder(drive.getLeftPosition(), 2048 , Constants.kPulleyDiameter / 12);

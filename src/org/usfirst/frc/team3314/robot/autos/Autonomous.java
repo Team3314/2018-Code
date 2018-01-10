@@ -5,9 +5,5 @@ public interface Autonomous {
 		public void update();
 		
 		public void reset();
-		
-		public void calcNext();
-		
-		public void doTransition();
 
 }
