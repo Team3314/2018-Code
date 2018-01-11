@@ -21,5 +21,9 @@ public class Constants {
 		public static double kWheelbaseWidth = 27.5; // inches
 		
 		public static double kMotionProfileGyro_kP = .025;
+		
+		public static double kRevToInConvFactor = 7.90274223082;
+		
+		public static int kDriveEncoderCodesPerRev = 8192;
 
 }

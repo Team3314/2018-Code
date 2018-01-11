@@ -15,8 +15,8 @@ import org.usfirst.frc.team3314.robot.Constants;
 import org.usfirst.frc.team3314.robot.DataLogger;
 import org.usfirst.frc.team3314.robot.GyroPIDOutput;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.*;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -232,6 +232,7 @@ public class Drive {
     	SmartDashboard.putNumber("Right Slave 1 Current", mRightSlave1.getOutputCurrent());
     	SmartDashboard.putNumber("Right Slave 2 Current", mRightSlave2.getOutputCurrent());
     	SmartDashboard.putString("Drive Mode", String.valueOf(currentDriveMode));
+    	
     }
     
     private void updateSpeedAndPosition() {
