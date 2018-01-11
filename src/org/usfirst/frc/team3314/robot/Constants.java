@@ -23,7 +23,6 @@ public class Constants {
 		public static double kMotionProfileGyro_kP = .025;
 		
 		public static double kRevToInConvFactor = 7.90274223082;
-		
 		public static int kDriveEncoderCodesPerRev = 8192;
 
 }

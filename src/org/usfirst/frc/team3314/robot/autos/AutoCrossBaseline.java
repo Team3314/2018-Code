@@ -6,25 +6,26 @@ import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-enum autoCrossBaselineStates {
-	START,
-	DRIVE,
-	STOP,
-	DONE
-}
-
 public class AutoCrossBaseline implements Autonomous {
+	
+	enum State {
+		START,
+		DRIVE,
+		STOP,
+		DONE
+	}
+	
 	private Drive drive = Drive.getInstance();
-	autoCrossBaselineStates currentState;
+	State currentState;
 	double desiredDistance;
 	
 	public AutoCrossBaseline() {
-		currentState = autoCrossBaselineStates.START;
+		currentState = State.START;
 	}
 	
 	@Override
 	public void reset() {
-		currentState = autoCrossBaselineStates.START;
+		currentState = State.START;
 	}
 	
 	@Override
@@ -32,19 +33,19 @@ public class AutoCrossBaseline implements Autonomous {
 		switch (currentState) {
 		case START:
 			drive.resetSensors();
-			currentState = autoCrossBaselineStates.DRIVE;
+			currentState = State.DRIVE;
 			break;
 		case DRIVE:
 			drive.setDesiredAngle(0);
 			drive.setDriveMode(driveMode.GYROLOCK);
 			drive.setDesiredSpeed(0.25);
 			if (drive.getAveragePosition() > 100) { //placeholder
-				currentState = autoCrossBaselineStates.STOP;
+				currentState = State.STOP;
 			}
 			break;
 		case STOP:
 			drive.setDesiredSpeed(0);
-			currentState = autoCrossBaselineStates.DONE;
+			currentState = State.DONE;
 			break;
 		case DONE:
 			break;
