@@ -24,7 +24,7 @@ import com.ctre.*;
 public class Robot extends IterativeRobot {
 	
 	private Drive drive = Drive.getInstance();
-	private HumanInterface hi = HumanInterface.getInstance();
+	private HumanInput hi = HumanInput.getInstance();
 
 	Compressor pcm1 = new Compressor();
 	
