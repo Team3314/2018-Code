@@ -9,6 +9,7 @@ public class HumanInput {
 	private final Joystick gamepad;
 	private final Joystick leftStick;
 	private final Joystick rightStick;
+	private final Joystick buttonBox;
 	
 	public static HumanInput getInstance() {
 		return mInstance;
@@ -18,6 +19,7 @@ public class HumanInput {
 		gamepad = new Joystick(0);
 		leftStick = new Joystick(1);
 		rightStick = new Joystick(2);
+		buttonBox = new Joystick(3);
 	}
 	
 	public double getLeftThrottle() {
@@ -50,5 +52,42 @@ public class HumanInput {
 	
 	public boolean getOuttake() {
 		return gamepad.getRawButton(2);
+	}
+	public int getBinaryOne() {
+		if(buttonBox.getRawButton(13)) {
+			return 1;
+		}
+		return 0;
+	}
+	
+	public int getBinaryTwo() {
+		if(buttonBox.getRawButton(14)) {
+			return 1;
+		}
+		return 0;
+	}
+	
+	public int getBinaryFour() {
+		if(buttonBox.getRawButton(15)) {
+			return 1;
+		}
+		return 0;
+	}
+	
+	public int getBinaryEight() {
+		if(buttonBox.getRawButton(16)) {
+			return 1;
+		}
+		return 0;
+	}
+	public boolean getRed() {
+		return buttonBox.getRawButton(12);
+	}
+	public boolean getBlue() {
+		boolean result = false;
+		if (!buttonBox.getRawButton(12)) {
+			result = true;
+		}
+		return result;
 	}
 }

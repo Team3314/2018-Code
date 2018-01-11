@@ -10,13 +10,19 @@ public class AutoModeExecuter {
 	}
 	
 	public void start() {
+		autoMode.reset();
 		if(thread == null) {
 			thread = new Thread(() -> {
-						if(autoMode != null) {
-							autoMode.update();
-						}
-				});
-				thread.start();
-			}
+				while(autoMode != null) {
+					autoMode.update();
+				}
+			});
+		thread.start();
 		}
 	}
+	public void stop() {
+		if(autoMode != null) {
+			autoMode = null;
+		}
+	}
+}

@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 //import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import org.usfirst.frc.team3314.robot.autos.AutoModeExecuter;
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
 import org.usfirst.frc.team3314.robot.subsystems.Intake;
 import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
@@ -27,6 +28,7 @@ public class Robot extends IterativeRobot {
 	private Drive drive = Drive.getInstance();
 	private Intake intake = Intake.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
+	private AutoModeExecuter autoExecuter = null;
 
 	Compressor pcm1 = new Compressor();
 	
@@ -54,7 +56,9 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		
+		autoExecuter = new AutoModeExecuter();
+		autoExecuter.setAutoMode(AutoModeSelector.getSelectedAutoMode());
+		autoExecuter.start();
 	}
 
 	/**
