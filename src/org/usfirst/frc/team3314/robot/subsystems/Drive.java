@@ -181,10 +181,6 @@ public class Drive {
     	return rightDrivePositionInches;
     }
     
-    public double getAveragePosition() {
-    	return (rightDrivePositionInches+leftDrivePositionInches)/2;
-    }
-    
     public void setDesiredSpeed(double speed) {
     	desiredLeftSpeed = speed;
     	desiredRightSpeed = speed;
