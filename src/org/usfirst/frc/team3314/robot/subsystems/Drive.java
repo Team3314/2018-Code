@@ -32,7 +32,6 @@ public class Drive {
 	public static Drive getInstance() {
 		return mInstance;
 	}
-
 	
 	//Control mode
 	public driveMode currentDriveMode = driveMode.OPEN_LOOP;
