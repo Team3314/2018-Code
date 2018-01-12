@@ -17,7 +17,7 @@ public class AutoCrossBaseline implements Autonomous {
 	
 	private Drive drive = Drive.getInstance();
 	State currentState;
-	double desiredDistance;
+	double desiredDistance = 100; //placeholder
 	
 	public AutoCrossBaseline() {
 		currentState = State.START;
@@ -39,7 +39,7 @@ public class AutoCrossBaseline implements Autonomous {
 			drive.setDesiredAngle(0);
 			drive.setDriveMode(driveMode.GYROLOCK);
 			drive.setDesiredSpeed(0.25);
-			if (drive.getAveragePosition() > 100) { //placeholder
+			if (drive.getAveragePosition() > desiredDistance) {
 				currentState = State.STOP;
 			}
 			break;

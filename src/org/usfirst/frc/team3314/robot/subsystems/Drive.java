@@ -162,6 +162,10 @@ public class Drive {
     	return navx.getYaw();
     }
     
+    public boolean checkTolerance() {
+    	return gyroControl.onTarget();
+    }
+    
     public int getLeftPositionTicks() {
     	return leftDrivePositionTicks;
     }
