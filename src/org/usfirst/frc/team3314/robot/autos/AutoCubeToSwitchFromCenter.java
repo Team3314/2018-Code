@@ -28,7 +28,7 @@ public class AutoCubeToSwitchFromCenter implements Autonomous {
 	private Drive drive = Drive.getInstance();
 	State currentState;
 	String gameData = DriverStation.getInstance().getGameSpecificMessage();
-	double desiredDistance = 100; //placeholder
+	double desiredDistance = 100, time = 0; //placeholder
 	
 	public AutoCubeToSwitchFromCenter() {
 		currentState = State.START;

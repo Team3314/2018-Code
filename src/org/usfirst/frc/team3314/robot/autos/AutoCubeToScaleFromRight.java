@@ -18,7 +18,7 @@ public class AutoCubeToScaleFromRight implements Autonomous {
 		DRIVE2,		//
 		STOP3,		//
 		TURN2,		//
-		STOP4,		// unnecessary if platform == 'R'
+		STOP4,		// not used/needed if platform == 'R'
 		DRIVE3,		//
 		STOP5,		//
 		TURN3,		//
@@ -30,7 +30,7 @@ public class AutoCubeToScaleFromRight implements Autonomous {
 	private Drive drive = Drive.getInstance();
 	State currentState;
 	String gameData = DriverStation.getInstance().getGameSpecificMessage();
-	double desiredDistance;
+	double desiredDistance, time = 0;
 	
 	public AutoCubeToScaleFromRight() {
 		currentState = State.START;

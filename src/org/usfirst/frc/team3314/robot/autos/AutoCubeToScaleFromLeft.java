@@ -18,7 +18,7 @@ public class AutoCubeToScaleFromLeft implements Autonomous {
 		DRIVE2,		//
 		STOP3,		//
 		TURN2,		//
-		STOP4,		// not needed/used if platform == 'L'
+		STOP4,		// not used/needed if platform == 'L'
 		DRIVE3,		//
 		STOP5,		//
 		TURN3,		//

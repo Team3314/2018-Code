@@ -28,7 +28,7 @@ public class AutoCubeToSwitchFromLeft implements Autonomous {
 	private Drive drive = Drive.getInstance();
 	State currentState;
 	String gameData = DriverStation.getInstance().getGameSpecificMessage();
-	double desiredDistance;
+	double desiredDistance, time = 0;
 	
 	public AutoCubeToSwitchFromLeft() {
 		currentState = State.START;
