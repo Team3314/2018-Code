@@ -28,7 +28,8 @@ public class Robot extends IterativeRobot {
 	private Drive drive = Drive.getInstance();
 	private Intake intake = Intake.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
-	private AutoModeExecuter autoExecuter = null;
+	private AutoModeExecuter autoExecuter = new AutoModeExecuter();
+	private AutoModeSelector selector = new AutoModeSelector();
 
 	Compressor pcm1 = new Compressor();
 	
@@ -55,9 +56,17 @@ public class Robot extends IterativeRobot {
 	 * SendableChooser make sure to add them to the chooser code above as well.
 	 */
 	@Override
+	public void disabledInit() {
+		autoExecuter.stop();
+	}
+	
+	public void disabledPeriodic() {
+		selector.pollFMS();
+	}
+	
+	@Override
 	public void autonomousInit() {
-		autoExecuter = new AutoModeExecuter();
-		autoExecuter.setAutoMode(AutoModeSelector.getSelectedAutoMode());
+		autoExecuter.setAutoMode(selector.getSelectedAutoMode());
 		autoExecuter.start();
 	}
 
@@ -74,6 +83,7 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		drive.logger.createNewFile();
 		drive.resetSensors();
+		autoExecuter.stop();
 	}
 	
 	/**

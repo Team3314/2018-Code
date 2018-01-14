@@ -6,7 +6,7 @@ import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class AutoCrossBaseline implements Autonomous {
+public class AutoCrossBaseline extends Autonomous {
 	
 	enum State {
 		START,
@@ -14,6 +14,10 @@ public class AutoCrossBaseline implements Autonomous {
 		STOP,
 		DONE
 	}
+	
+	//Switch and Scale sides
+	private char switchSide = ' ';
+	private char scaleSide = ' ';
 	
 	private Drive drive = Drive.getInstance();
 	private State currentState;
@@ -32,10 +36,11 @@ public class AutoCrossBaseline implements Autonomous {
 	public void update() {
 		switch (currentState) {
 		case START:
-			drive.resetSensors();
+			resetSensors();
 			currentState = State.DRIVE;
 			break;
 		case DRIVE:
+			
 			drive.setDesiredAngle(0);
 			drive.setDriveMode(driveMode.GYROLOCK);
 			drive.setDesiredSpeed(0.25);
@@ -53,4 +58,10 @@ public class AutoCrossBaseline implements Autonomous {
 		SmartDashboard.putString("Auto state", currentState.toString());
 	}
 
+	@Override
+	public void setGameData(String data) {
+		// TODO Auto-generated method stub
+		switchSide = data.charAt(0);
+		scaleSide = data.charAt(1);
+	}
 }
