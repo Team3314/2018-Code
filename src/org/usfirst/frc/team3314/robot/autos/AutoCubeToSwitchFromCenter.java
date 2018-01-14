@@ -8,9 +8,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoCubeToSwitchFromCenter implements Autonomous {
-
-	//CURRENT PATH = drive forward, sharp turn in direction depending on FMS, continue driving,
-	//				 sharp turn in direction of switch, drive forward more, cube release
 	
 	enum State {
 		START,
@@ -75,12 +72,12 @@ public class AutoCubeToSwitchFromCenter implements Autonomous {
 			break;
 		case STOP2:
 			drive.setDesiredSpeed(0);
-			drive.resetSensors();
+			drive.resetDriveEncoders();
 			desiredDistance = 100; //placeholder
 			currentState = State.DRIVE2;
 			break;
 		case DRIVE2:
-			drive.setDesiredAngle(0);
+			drive.setDesiredAngle(drive.getAngle());
 			drive.setDesiredSpeed(0.25);
 			if (drive.getAveragePosition() > desiredDistance) {
 				currentState = State.STOP3;
@@ -91,24 +88,18 @@ public class AutoCubeToSwitchFromCenter implements Autonomous {
 			currentState = State.TURN2;
 			break;
 		case TURN2:
-			if (gameData.charAt(0) == 'L') {
-				drive.setDesiredAngle(60);
-			} else {
-				drive.setDesiredAngle(-60);
-			}
-			
+			drive.setDesiredAngle(0);
 			if (drive.checkTolerance()) {
 				currentState = State.STOP4;
 			}
 			break;
 		case STOP4:
 			drive.setDesiredSpeed(0);
-			drive.resetSensors();
+			drive.resetDriveEncoders();
 			desiredDistance = 100; //placeholder
 			currentState = State.DRIVE3;
 			break;
 		case DRIVE3:
-			drive.setDesiredAngle(0);
 			drive.setDesiredSpeed(0.25);
 			if (drive.getAveragePosition() > desiredDistance) {
 				currentState = State.STOP5;

@@ -62,7 +62,8 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		
+		drive.update();
+		intake.update();
 	}
 
 	
@@ -77,8 +78,9 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		
 		drive.update();
+		intake.update();
+		
 		if(hi.getGyrolock()) {
 			if(!lastGyrolock) {
 				drive.setDriveMode(driveMode.GYROLOCK);
@@ -112,12 +114,5 @@ public class Robot extends IterativeRobot {
 		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
 		lastGyrolock = hi.getGyrolock();
 		
-	}
-
-	/**
-	 * This function is called periodically during test mode
-	 */
-	@Override
-	public void testPeriodic() {
 	}
 }

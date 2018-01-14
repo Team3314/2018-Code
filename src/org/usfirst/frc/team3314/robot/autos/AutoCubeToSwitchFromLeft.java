@@ -8,19 +8,19 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoCubeToSwitchFromLeft implements Autonomous {
-
+	
 	enum State {
 		START,
 		DRIVE1,
 		STOP1,
-		TURN1,
-		STOP2,
-		DRIVE2,
-		STOP3,
-		TURN2,
-		STOP4,
-		DRIVE3,
-		STOP5,
+		TURN1,		//
+		STOP2,		//
+		DRIVE2,		//
+		STOP3,		//
+		TURN2,		// not used/needed if platform == 'L'
+		STOP4,		//
+		DRIVE3,		//
+		STOP5,		//
 		RELEASE_CUBE,
 		DONE
 	}
@@ -28,7 +28,7 @@ public class AutoCubeToSwitchFromLeft implements Autonomous {
 	private Drive drive = Drive.getInstance();
 	State currentState;
 	String gameData = DriverStation.getInstance().getGameSpecificMessage();
-	double desiredDistance = 100; //placeholder
+	double desiredDistance;
 	
 	public AutoCubeToSwitchFromLeft() {
 		currentState = State.START;
@@ -46,6 +46,13 @@ public class AutoCubeToSwitchFromLeft implements Autonomous {
 		switch (currentState) {
 			case START:
 				drive.resetSensors();
+				
+				if (gameData.charAt(0) == 'L') {
+					desiredDistance = 150;
+				} else {
+					desiredDistance = 75;
+				}
+				
 				currentState = State.DRIVE1;
 				break;
 			case DRIVE1:
@@ -58,30 +65,27 @@ public class AutoCubeToSwitchFromLeft implements Autonomous {
 				break;
 			case STOP1:
 				drive.setDesiredSpeed(0);
-				currentState = State.TURN1;
+				
+				if (gameData.charAt(0) == 'L') {
+					currentState = State.RELEASE_CUBE;
+				} else {
+					currentState = State.TURN1;
+				}
 				break;
 			case TURN1:
-				if (gameData.charAt(0) == 'L') {
-					drive.setDesiredAngle(0); //place holder
-				} else {
-					drive.setDesiredAngle(25); //place holder
-				}
+				drive.setDesiredAngle(25); //place holder
 				if (drive.checkTolerance()) {
 					currentState = State.STOP2;
 				}
 				break;
 			case STOP2:
 				drive.setDesiredSpeed(0);
-				drive.resetSensors();
-					if (gameData.charAt(0) == 'L') {
-						desiredDistance = 80; //placeholder
-					} else {
-						desiredDistance = 100; //place holder
-					}
-					currentState = State.DRIVE2;
+				drive.resetDriveEncoders();
+				desiredDistance = 100; //place holder
+				currentState = State.DRIVE2;
 				break;
 			case DRIVE2:
-				drive.setDesiredAngle(0);
+				drive.setDesiredAngle(drive.getAngle());
 				drive.setDesiredSpeed(.25);
 				if (drive.getAveragePosition() > desiredDistance) {
 					currentState = State.STOP3;
@@ -92,24 +96,18 @@ public class AutoCubeToSwitchFromLeft implements Autonomous {
 				currentState = State.TURN2;
 				break;
 			case TURN2:
-				if (gameData.charAt(0) == 'L') {
-					drive.setDesiredAngle(0);
-				} else {
-					drive.setDesiredAngle(-25);
-				}
-				
+				drive.setDesiredAngle(0);
 				if (drive.checkTolerance()) {
 					currentState = State.STOP4;
 				}
 				break;
 			case STOP4:
 				drive.setDesiredSpeed(0);
-				drive.resetSensors();
-				desiredDistance = 100; //place holder
+				drive.resetDriveEncoders();
+				desiredDistance = 75; //place holder
 				currentState = State.DRIVE3;
 				break;
 			case DRIVE3:
-				drive.setDesiredAngle(0);
 				drive.setDesiredSpeed(.25);
 				if (drive.getAveragePosition() > desiredDistance) {
 					currentState = State.STOP5;

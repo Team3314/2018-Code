@@ -35,8 +35,8 @@ public class Intake {
 	public void outputToSmartDashboard() {
 		SmartDashboard.putNumber("Intake Roller 1 Voltage", mRollerLeft.getMotorOutputVoltage());
 		SmartDashboard.putNumber("Intake Roller 2 Voltage", mRollerRight.getMotorOutputVoltage());
-		SmartDashboard.putNumber("Intake Roller 1 Output Percent", mRollerLeft.getMotorOutputPercent());
-		SmartDashboard.putNumber("Intake Roller 2 Output Percent", mRollerRight.getMotorOutputPercent());
+		//SmartDashboard.putNumber("Intake Roller 1 Output Percent", mRollerLeft.getMotorOutputPercent());
+		//SmartDashboard.putNumber("Intake Roller 2 Output Percent", mRollerRight.getMotorOutputPercent());
 		SmartDashboard.putNumber("Intake Roller 1 Current", mRollerLeft.getOutputCurrent());
 		SmartDashboard.putNumber("Intake Roller 2 Current", mRollerRight.getOutputCurrent());
 	}

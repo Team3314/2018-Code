@@ -247,7 +247,7 @@ public class Drive {
     	rightDriveSpeedRPM =  rightDriveSpeedTicks * (600.0/ Constants.kDriveEncoderCodesPerRev);
     }
     
-    private void resetDriveEncoders() {
+    public void resetDriveEncoders() {
 		mLeftMaster.setSelectedSensorPosition(0, 0, 0);
 		mRightMaster.setSelectedSensorPosition(0, 0, 0);
 	}
