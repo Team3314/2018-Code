@@ -53,20 +53,41 @@ public class HumanInput {
 	public boolean getOuttake() {
 		return gamepad.getRawButton(2);
 	}
-	
-	public boolean getBinaryOne() {
-		return buttonBox.getRawButton(13);
+	public int getBinaryOne() {
+		if(buttonBox.getRawButton(13)) {
+			return 1;
+		}
+		return 0;
 	}
 	
-	public boolean getBinaryTwo() {
-		return buttonBox.getRawButton(14);
+	public int getBinaryTwo() {
+		if(buttonBox.getRawButton(14)) {
+			return 1;
+		}
+		return 0;
 	}
 	
-	public boolean getBinaryFour() {
-		return buttonBox.getRawButton(15);
+	public int getBinaryFour() {
+		if(buttonBox.getRawButton(15)) {
+			return 1;
+		}
+		return 0;
 	}
 	
-	public boolean getBinaryEight() {
-		return buttonBox.getRawButton(16);
+	public int getBinaryEight() {
+		if(buttonBox.getRawButton(16)) {
+			return 1;
+		}
+		return 0;
+	}
+	public boolean getRed() {
+		return buttonBox.getRawButton(12);
+	}
+	public boolean getBlue() {
+		boolean result = false;
+		if (!buttonBox.getRawButton(12)) {
+			result = true;
+		}
+		return result;
 	}
 }

@@ -1,17 +1,11 @@
 package org.usfirst.frc.team3314.robot.autos;
-import java.io.File;
-
-import org.usfirst.frc.team3314.robot.Constants;
+import org.usfirst.frc.team3314.robot.paths.PathFollower;
+import org.usfirst.frc.team3314.robot.paths.PathOne;
+import org.usfirst.frc.team3314.robot.paths.PathTwo;
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import jaci.pathfinder.Pathfinder;
-import jaci.pathfinder.Trajectory;
-import jaci.pathfinder.Waypoint;
-import jaci.pathfinder.followers.EncoderFollower;
-import jaci.pathfinder.modifiers.TankModifier;
 
-public class MotionProfile implements Autonomous {
+public class MotionProfile extends Autonomous {
 	
 	enum State {
 		START,
@@ -19,22 +13,20 @@ public class MotionProfile implements Autonomous {
 		DONE
 	}
 	
-	File myFile = new File("motionprofile.csv");
+
+
+
+	private char switchSide = ' ';
+	private char scaleSide = ' ';
 	
-	private Drive drive = Drive.getInstance();
-
-     Trajectory trajectory = Pathfinder.readFromCSV(myFile);
      // Wheelbase Width = 27.5 in
-     TankModifier modifier = new TankModifier(trajectory).modify(27.5/12); // <- inside to inside of tracks ##  0.7493);
-     
-
+	
      // Do something with the new Trajectories...
-     Trajectory leftTrajectory = modifier.getLeftTrajectory();
-     Trajectory rightTrajectory = modifier.getRightTrajectory();
-     
-     EncoderFollower left = new EncoderFollower(modifier.getLeftTrajectory());
-     EncoderFollower right = new EncoderFollower(modifier.getRightTrajectory());
-     
+
+	 PathOne pathOne = new PathOne();
+	 PathTwo pathTwo = new PathTwo();
+     PathFollower pathFollower = new PathFollower();
+	
      State currentState;
      
      double time = 0;
@@ -47,21 +39,14 @@ public class MotionProfile implements Autonomous {
      		switch (currentState) {
 			case START:
 				currentState = State.RUNPROFILE;
-				left.configureEncoder(drive.getLeftPositionTicks(), Constants.kDriveEncoderCodesPerRev , Constants.kPulleyDiameter / 12);
-				right.configureEncoder(drive.getRightPositionTicks(), Constants.kDriveEncoderCodesPerRev , Constants.kPulleyDiameter / 12);
-				left.configurePIDVA(1.0, 0.0, 0.0, 1 / Constants.kMaxVelocity, 0);
 				break;
 				
 			case RUNPROFILE:
-				double l = left.calculate(drive.getLeftPositionTicks());
-				double r = right.calculate(drive.getRightPositionTicks());
-				double gyroHeading = drive.getAngle();
-				double desiredHeading = Pathfinder.r2d(left.getHeading());
-				double angleDifference = Pathfinder.boundHalfDegrees(desiredHeading - gyroHeading);
-				double turn = Constants.kMotionProfileGyro_kP  * angleDifference;
-				
-				drive.setDesiredSpeed(l - turn, r + turn);
-				if (left.isFinished() && right.isFinished())  {
+				if(switchSide == 'L')
+					pathFollower.followPath(pathOne);
+				else if(switchSide == 'R') 
+					pathFollower.followPath(pathTwo);
+				if (pathFollower.isDone())  {
 					currentState = State.DONE;
 				}
 				break;
@@ -69,10 +54,17 @@ public class MotionProfile implements Autonomous {
 				break;
  		}
     		time--;
+    		SmartDashboard.putString("Auto state", currentState.toString());
     }
      	
      	@Override
     		public void reset() {
     			currentState = State.START;
     		}
+		@Override
+		public void setGameData(String data) {
+			// TODO Auto-generated method stub
+			switchSide = data.charAt(0);
+			scaleSide = data.charAt(1);
+		}
 }
