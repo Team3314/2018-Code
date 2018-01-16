@@ -5,12 +5,16 @@ import org.usfirst.frc.team3314.robot.subsystems.Drive;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class AutoSwitchThenScaleFromLeft implements Autonomous {
+public class AutoSwitchThenScaleFromLeft extends Autonomous {
 
 	enum State {
 		START,
 		DONE
 	}
+	
+	//Switch and Scale sides
+		private char switchSide = ' ';
+		private char scaleSide = ' ';
 	
 	private Drive drive = Drive.getInstance();
 	String gameData = DriverStation.getInstance().getGameSpecificMessage();
@@ -38,6 +42,12 @@ public class AutoSwitchThenScaleFromLeft implements Autonomous {
 		}
 		
 		SmartDashboard.putString("Auto state", currentState.toString());
+	}
+	
+	public void setGameData(String data) {
+		// TODO Auto-generated method stub
+		switchSide = data.charAt(0);
+		scaleSide = data.charAt(1);
 	}
 
 }

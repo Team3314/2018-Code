@@ -5,7 +5,7 @@ import org.usfirst.frc.team3314.robot.subsystems.Drive;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class AutoSwitchThenScaleFromRight implements Autonomous {
+public class AutoSwitchThenScaleFromRight extends Autonomous {
 
 	enum State {
 		START,             
@@ -38,6 +38,10 @@ public class AutoSwitchThenScaleFromRight implements Autonomous {
 		DONE				
 	}
 	
+	//Switch and Scale sides
+		private char switchSide = ' ';
+		private char scaleSide = ' ';
+	
 	private Drive drive = Drive.getInstance();
 	String gameData = DriverStation.getInstance().getGameSpecificMessage();
 	State currentState;
@@ -66,4 +70,10 @@ public class AutoSwitchThenScaleFromRight implements Autonomous {
 		SmartDashboard.putString("Auto state", currentState.toString());
 	}
 
+	public void setGameData(String data) {
+		// TODO Auto-generated method stub
+		switchSide = data.charAt(0);
+		scaleSide = data.charAt(1);
+	}
+	
 }

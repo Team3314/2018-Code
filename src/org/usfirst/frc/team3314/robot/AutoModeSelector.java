@@ -13,9 +13,9 @@ public class AutoModeSelector {
 	private  Autonomous autoMode;
 	private String gameData;
 	private Autonomous auto0 = new AutoNothing(), 
-			auto1 = new AutoCrossBaseline();
-			//auto2 = new MotionProfile();
-	private  Autonomous[] autos = {auto0, auto1,/* auto2*/};
+			auto1 = new AutoCrossBaseline(),
+			auto2 = new MotionProfile();
+	private  Autonomous[] autos = {auto0, auto1, auto2};
 	
 	public Autonomous getSelectedAutoMode() {
 		autoModeBinary = "" + hi.getBinaryEight() + hi.getBinaryFour() + hi.getBinaryTwo() + hi.getBinaryOne();

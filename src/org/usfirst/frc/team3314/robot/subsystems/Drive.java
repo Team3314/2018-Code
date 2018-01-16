@@ -19,7 +19,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-public class Drive {
+public class Drive implements Subsystem {
 	
 	public enum driveMode {
 		OPEN_LOOP,
@@ -219,7 +219,7 @@ public class Drive {
 
     }
     
-    private void outputToSmartDashboard() {
+    public void outputToSmartDashboard() {
     	SmartDashboard.putNumber("Left Encoder Ticks", leftDrivePositionTicks);
     	SmartDashboard.putNumber("Right Encoder Ticks", rightDrivePositionTicks);
     	SmartDashboard.putNumber("Left Encoder Position", leftDrivePositionInches);

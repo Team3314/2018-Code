@@ -7,7 +7,7 @@ import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class AutoCubeToScaleFromRight implements Autonomous {
+public class AutoCubeToScaleFromRight extends Autonomous {
 
 	enum State {
 		START,
@@ -26,6 +26,10 @@ public class AutoCubeToScaleFromRight implements Autonomous {
 		RELEASE_CUBE,
 		DONE
 	}
+	
+	//Switch and Scale sides
+		private char switchSide = ' ';
+		private char scaleSide = ' ';
 	
 	private Drive drive = Drive.getInstance();
 	State currentState;
@@ -47,9 +51,9 @@ public class AutoCubeToScaleFromRight implements Autonomous {
 		// TODO Auto-generated method stub
 		switch (currentState) {
 		case START:
-			drive.resetSensors();
+			resetSensors();
 			
-			if (gameData.charAt(1) == 'L') {
+			if (scaleSide == 'L') {
 				desiredDistance = 150; //placeholder
 			} else {
 				desiredDistance = 300; //placeholder
@@ -77,7 +81,7 @@ public class AutoCubeToScaleFromRight implements Autonomous {
 			break;
 		case STOP2:
 			drive.setDesiredSpeed(0);
-			if (gameData.charAt(1) == 'L') {
+			if (scaleSide == 'L') {
 				drive.resetDriveEncoders();
 				desiredDistance = 100; //placeholder
 				currentState = State.DRIVE2;
@@ -136,6 +140,12 @@ public class AutoCubeToScaleFromRight implements Autonomous {
 		}
 		
 		SmartDashboard.putString("Auto state", currentState.toString());
+	}
+	
+	public void setGameData(String data) {
+		// TODO Auto-generated method stub
+		switchSide = data.charAt(0);
+		scaleSide = data.charAt(1);
 	}
 
 }
