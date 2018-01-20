@@ -1,11 +1,8 @@
 package org.usfirst.frc.team3314.robot.paths;
 
 import org.usfirst.frc.team3314.robot.Constants;
-
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.followers.EncoderFollower;
-
-import org.usfirst.frc.team3314.robot.Constants;
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
 
 public class PathFollower {

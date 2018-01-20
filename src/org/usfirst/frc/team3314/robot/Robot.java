@@ -2,13 +2,10 @@ package org.usfirst.frc.team3314.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
-//import edu.wpi.first.wpilibj.Joystick;
-//import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3314.robot.autos.AutoModeExecuter;
-import org.usfirst.frc.team3314.robot.subsystems.Drive;
-import org.usfirst.frc.team3314.robot.subsystems.Intake;
+import org.usfirst.frc.team3314.robot.subsystems.*;
 import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 
 //import com.ctre.*;
@@ -27,7 +24,10 @@ public class Robot extends IterativeRobot {
 	
 	private Drive drive = Drive.getInstance();
 	private Intake intake = Intake.getInstance();
+	private Camera camera = Camera.getInstance();
+	private Tracking tracking = Tracking.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
+	
 	private AutoModeExecuter autoExecuter = new AutoModeExecuter();
 	private AutoModeSelector selector = new AutoModeSelector();
 
@@ -77,6 +77,8 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		drive.update();
 		intake.update();
+		camera.update();
+		tracking.update();
 	}
 
 	
@@ -94,6 +96,8 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		drive.update();
 		intake.update();
+		camera.update();
+		tracking.update();
 		
 		if(hi.getGyrolock()) {
 			if(!lastGyrolock) {
@@ -104,6 +108,10 @@ public class Robot extends IterativeRobot {
 		}
 		else {
 			drive.setDriveMode(driveMode.OPEN_LOOP);
+		}
+		
+		if (hi.getVisionCtrl()) {
+			camera.trackingRequest = true;
 		}
 		
 		if(hi.getHighGear()) {

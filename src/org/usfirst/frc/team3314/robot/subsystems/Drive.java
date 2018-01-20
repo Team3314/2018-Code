@@ -24,6 +24,7 @@ public class Drive implements Subsystem {
 	public enum driveMode {
 		OPEN_LOOP,
 		GYROLOCK,
+		VISION_CONTROL,
 		MOTION_PROFILE
 	}
 	
@@ -49,7 +50,9 @@ public class Drive implements Subsystem {
     
     //Data Logging
     public DataLogger logger;
-
+    
+    public Camera camera;
+    
     //PID
 	private GyroPIDOutput gyroPIDOutput;
 	private PIDController gyroControl;
@@ -86,6 +89,11 @@ public class Drive implements Subsystem {
     			gyroControl.setSetpoint(desiredAngle);
     			controlMode = ControlMode.PercentOutput;
     			break;
+    		case VISION_CONTROL:
+    			rawLeftSpeed = leftStickInput + camera.steeringAdjust;
+    			rawRightSpeed = leftStickInput - camera.steeringAdjust;
+    			controlMode = ControlMode.PercentOutput;
+    			break;
     		case MOTION_PROFILE:
     			break;
     	}
@@ -99,6 +107,8 @@ public class Drive implements Subsystem {
     private Drive() {
     	// Logger
     	 logger = DataLogger.getInstance();
+    	 
+    	 camera = Camera.getInstance();
     	
 		//Hardware
     	pdp  = new PowerDistributionPanel();

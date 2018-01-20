@@ -42,6 +42,10 @@ public class HumanInput {
 		return rightStick.getRawButton(1);
 	}
 	
+	public boolean getVisionCtrl() {
+		return leftStick.getRawButton(1);
+	}
+	
 	public boolean getFullSpeedForward() {
 		return rightStick.getRawButton(11) && rightStick.getRawButton(10);
 	}

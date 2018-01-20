@@ -9,7 +9,7 @@ public class Intake implements Subsystem {
 
 	private static Intake mInstance = new Intake();
 	
-	private WPI_TalonSRX mRollerLeft, mRollerRight; //sparks maybe
+	private WPI_TalonSRX mRollerLeft, mRollerRight;
 	private double leftSpeed, rightSpeed;
 	
 	public static Intake getInstance() {
