@@ -13,14 +13,14 @@ public class AutoModeSelector {
 	private  Autonomous autoMode;
 	private String gameData;
 	private Autonomous auto0 = new AutoNothing(), 
-			auto1 = new AutoCrossBaseline();
-			//auto2 = new MotionProfile();
-	private  Autonomous[] autos = {auto0, auto1,/* auto2*/};
+			auto1 = new AutoCrossBaseline(),
+			auto2 = new MotionProfile();
+	private  Autonomous[] autos = {auto0, auto1, auto2};
 	
 	public Autonomous getSelectedAutoMode() {
 		autoModeBinary = "" + hi.getBinaryEight() + hi.getBinaryFour() + hi.getBinaryTwo() + hi.getBinaryOne();
 		autoModeDecimal = Integer.parseInt(autoModeBinary, 2);
-		autoMode = autos[0];//autoModeDecimal];
+		autoMode = autos[2];//autoModeDecimal];
 		pollFMS();
 		autoMode.setGameData(gameData);
 		autoMode.reset();
@@ -28,8 +28,6 @@ public class AutoModeSelector {
 	}
 	
 	public void pollFMS() {
-		if(fms.isFMSAttached()) {
 			gameData = fms.getGameSpecificMessage();
-		}
 	}
 }

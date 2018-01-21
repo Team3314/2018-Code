@@ -4,26 +4,27 @@ package org.usfirst.frc.team3314.robot.subsystems;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3314.robot.Constants;
 import org.usfirst.frc.team3314.robot.DataLogger;
 import org.usfirst.frc.team3314.robot.GyroPIDOutput;
 
-import com.ctre.*;
+import com.cruzsbrian.robolog.Log;
+import com.ctre.phoenix.motion.MotionProfileStatus;
+import com.ctre.phoenix.motion.SetValueMotionProfile;
+import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class Drive {
 	
 	public enum driveMode {
+		IDLE,
 		OPEN_LOOP,
 		GYROLOCK,
 		MOTION_PROFILE
@@ -59,7 +60,7 @@ public class Drive {
 
     private double rawLeftSpeed, rawRightSpeed, leftStickInput, rightStickInput, desiredLeftSpeed, desiredRightSpeed, desiredAngle;
     
-    private int leftDrivePositionTicks, rightDrivePositionTicks, leftDriveSpeedTicks, rightDriveSpeedTicks;
+    private int leftDrivePositionTicks, rightDrivePositionTicks, leftDriveSpeedTicks, rightDriveSpeedTicks, motionProfileMode = 0;
     
     private double leftDrivePositionInches, rightDrivePositionInches, leftDriveSpeedRPM, rightDriveSpeedRPM;
     
@@ -74,6 +75,11 @@ public class Drive {
     	updateSpeedAndPosition();
     	logSpeed();
     	switch(currentDriveMode) {
+    		case IDLE:
+    			controlMode = ControlMode.Disabled;
+    			rawLeftSpeed = 0;
+    			rawRightSpeed = 0;
+    			break;
     		case OPEN_LOOP:
     			rawLeftSpeed = leftStickInput;
     			rawRightSpeed = rightStickInput;
@@ -90,10 +96,14 @@ public class Drive {
     			controlMode = ControlMode.PercentOutput;
     			break;
     		case MOTION_PROFILE:
+    			log();
+    			controlMode = ControlMode.MotionProfile;
+    			rawLeftSpeed = motionProfileMode;
+    			rawRightSpeed = motionProfileMode;
     			break;
     	}
-    	mLeftMaster.set(controlMode, rawLeftSpeed);
-    	mRightMaster.set(controlMode, rawRightSpeed);
+	    	mLeftMaster.set(controlMode, rawLeftSpeed);
+	    	mRightMaster.set(controlMode, rawRightSpeed);
     
     }
 
@@ -123,10 +133,23 @@ public class Drive {
 		
 		//Talons
     	mLeftMaster = new WPI_TalonSRX(0);
-    	//mLeftMaster.enable
     	mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
     	mLeftMaster.setInverted(true);
     	mLeftMaster.setSensorPhase(true);
+    	mLeftMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
+    	mLeftMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
+    	mLeftMaster.selectProfileSlot(0, 0);
+    	//Gyrolock gains
+    	mLeftMaster.config_kP(0, Constants.kMotionProfile_kP, 0); //slot, value, timeout
+    	mLeftMaster.config_kI(0, Constants.kMotionProfile_kI, 0);
+    	mLeftMaster.config_kD(0, Constants.kMotionProfile_kD, 0);
+    	mLeftMaster.config_kF(0, Constants.kMotionProfile_kF, 0);
+    	
+    	//Gyrolock gains
+    	mLeftMaster.config_kP(0, Constants.kGyroLock_kP, 0); //slot, value, timeout
+    	mLeftMaster.config_kI(0, Constants.kGyroLock_kI, 0);
+    	mLeftMaster.config_kD(0, Constants.kGyroLock_kD, 0);
+    	mLeftMaster.config_kF(0, Constants.kGyroLock_kF, 0);
     	
     	mLeftSlave1 = new WPI_TalonSRX(1);
     	mLeftSlave1.follow(mLeftMaster);
@@ -139,13 +162,28 @@ public class Drive {
     	mRightMaster = new WPI_TalonSRX(3);
     	mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
     	mRightMaster.setSensorPhase(true);
-
+    	mRightMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
+    	mRightMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
+    	//Motion Profile Gains
+    	mRightMaster.selectProfileSlot(0, 0);
+    	mRightMaster.config_kP(0, Constants.kMotionProfile_kP, 0); //slot, value, timeout
+    	mRightMaster.config_kI(0, Constants.kMotionProfile_kI, 0);
+    	mRightMaster.config_kD(0, Constants.kMotionProfile_kD, 0);
+    	mRightMaster.config_kF(0, Constants.kMotionProfile_kF, 0);
+    	
+    	//Gyrolock gains
+    	mRightMaster.config_kP(0, Constants.kGyroLock_kP, 0); //slot, value, timeout
+    	mRightMaster.config_kI(0, Constants.kGyroLock_kI, 0);
+    	mRightMaster.config_kD(0, Constants.kGyroLock_kD, 0);
+    	mRightMaster.config_kF(0, Constants.kGyroLock_kF, 0);
+    	
     	
     	mRightSlave1 = new WPI_TalonSRX(4);
     	mRightSlave1.follow(mRightMaster);
     	
     	mRightSlave2 = new WPI_TalonSRX(5);
     	mRightSlave2.follow(mRightMaster);
+    	
     	
     	resetSensors();
     	
@@ -196,6 +234,10 @@ public class Drive {
     }
     
     public void setDriveMode(driveMode mode) {
+    	if(mode == driveMode.GYROLOCK) {
+			setDesiredAngle(getAngle());
+			mLeftMaster.selectProfileSlot(1, 0);
+    	}
     	currentDriveMode = mode;
     }
     
@@ -204,11 +246,14 @@ public class Drive {
     }
     
     private void logSpeed() {
-    	String[] names = {"Left Encoder Speed", "Right Encoder Speed", "Left Encoder Position", "Right Encoder Position", "NavX Y Acceleration", "NavX X Acceleration",
+    	String[] names = {"Left Encoder Speed", "Right Encoder Speed", "Left Encoder Position", "Right Encoder Position", "Left Encoder Position Ticks","Right Encoder Position Ticks",
+    			"Left Encoder Position Setpoint",  "Right Encoder Velocity Setpoint","Left Encoder Velocity Setpoint", "Right Encoder Velocity Setpoint", "NavX Y Acceleration", "NavX X Acceleration",
     			"Left Master Current", "Left Slave 1 Current","Left Slave 2 Current", "Right Master Current", "Right Slave 1 Current", "Right Slave 2 Current",
     			"Left Master Voltage", "Left Slave 1 Voltage","Left Slave 2 Voltage", "Right Master Voltage", "Right Slave 1 Voltage", "Right Slave 2 Voltage",
     			"Battery Voltage", "High Gear"};
-    	String[] values = {String.valueOf(mLeftMaster.getSelectedSensorVelocity(0)), String.valueOf(mRightMaster.getSelectedSensorVelocity(0)), String.valueOf(leftDrivePositionInches), String.valueOf(rightDrivePositionInches),
+    	String[] values = {String.valueOf(mLeftMaster.getSelectedSensorVelocity(0)), String.valueOf(mRightMaster.getSelectedSensorVelocity(0)), 
+    			String.valueOf(leftDrivePositionInches), String.valueOf(rightDrivePositionInches), String.valueOf(leftDrivePositionTicks), String.valueOf(rightDrivePositionTicks),
+    			String.valueOf(mLeftMaster.getActiveTrajectoryPosition()), String.valueOf(mRightMaster.getActiveTrajectoryPosition()), String.valueOf(mLeftMaster.getActiveTrajectoryVelocity()),String.valueOf(mRightMaster.getActiveTrajectoryVelocity()),
     			String.valueOf(navx.getWorldLinearAccelY()), String.valueOf(navx.getWorldLinearAccelX()), String.valueOf(mLeftMaster.getOutputCurrent()),
     			String.valueOf(mLeftSlave1.getOutputCurrent()), String.valueOf(mLeftSlave2.getOutputCurrent()), String.valueOf(mRightMaster.getOutputCurrent()),
     			String.valueOf(mRightSlave1.getOutputCurrent()), String.valueOf(mRightSlave2.getOutputCurrent()), String.valueOf(mLeftMaster.getMotorOutputVoltage()),
@@ -235,6 +280,25 @@ public class Drive {
     	
     }
     
+    public void log() {
+    	Log.log("Left Position Setpoint", mLeftMaster.getActiveTrajectoryPosition());
+		Log.log("Right Poistion Setpoint", mRightMaster.getActiveTrajectoryPosition());
+		Log.log("Left Velocity Setpoint", mLeftMaster.getActiveTrajectoryVelocity());
+		Log.log("Right Velocity Setpoint", mRightMaster.getActiveTrajectoryVelocity());
+		Log.log("Left Position", leftDrivePositionTicks);
+		Log.log("Right Position", rightDrivePositionTicks);
+		Log.log("Left Velocity", leftDriveSpeedTicks);
+		Log.log("Right Velocity", rightDriveSpeedTicks);
+		Log.add("Left Position Setpoint", (double)mLeftMaster.getActiveTrajectoryPosition());
+		Log.add("Right Position Setpoint",(double) mRightMaster.getActiveTrajectoryPosition());
+		Log.add("Left Velocity Setpoint",(double) mLeftMaster.getActiveTrajectoryVelocity());
+		Log.add("Right Velocity Setpoint", (double)mRightMaster.getActiveTrajectoryVelocity());
+		Log.add("Left Position", (double)leftDrivePositionTicks);
+		Log.add("Right Position", (double)rightDrivePositionTicks);
+		Log.add("Left Velocity",(double) leftDriveSpeedTicks);
+		Log.add("Right Velocity",(double) rightDriveSpeedTicks);
+    }
+    
     private void updateSpeedAndPosition() {
     	leftDrivePositionTicks = mLeftMaster.getSelectedSensorPosition(0);
     	rightDrivePositionTicks =  mRightMaster.getSelectedSensorPosition(0);
@@ -245,15 +309,50 @@ public class Drive {
     	leftDriveSpeedRPM = leftDriveSpeedTicks * (600.0/ Constants.kDriveEncoderCodesPerRev);
     	rightDriveSpeedRPM =  rightDriveSpeedTicks * (600.0/ Constants.kDriveEncoderCodesPerRev);
     }
-    
+  
     private void resetDriveEncoders() {
+		mLeftMaster.set(ControlMode.Position, 0);
+		mRightMaster.set(ControlMode.Position, 0);
+		mLeftMaster.set(ControlMode.Velocity, 0);
+		mRightMaster.set(ControlMode.Velocity, 0);
+		mLeftMaster.set(ControlMode.MotionProfile,0);
+		mRightMaster.set(ControlMode.MotionProfile, 0);
 		mLeftMaster.setSelectedSensorPosition(0, 0, 0);
 		mRightMaster.setSelectedSensorPosition(0, 0, 0);
 	}
-    
     public void resetSensors() {
     	navx.reset();
     	resetDriveEncoders();
     }
-	
+    
+    public void pushPoints(TrajectoryPoint leftPoint, TrajectoryPoint rightPoint) {
+    	mLeftMaster.pushMotionProfileTrajectory(leftPoint);
+    	mRightMaster.pushMotionProfileTrajectory(rightPoint);
+    }
+    
+    public void flushTalonBuffer() {
+    	mLeftMaster.clearMotionProfileTrajectories();
+    	mRightMaster.clearMotionProfileTrajectories();
+    }
+    
+    public void processMotionProfilePoints() {
+    	mLeftMaster.processMotionProfileBuffer();
+    	mRightMaster.processMotionProfileBuffer();
+    }
+    
+    public int checkLeftBuffer() {
+    	return mLeftMaster.getMotionProfileTopLevelBufferCount();
+    }
+    
+    public void getRightStatus(MotionProfileStatus status) {
+   	 mRightMaster.getMotionProfileStatus(status);
+   }
+    
+    public void getLeftStatus(MotionProfileStatus status) {
+    	 mLeftMaster.getMotionProfileStatus(status);
+    }
+    
+    public void setMotionProfileStatus(int status) { //0,1,2
+    	motionProfileMode = status;
+    }
 }

@@ -4,10 +4,21 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public class Constants {
 	
+	public static int kDriveEncoderCodesPerRev = 8192;
+	
+	
+	public static double kRevToInConvFactor = 7.90274223082;
+	
+	//PID Values for Motion Profile 
+		public static double kMotionProfile_kP = .05;
+		public static double kMotionProfile_kI = 0;
+		public static double kMotionProfile_kD = 0;
+		public static double kMotionProfile_kF = .1204;
+	
 	//PID values for gyro
 		public static double kGyroLock_kP = .04;
-		public static double kGyroLock_kI = .002;
-		public static double kGyroLock_kD = .1;
+		public static double kGyroLock_kI = 0;//.002;
+		public static double kGyroLock_kD = 0;//0.1;
 		public static double kGyroLock_kF = 0;
 		
 		public static double kMotionProfileGyro_kP = .025;
@@ -21,9 +32,10 @@ public class Constants {
 		public static double kMaxVelocity = 15.0; //fps
 		public static double kWheelbaseWidth = 27.5 / 12; // inches to feet
 		
-		
-		public static double kRevToInConvFactor = 7.90274223082;
-		
-		public static int kDriveEncoderCodesPerRev = 8192;
+		//Drive Motion Profile
+		public static int kDriveMotionControlFramePeriod = 2;// 2ms
+		public static int kDriveMotionControlTrajectoryPeriod = 5; //5ms;
+		public static double kFeetToEncoderCodes = (12 *kDriveEncoderCodesPerRev) / kRevToInConvFactor;
+	
 
 }

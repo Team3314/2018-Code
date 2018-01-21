@@ -10,18 +10,20 @@ import jaci.pathfinder.followers.EncoderFollower;
 import jaci.pathfinder.modifiers.TankModifier;
 
 public class PathTwo implements Path{
-	private File motionProfileTwo = new File("motionProfileTwo.csv");
-    Trajectory trajectoryOne = Pathfinder.readFromCSV(motionProfileTwo);
-     TankModifier modifier = new TankModifier(trajectoryOne).modify(Constants.kWheelbaseWidth); // <- inside to inside of tracks ##  0.7493);
-     Trajectory leftTrajectory = modifier.getLeftTrajectory();
-     Trajectory rightTrajectory = modifier.getRightTrajectory();
-     EncoderFollower left = new EncoderFollower(leftTrajectory);
-     EncoderFollower right = new EncoderFollower(rightTrajectory);
-     
-     public EncoderFollower getLeftEncoderFollower() {
-     	return left;
+
+	private File leftPath = new File("/home/lvuser/paths/Turn_left_detailed.csv");
+	private File rightPath = new File("/home/lvuser/paths/Turn_right_detailed.csv");
+	
+	@Override
+	public File getLeftPath() {
+		// TODO Auto-generated method stub
+		return leftPath;
 	}
-     public EncoderFollower getRightEncoderFollower() {
-      	return right;
- 	}
+
+	@Override
+	public File getRightPath() {
+		// TODO Auto-generated method stub
+		return rightPath;
+	}
+
 }

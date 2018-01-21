@@ -7,9 +7,13 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3314.robot.autos.AutoModeExecuter;
+import org.usfirst.frc.team3314.robot.autos.Autonomous;
+import org.usfirst.frc.team3314.robot.motion.PathFollower;
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
 import org.usfirst.frc.team3314.robot.subsystems.Intake;
 import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
+
+import com.cruzsbrian.robolog.Log;
 
 //import com.ctre.*;
 //import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -28,10 +32,13 @@ public class Robot extends IterativeRobot {
 	private Drive drive = Drive.getInstance();
 	private Intake intake = Intake.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
-	private AutoModeExecuter autoExecuter = new AutoModeExecuter();
+	//private AutoModeExecuter autoExecuter = new AutoModeExecuter();
 	private AutoModeSelector selector = new AutoModeSelector();
+	private PathFollower pathFollower = new PathFollower();
 
 	Compressor pcm1 = new Compressor();
+	
+	Autonomous selectedAutoMode = null;
 	
 	private boolean lastGyrolock = false;
 
@@ -41,7 +48,13 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void robotInit() {	
+		Log.startServer(1099);
 		drive.resetSensors();
+	}
+	
+	@Override
+	public void robotPeriodic() {
+		//drive.update();
 	}
 
 	/**
@@ -57,17 +70,23 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void disabledInit() {
-		autoExecuter.stop();
+		pathFollower.stop();
+		drive.setDriveMode(driveMode.IDLE);
+		//autoExecuter.stop();
 	}
 	
+	@Override
 	public void disabledPeriodic() {
-		selector.pollFMS();
+		//drive.flushTalonBuffer();
 	}
 	
 	@Override
 	public void autonomousInit() {
-		autoExecuter.setAutoMode(selector.getSelectedAutoMode());
-		autoExecuter.start();
+		drive.flushTalonBuffer();
+		drive.setDriveMode(driveMode.IDLE);
+		selectedAutoMode = selector.getSelectedAutoMode();
+		drive.logger.createNewFile("Auto");
+		//autoExecuter.start();
 	}
 
 	/**
@@ -75,15 +94,17 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		
+		drive.update();
+		selectedAutoMode.update();
 	}
 
 	
 	@Override
 	public void teleopInit() {
-		drive.logger.createNewFile();
+		drive.logger.createNewFile("Teleop");
+		pathFollower.stop();
 		drive.resetSensors();
-		autoExecuter.stop();
+		drive.flushTalonBuffer();
 	}
 	
 	/**
@@ -91,12 +112,10 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		
 		drive.update();
 		if(hi.getGyrolock()) {
 			if(!lastGyrolock) {
 				drive.setDriveMode(driveMode.GYROLOCK);
-				drive.setDesiredAngle(drive.getAngle());
 			}
 			drive.setDesiredSpeed(hi.getLeftThrottle());
 		}
@@ -124,6 +143,7 @@ public class Robot extends IterativeRobot {
 		}
 		
 		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
+		SmartDashboard.putBoolean("Gyrolock", hi.getGyrolock());
 		lastGyrolock = hi.getGyrolock();
 		
 	}
