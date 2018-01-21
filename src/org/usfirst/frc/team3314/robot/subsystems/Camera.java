@@ -21,6 +21,7 @@ public class Camera {
 	
 	public void update() {
 		// TODO Auto-generated method stub
+		// camera = 90 fps/hz = 1 frame per 11.1 ms = 0.0111 sec
 		targetsInView = limelight.getEntry("tv").getDouble(0);
 		targetHorizOffset = limelight.getEntry("tx").getDouble(0);
 		targetVertOffset = limelight.getEntry("ty").getDouble(0);

@@ -8,7 +8,7 @@ public class Tracking {
 
 	enum State {
 		START,
-		SEEK,
+		//SEEK,
 		TRACK,
 		STOP,
 		DRIVE,
@@ -47,15 +47,15 @@ public class Tracking {
 		case START:
 			if (camera.trackingRequest) {
 				drive.setDriveMode(driveMode.VISION_CONTROL);
-				currentState = State.SEEK;
+				currentState = /*State.SEEK;*/ State.TRACK;
 			}
 			break;
-		case SEEK:
+		/*case SEEK:
 			camera.setSteeringAdjust(0.3);
 			if (camera.isTargetInView()) {
 				currentState = State.TRACK;
 			}
-			break;
+			break;*/
 		case TRACK:
 			camera.setSteeringAdjust(Constants.kGyroLock_kP*camera.getError());
 			if (Math.abs(camera.getError()) < 0.1) {

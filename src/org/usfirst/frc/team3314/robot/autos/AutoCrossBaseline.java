@@ -21,7 +21,7 @@ public class AutoCrossBaseline extends Autonomous {
 	
 	private Drive drive = Drive.getInstance();
 	private State currentState;
-	//private double desiredDistance;
+	private double time = 50;
 	
 	public AutoCrossBaseline() {
 		currentState = State.START;
@@ -49,7 +49,9 @@ public class AutoCrossBaseline extends Autonomous {
 			break;
 		case STOP:
 			drive.setDesiredSpeed(0);
-			currentState = State.DONE;
+			if (time <= 0) {
+				currentState = State.DONE;
+			}
 			break;
 		case DONE:
 			break;
@@ -59,7 +61,6 @@ public class AutoCrossBaseline extends Autonomous {
 
 	@Override
 	public void setGameData(String data) {
-		// TODO Auto-generated method stub
 		switchSide = data.charAt(0);
 		scaleSide = data.charAt(1);
 	}
