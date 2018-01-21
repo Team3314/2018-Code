@@ -3,8 +3,6 @@ package org.usfirst.frc.team3314.robot;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.concurrent.TimeUnit;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DataLogger {
@@ -25,9 +23,9 @@ public class DataLogger {
 	public DataLogger() {
 	}
 	
-	public void createNewFile() {
+	public void createNewFile(String name) {
 		run = false;
-		data = new File("/home/lvuser/test"+ System.currentTimeMillis() + ".csv");
+		data = new File("/home/lvuser/"+ name + System.currentTimeMillis() + ".csv");
 		try {
 			if(!data.exists()) {
 				data.createNewFile();

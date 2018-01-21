@@ -20,7 +20,7 @@ public class AutoModeSelector {
 	public Autonomous getSelectedAutoMode() {
 		autoModeBinary = "" + hi.getBinaryEight() + hi.getBinaryFour() + hi.getBinaryTwo() + hi.getBinaryOne();
 		autoModeDecimal = Integer.parseInt(autoModeBinary, 2);
-		autoMode = autos[0];//autoModeDecimal];
+		autoMode = autos[2];//autoModeDecimal];
 		pollFMS();
 		autoMode.setGameData(gameData);
 		autoMode.reset();
@@ -28,8 +28,6 @@ public class AutoModeSelector {
 	}
 	
 	public void pollFMS() {
-		if(fms.isFMSAttached()) {
 			gameData = fms.getGameSpecificMessage();
-		}
 	}
 }
