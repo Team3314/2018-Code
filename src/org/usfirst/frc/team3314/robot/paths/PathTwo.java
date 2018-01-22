@@ -10,7 +10,6 @@ import jaci.pathfinder.followers.EncoderFollower;
 import jaci.pathfinder.modifiers.TankModifier;
 
 public class PathTwo implements Path{
-
 	private File leftPath = new File("/home/lvuser/paths/Turn_left_detailed.csv");
 	private File rightPath = new File("/home/lvuser/paths/Turn_right_detailed.csv");
 	

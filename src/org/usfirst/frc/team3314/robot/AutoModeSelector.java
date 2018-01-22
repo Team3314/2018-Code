@@ -1,7 +1,6 @@
 package org.usfirst.frc.team3314.robot;
 
 import org.usfirst.frc.team3314.robot.autos.*;
-
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class AutoModeSelector {
