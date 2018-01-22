@@ -2,15 +2,13 @@ package org.usfirst.frc.team3314.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake {
 
 	private static Intake mInstance = new Intake();
 	
-	private VictorSPX mRollerLeft, mRollerRight; //sparks maybe
+	private VictorSPX mRollerLeft, mRollerRight;
 	private double leftSpeed, rightSpeed;
 	
 	public static Intake getInstance() {

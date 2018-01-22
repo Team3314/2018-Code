@@ -13,6 +13,7 @@ import org.usfirst.frc.team3314.robot.Constants;
 import org.usfirst.frc.team3314.robot.DataLogger;
 import org.usfirst.frc.team3314.robot.GyroPIDOutput;
 
+
 import com.cruzsbrian.robolog.Log;
 import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.SetValueMotionProfile;
@@ -27,6 +28,7 @@ public class Drive {
 		IDLE,
 		OPEN_LOOP,
 		GYROLOCK,
+		VISION_CONTROL,
 		MOTION_PROFILE
 	}
 	
@@ -35,7 +37,6 @@ public class Drive {
 	public static Drive getInstance() {
 		return mInstance;
 	}
-
 	
 	//Control mode
 	public driveMode currentDriveMode = driveMode.OPEN_LOOP;
@@ -53,7 +54,9 @@ public class Drive {
     
     //Data Logging
     public DataLogger logger;
-
+    
+    public Camera camera;
+    
     //PID
 	private GyroPIDOutput gyroPIDOutput;
 	private PIDController gyroControl;
@@ -95,6 +98,11 @@ public class Drive {
     			gyroControl.setSetpoint(desiredAngle);
     			controlMode = ControlMode.PercentOutput;
     			break;
+    		case VISION_CONTROL:
+    			rawLeftSpeed = leftStickInput + camera.steeringAdjust;
+    			rawRightSpeed = leftStickInput - camera.steeringAdjust;
+    			controlMode = ControlMode.PercentOutput;
+    			break;
     		case MOTION_PROFILE:
     			log();
     			controlMode = ControlMode.MotionProfile;
@@ -102,8 +110,8 @@ public class Drive {
     			rawRightSpeed = motionProfileMode;
     			break;
     	}
-	    	mLeftMaster.set(controlMode, rawLeftSpeed);
-	    	mRightMaster.set(controlMode, rawRightSpeed);
+    	mLeftMaster.set(controlMode, rawLeftSpeed);
+    	mRightMaster.set(controlMode, rawRightSpeed);
     
     }
 
@@ -112,6 +120,8 @@ public class Drive {
     private Drive() {
     	// Logger
     	 logger = DataLogger.getInstance();
+    	 
+    	 camera = Camera.getInstance();
     	
 		//Hardware
     	pdp  = new PowerDistributionPanel();
@@ -201,6 +211,10 @@ public class Drive {
     
     public double getAngle() {
     	return navx.getYaw();
+    }
+    
+    public boolean checkTolerance() {
+    	return gyroControl.onTarget();
     }
     
     public int getLeftPositionTicks() {
@@ -310,7 +324,7 @@ public class Drive {
     	rightDriveSpeedRPM =  rightDriveSpeedTicks * (600.0/ Constants.kDriveEncoderCodesPerRev);
     }
   
-    private void resetDriveEncoders() {
+    public void resetDriveEncoders() {
 		mLeftMaster.set(ControlMode.Position, 0);
 		mRightMaster.set(ControlMode.Position, 0);
 		mLeftMaster.set(ControlMode.Velocity, 0);
@@ -320,6 +334,7 @@ public class Drive {
 		mLeftMaster.setSelectedSensorPosition(0, 0, 0);
 		mRightMaster.setSelectedSensorPosition(0, 0, 0);
 	}
+    
     public void resetSensors() {
     	navx.reset();
     	resetDriveEncoders();

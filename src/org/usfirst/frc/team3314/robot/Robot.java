@@ -2,15 +2,12 @@ package org.usfirst.frc.team3314.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
-//import edu.wpi.first.wpilibj.Joystick;
-//import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3314.robot.autos.AutoModeExecuter;
 import org.usfirst.frc.team3314.robot.autos.Autonomous;
 import org.usfirst.frc.team3314.robot.motion.PathFollower;
-import org.usfirst.frc.team3314.robot.subsystems.Drive;
-import org.usfirst.frc.team3314.robot.subsystems.Intake;
+import org.usfirst.frc.team3314.robot.subsystems.*;
 import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 
 import com.cruzsbrian.robolog.Log;
@@ -31,7 +28,10 @@ public class Robot extends IterativeRobot {
 	
 	private Drive drive = Drive.getInstance();
 	private Intake intake = Intake.getInstance();
+	private Camera camera = Camera.getInstance();
+	private Tracking tracking = Tracking.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
+	
 	//private AutoModeExecuter autoExecuter = new AutoModeExecuter();
 	private AutoModeSelector selector = new AutoModeSelector();
 	private PathFollower pathFollower = new PathFollower();
@@ -95,6 +95,9 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		drive.update();
+		intake.update();
+		camera.update();
+		tracking.update();
 		selectedAutoMode.update();
 	}
 
@@ -113,14 +116,23 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		drive.update();
+		intake.update();
+		camera.update();
+		tracking.update();
+		
 		if(hi.getGyrolock()) {
 			if(!lastGyrolock) {
 				drive.setDriveMode(driveMode.GYROLOCK);
+				drive.setDesiredAngle(drive.getAngle());
 			}
 			drive.setDesiredSpeed(hi.getLeftThrottle());
 		}
 		else {
 			drive.setDriveMode(driveMode.OPEN_LOOP);
+		}
+		
+		if (hi.getVisionCtrl()) {
+			camera.trackingRequest = true;
 		}
 		
 		if(hi.getHighGear()) {
@@ -146,12 +158,5 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putBoolean("Gyrolock", hi.getGyrolock());
 		lastGyrolock = hi.getGyrolock();
 		
-	}
-
-	/**
-	 * This function is called periodically during test mode
-	 */
-	@Override
-	public void testPeriodic() {
 	}
 }
