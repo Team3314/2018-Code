@@ -23,16 +23,12 @@ public class AutoCubeToSwitchFromRight extends Autonomous {
 		DONE
 	}
 	
-	private State currentState;
+	private State currentState = State.START;
 	private double time = 0; //place holder
 	private Path startToSwitchLeft = new StartRightToSwitchLeft();
 	private Path startToSwitchRight = new StartRightToSwitchRight();
 	
 	private Path selectedPath = null;
-	
-	public AutoCubeToSwitchFromRight() {
-		currentState = State.START;
-	}
 	
 	@Override
 	public void reset() {
