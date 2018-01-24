@@ -23,12 +23,6 @@ public class AutoCubeToSwitchFromRight extends Autonomous {
 		DONE
 	}
 	
-	//Switch and Scale sides
-	private char switchSide = ' ';
-	private char scaleSide = ' ';
-
-	
-	//TODO replace paths wiht correct ones
 	private State currentState;
 	private double time = 0; //place holder
 	private Path startToSwitchLeft = new StartRightToSwitchLeft();
@@ -71,11 +65,5 @@ public class AutoCubeToSwitchFromRight extends Autonomous {
 		}
 		
 		SmartDashboard.putString("Auto state", currentState.toString());
-	}
-
-	public void setGameData(String data) {
-		// TODO Auto-generated method stub
-		switchSide = data.charAt(0);
-		scaleSide = data.charAt(1);
 	}
 }
