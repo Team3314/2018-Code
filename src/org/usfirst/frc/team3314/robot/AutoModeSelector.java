@@ -21,6 +21,9 @@ public class AutoModeSelector {
 		autoModeDecimal = Integer.parseInt(autoModeBinary, 2);
 		autoMode = autos[2];//autoModeDecimal];
 		pollFMS();
+		if(gameData.length() < 2) {
+			return auto1;
+		}
 		autoMode.setGameData(gameData);
 		autoMode.reset();
  		return autoMode;

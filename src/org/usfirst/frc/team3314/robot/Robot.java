@@ -95,9 +95,11 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		drive.update();
+		/* XXX Temporarily commented out until these subsystems are installed on the robot
 		intake.update();
 		camera.update();
 		tracking.update();
+		*/
 		selectedAutoMode.update();
 	}
 

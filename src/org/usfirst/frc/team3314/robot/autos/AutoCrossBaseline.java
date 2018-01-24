@@ -58,10 +58,4 @@ public class AutoCrossBaseline extends Autonomous {
 		}
 		SmartDashboard.putString("Auto state", currentState.toString());
 	}
-
-	@Override
-	public void setGameData(String data) {
-		switchSide = data.charAt(0);
-		scaleSide = data.charAt(1);
-	}
 }

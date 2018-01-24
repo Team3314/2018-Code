@@ -3,6 +3,7 @@ package org.usfirst.frc.team3314.robot.motion;
 import java.util.List;
 
 import org.usfirst.frc.team3314.robot.Constants;
+import org.usfirst.frc.team3314.robot.paths.Path;
 
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.followers.EncoderFollower;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.Notifier;
 public class PathFollower {
 	
 	private Drive drive = Drive.getInstance();
+	private CSVParser parser = new CSVParser();
 	private boolean pathFinished = false;
 	private double updateRate = 1/50;
 	private long waitTime = (long) (updateRate * 1000.0);
@@ -45,15 +47,18 @@ public class PathFollower {
 		notifier.stop();
 	}
 	
-	public boolean isDone() {
-		return pathFinished;
+	public void loadPoints(Path path) {
+		parser.start(path.getLeftPath(), path.getRightPath());
 	}
 	
-	public void checkDone() { 
+	public boolean isDone() {
 		drive.getLeftStatus(leftStatus);
 		drive.getRightStatus(rightStatus);
 		if(leftStatus.isLast == true && rightStatus.isLast == true) {
+			stop();
 			pathFinished = true;
 		}
+		return pathFinished;
 	}
+
 }

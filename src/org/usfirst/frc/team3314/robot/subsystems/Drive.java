@@ -135,8 +135,8 @@ public class Drive {
 		//Sets the PID controller to treat 180 and -180 to be the same point, 
 		//so that when turning the robot takes the shortest path instead of going the long way around
 		//Effectively changes PID input from a line to a circle
-	    gyroControl.setContinuous(); 
 		gyroControl.setInputRange(-180, 180);
+	    gyroControl.setContinuous(); 
 		gyroControl.setOutputRange(-.7, .7);		// Limits speed of turn to prevent overshoot
 		gyroControl.setAbsoluteTolerance(1);
     	

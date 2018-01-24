@@ -1,8 +1,15 @@
 package org.usfirst.frc.team3314.robot.autos;
 
-import org.usfirst.frc.team3314.robot.subsystems.Drive;
+import org.usfirst.frc.team3314.robot.motion.CSVParser;
+import org.usfirst.frc.team3314.robot.motion.PathFollower;
+import org.usfirst.frc.team3314.robot.paths.Path;
+import org.usfirst.frc.team3314.robot.paths.StartLeftToSwitchLeft;
+import org.usfirst.frc.team3314.robot.paths.StartLeftToSwitchRight;
+import org.usfirst.frc.team3314.robot.paths.SwitchLeftToScaleLeft;
+import org.usfirst.frc.team3314.robot.paths.SwitchLeftToScaleRight;
+import org.usfirst.frc.team3314.robot.paths.SwitchRightToScaleLeft;
+import org.usfirst.frc.team3314.robot.paths.SwitchRightToScaleRight;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoSwitchThenScaleFromLeft extends Autonomous {
@@ -13,29 +20,33 @@ public class AutoSwitchThenScaleFromLeft extends Autonomous {
 	}
 	
 	//Switch and Scale sides
-		private char switchSide = ' ';
-		private char scaleSide = ' ';
+	private char switchSide = ' ';
+	private char scaleSide = ' ';
 	
-	private Drive drive = Drive.getInstance();
-	String gameData = DriverStation.getInstance().getGameSpecificMessage();
-	State currentState;
-	double desiredDistance, time;
+	private State currentState = State.START;
+	private double time;
+	private Path startToSwitchLeft = new StartLeftToSwitchLeft();
+	private Path startToSwitchRight = new StartLeftToSwitchRight();
+	private Path switchRightToScaleLeft = new SwitchRightToScaleLeft();
+	private Path switchRightToScaleRight = new SwitchRightToScaleRight();
+	private Path switchLeftToScaleLeft = new SwitchLeftToScaleLeft();
+	private Path switchLeftToScaleRight = new SwitchLeftToScaleRight();
 	
-	public AutoSwitchThenScaleFromLeft() {
-		currentState = State.START;
-	}
+	private Path firstPath = null;
 	
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		currentState = State.START;
 	}
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
 		switch (currentState) {
 		case START:
+			firstPath = selectPath(startToSwitchLeft, startToSwitchRight, "switch");
+			secondPath = selectPath(scaleLeftToSwitchLeft, scaleLeftToSwitchRight, scaleRightToSwitchLeft, scaleRightToSwitchRight);
+			loadPath(firstPath);
+			startPathFollower();
 			break;
 		case DONE:
 			break;
@@ -45,7 +56,6 @@ public class AutoSwitchThenScaleFromLeft extends Autonomous {
 	}
 	
 	public void setGameData(String data) {
-		// TODO Auto-generated method stub
 		switchSide = data.charAt(0);
 		scaleSide = data.charAt(1);
 	}

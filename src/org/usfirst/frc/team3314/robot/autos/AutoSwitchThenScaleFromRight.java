@@ -1,51 +1,32 @@
 package org.usfirst.frc.team3314.robot.autos;
-
-import org.usfirst.frc.team3314.robot.subsystems.Drive;
-
-import edu.wpi.first.wpilibj.DriverStation;
+import org.usfirst.frc.team3314.robot.paths.Path;
+import org.usfirst.frc.team3314.robot.paths.StartRightToSwitchLeft;
+import org.usfirst.frc.team3314.robot.paths.StartRightToSwitchRight;
+import org.usfirst.frc.team3314.robot.paths.SwitchLeftToScaleLeft;
+import org.usfirst.frc.team3314.robot.paths.SwitchLeftToScaleRight;
+import org.usfirst.frc.team3314.robot.paths.SwitchRightToScaleLeft;
+import org.usfirst.frc.team3314.robot.paths.SwitchRightToScaleRight;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoSwitchThenScaleFromRight extends Autonomous {
 
 	enum State {
 		START,             
-		/*DRIVE1_L,			
-		STOP1_L	,			
-		TURN1_L,				
-		STOP2_L,				
-		RELEASE_CUBE1_L,		
-		TURN2_L,				
-		STOP3_L,				
-		DRIVE2_L,				
-		STOP4_L,				
-		TURN3_L,				
-		STOP5_L,				
-		DRIVE3_L,				
-		STOP6_L,				
-		INTAKE_CUBE_L,		
-		TURN4_L,				
-		STOP7_L,				
-		DRIVE4_L,				
-		STOP8_L,
-		TURN5_LR,
-		STOP9_LR,
-		DRIVE5_LR,
-		STOP10_LR,
-		TURN6_LR,
-		DRIVE6_LR,
-		STOP11_LR,		
-		RELEASE_CUBE2,*/
 		DONE				
 	}
 	
-	//Switch and Scale sides
-		private char switchSide = ' ';
-		private char scaleSide = ' ';
+
+	private State currentState;
+	private double time;
+	private Path startToSwitchLeft = new StartRightToSwitchLeft();
+	private Path startToSwitchRight = new StartRightToSwitchRight();
+	private Path switchRightToScaleLeft = new SwitchRightToScaleLeft();
+	private Path switchRightToScaleRight = new SwitchRightToScaleRight();
+	private Path switchLeftToScaleLeft = new SwitchLeftToScaleLeft();
+	private Path switchLeftToScaleRight = new SwitchLeftToScaleRight();
 	
-	private Drive drive = Drive.getInstance();
-	String gameData = DriverStation.getInstance().getGameSpecificMessage();
-	State currentState;
-	double desiredDistance, time;
+	private Path firstPath = null;
+	private Path secondPath = null;
 	
 	public AutoSwitchThenScaleFromRight() {
 		currentState = State.START;
@@ -53,27 +34,23 @@ public class AutoSwitchThenScaleFromRight extends Autonomous {
 	
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		currentState = State.START;
 	}
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
 		switch (currentState) {
 		case START:
+			firstPath = selectPath(startToSwitchLeft, startToSwitchRight, "switch");
+			secondPath = selectPath(switchLeftToScaleLeft, switchLeftToScaleRight, switchRightToScaleLeft, switchRightToScaleRight);
+			loadPath(firstPath);
+			startPathFollower();
 			break;
+			
 		case DONE:
 			break;
 		}
 		
 		SmartDashboard.putString("Auto state", currentState.toString());
 	}
-
-	public void setGameData(String data) {
-		// TODO Auto-generated method stub
-		switchSide = data.charAt(0);
-		scaleSide = data.charAt(1);
-	}
-	
 }

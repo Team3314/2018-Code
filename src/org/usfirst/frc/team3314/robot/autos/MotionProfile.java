@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3314.robot.autos;
 import org.usfirst.frc.team3314.robot.motion.CSVParser;
 import org.usfirst.frc.team3314.robot.motion.PathFollower;
+import org.usfirst.frc.team3314.robot.paths.Path;
 import org.usfirst.frc.team3314.robot.paths.PathOne;
 import org.usfirst.frc.team3314.robot.paths.PathTwo;
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
@@ -21,11 +22,10 @@ public class MotionProfile extends Autonomous {
 	
      // Do something with the new Trajectories...
 
-	 PathOne pathOne = new PathOne();
-	 PathTwo pathTwo = new PathTwo();
-     CSVParser csvParser = new CSVParser();
-	 PathFollower pathFollower = new PathFollower();
-	 Drive drive = Drive.getInstance();
+	 Path pathOne = new PathOne();
+	 Path pathTwo = new PathTwo();
+	
+	 private Path selectedPath = null;
      
      State currentState;
      
@@ -38,20 +38,15 @@ public class MotionProfile extends Autonomous {
     	 public void update() {
      		switch (currentState) {
 			case START:
-				if(switchSide == 'L') {
-					csvParser.start(pathOne.getLeftPath(), pathOne.getRightPath());
-				}
-				else if(switchSide == 'R') {
-					csvParser.start(pathTwo.getLeftPath(), pathTwo.getRightPath());
-				}
-				drive.setHighGear(false);
-				pathFollower.start();
+				selectedPath = selectPath(pathOne, pathTwo, "switch");
+				loadPath(selectedPath);
+				setHighGear(false);
+				startPathFollower();
 				currentState = State.RUNPROFILE;
 				break;
 				
 			case RUNPROFILE:
-				pathFollower.checkDone();
-				if (pathFollower.isDone())  {
+				if (isPathDone())  {
 					currentState = State.DONE;
 				}
 				break;
@@ -63,13 +58,7 @@ public class MotionProfile extends Autonomous {
     }
      	
      	@Override
-    		public void reset() {
-    			currentState = State.START;
-    		}
-		@Override
-		public void setGameData(String data) {
-			// TODO Auto-generated method stub
-			switchSide = data.charAt(0);
-			scaleSide = data.charAt(1);
-		}
+	public void reset() {
+		currentState = State.START;
+	}
 }

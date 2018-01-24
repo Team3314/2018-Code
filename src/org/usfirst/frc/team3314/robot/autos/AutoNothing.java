@@ -33,10 +33,4 @@ public class AutoNothing extends Autonomous {
 
 		SmartDashboard.putString("Auto state", currentState.toString());
 	}
-
-	@Override
-	public void setGameData(String data) {
-		// TODO Auto-generated method stub
-		
-	}
 }
