@@ -36,13 +36,11 @@ public class AutoCubeToSwitchFromRight extends Autonomous {
 	
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		currentState = State.START;
 	}
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
 		switch (currentState) {
 		case START:
 			resetSensors();
