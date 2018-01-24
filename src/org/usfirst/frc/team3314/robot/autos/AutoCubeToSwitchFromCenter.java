@@ -20,11 +20,7 @@ public class AutoCubeToSwitchFromCenter extends Autonomous {
 	
 	private Path selectedPath = null;
 	
-	private State currentState;
-	
-	public AutoCubeToSwitchFromCenter() {
-		currentState = State.START;
-	}
+	private State currentState = State.START;;
 	
 	@Override
 	public void reset() {
