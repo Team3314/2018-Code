@@ -56,10 +56,4 @@ public class AutoCubeToSwitchFromCenter extends Autonomous {
 		
 		SmartDashboard.putString("Auto state", currentState.toString());
 	}
-	
-	public void setGameData(String data) {
-		switchSide = data.charAt(0);
-		scaleSide = data.charAt(1);
-	}
-
 }
