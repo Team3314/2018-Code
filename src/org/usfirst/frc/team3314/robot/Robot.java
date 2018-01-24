@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.usfirst.frc.team3314.robot.autos.AutoModeExecuter;
+//import org.usfirst.frc.team3314.robot.autos.AutoModeExecuter;
 import org.usfirst.frc.team3314.robot.autos.Autonomous;
 import org.usfirst.frc.team3314.robot.motion.PathFollower;
 import org.usfirst.frc.team3314.robot.subsystems.*;
@@ -28,6 +28,8 @@ public class Robot extends IterativeRobot {
 	
 	private Drive drive = Drive.getInstance();
 	private Intake intake = Intake.getInstance();
+	private Arm arm = Arm.getInstance();
+	
 	private Camera camera = Camera.getInstance();
 	private Tracking tracking = Tracking.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
@@ -49,6 +51,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {	
 		Log.startServer(1099);
+		camera.start();
 		drive.resetSensors();
 	}
 	
@@ -96,7 +99,7 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		drive.update();
 		intake.update();
-		camera.update();
+		arm.update();
 		tracking.update();
 		selectedAutoMode.update();
 	}
@@ -108,6 +111,7 @@ public class Robot extends IterativeRobot {
 		pathFollower.stop();
 		drive.resetSensors();
 		drive.flushTalonBuffer();
+		camera.setLEDMode(1);
 	}
 	
 	/**
@@ -117,7 +121,7 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		drive.update();
 		intake.update();
-		camera.update();
+		arm.update();
 		tracking.update();
 		
 		if(hi.getGyrolock()) {

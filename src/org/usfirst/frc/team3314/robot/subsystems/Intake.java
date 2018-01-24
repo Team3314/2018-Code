@@ -4,11 +4,11 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Intake {
+public class Intake implements Subsystem {
 
 	private static Intake mInstance = new Intake();
 	
-	private VictorSPX mRollerLeft, mRollerRight;
+	private VictorSPX rollerLeft, rollerRight;
 	private double leftSpeed, rightSpeed;
 	
 	public static Intake getInstance() {
@@ -17,13 +17,13 @@ public class Intake {
 	
 	public void update() {
 		outputToSmartDashboard();
-		mRollerLeft.set(ControlMode.PercentOutput, leftSpeed);
-		mRollerRight.set(ControlMode.PercentOutput, rightSpeed);
+		rollerLeft.set(ControlMode.PercentOutput, leftSpeed);
+		rollerRight.set(ControlMode.PercentOutput, rightSpeed);
 	}
 	
 	private Intake() {
-		mRollerLeft = new VictorSPX(6);
-		mRollerRight = new VictorSPX(7);
+		rollerLeft = new VictorSPX(6);
+		rollerRight = new VictorSPX(7);
 	}
 	
 	public void setDesiredSpeed(double speed) {
@@ -31,10 +31,13 @@ public class Intake {
 		rightSpeed = speed;
 	}
 	
-	public void outputToSmartDashboard() {
-		SmartDashboard.putNumber("Intake Roller 1 Voltage", mRollerLeft.getMotorOutputVoltage());
-		SmartDashboard.putNumber("Intake Roller 2 Voltage", mRollerRight.getMotorOutputVoltage());
-		SmartDashboard.putNumber("Intake Roller 1 Output Percent", mRollerLeft.getMotorOutputPercent());
-		SmartDashboard.putNumber("Intake Roller 2 Output Percent", mRollerRight.getMotorOutputPercent());
+	public void resetSensors() {
+	}
+	
+	private void outputToSmartDashboard() {
+		SmartDashboard.putNumber("Intake Roller 1 Voltage", rollerLeft.getMotorOutputVoltage());
+		SmartDashboard.putNumber("Intake Roller 2 Voltage", rollerRight.getMotorOutputVoltage());
+		SmartDashboard.putNumber("Intake Roller 1 Output Percent", rollerLeft.getMotorOutputPercent());
+		SmartDashboard.putNumber("Intake Roller 2 Output Percent", rollerRight.getMotorOutputPercent());
 	}
 }

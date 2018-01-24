@@ -16,13 +16,13 @@ import org.usfirst.frc.team3314.robot.GyroPIDOutput;
 
 import com.cruzsbrian.robolog.Log;
 import com.ctre.phoenix.motion.MotionProfileStatus;
-import com.ctre.phoenix.motion.SetValueMotionProfile;
+//import com.ctre.phoenix.motion.SetValueMotionProfile;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-public class Drive {
+public class Drive implements Subsystem {
 	
 	public enum driveMode {
 		IDLE,
@@ -324,7 +324,7 @@ public class Drive {
     	rightDriveSpeedRPM =  rightDriveSpeedTicks * (600.0/ Constants.kDriveEncoderCodesPerRev);
     }
   
-    private void resetDriveEncoders() {
+    public void resetDriveEncoders() {
 		mLeftMaster.set(ControlMode.Position, 0);
 		mRightMaster.set(ControlMode.Position, 0);
 		mLeftMaster.set(ControlMode.Velocity, 0);
