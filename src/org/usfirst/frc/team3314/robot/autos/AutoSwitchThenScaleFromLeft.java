@@ -1,7 +1,5 @@
 package org.usfirst.frc.team3314.robot.autos;
 
-import org.usfirst.frc.team3314.robot.motion.CSVParser;
-import org.usfirst.frc.team3314.robot.motion.PathFollower;
 import org.usfirst.frc.team3314.robot.paths.Path;
 import org.usfirst.frc.team3314.robot.paths.StartLeftToSwitchLeft;
 import org.usfirst.frc.team3314.robot.paths.StartLeftToSwitchRight;
@@ -18,10 +16,6 @@ public class AutoSwitchThenScaleFromLeft extends Autonomous {
 		START,
 		DONE
 	}
-	
-	//Switch and Scale sides
-	private char switchSide = ' ';
-	private char scaleSide = ' ';
 	
 	private State currentState = State.START;
 	private double time;
@@ -55,10 +49,4 @@ public class AutoSwitchThenScaleFromLeft extends Autonomous {
 		
 		SmartDashboard.putString("Auto state", currentState.toString());
 	}
-	
-	public void setGameData(String data) {
-		switchSide = data.charAt(0);
-		scaleSide = data.charAt(1);
-	}
-
 }
