@@ -10,11 +10,7 @@ public class AutoNothing extends Autonomous {
 		DONE
 	}
 	
-	State currentState;
-	
-	public AutoNothing() {
-		currentState = State.START;
-	}
+	State currentState = State.START;
 	
 	public void reset() {
 		currentState = State.START;
