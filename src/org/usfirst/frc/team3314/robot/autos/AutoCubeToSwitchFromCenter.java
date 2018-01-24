@@ -15,10 +15,6 @@ public class AutoCubeToSwitchFromCenter extends Autonomous {
 		DONE
 	}
 	
-	//Switch and Scale sides
-	private char switchSide = ' ';
-	private char scaleSide = ' ';
-
 	private Path startToSwitchLeft = new StartCenterToSwitchLeft();
 	private Path startToSwitchRight = new StartCenterToSwitchRight();
 	
