@@ -33,6 +33,7 @@ public class AutoSwitchThenScaleFromLeft extends Autonomous {
 	private Path switchLeftToScaleRight = new SwitchLeftToScaleRight();
 	
 	private Path firstPath = null;
+	private Path secondPath = null;
 	
 	@Override
 	public void reset() {
@@ -44,7 +45,7 @@ public class AutoSwitchThenScaleFromLeft extends Autonomous {
 		switch (currentState) {
 		case START:
 			firstPath = selectPath(startToSwitchLeft, startToSwitchRight, "switch");
-			secondPath = selectPath(scaleLeftToSwitchLeft, scaleLeftToSwitchRight, scaleRightToSwitchLeft, scaleRightToSwitchRight);
+			//secondPath = selectPath(scaleLeftToSwitchLeft, scaleLeftToSwitchRight, scaleRightToSwitchLeft, scaleRightToSwitchRight); TODO : add right paths
 			loadPath(firstPath);
 			startPathFollower();
 			break;
