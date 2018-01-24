@@ -18,11 +18,8 @@ public class AutoScaleThenSwitchFromLeft extends Autonomous {
 		RELEASE_CUBE2,
 		DONE
 	}
-	private State currentState = State.START;
 	
-	//Switch and Scale sides
-	private char switchSide = ' ';
-	private char scaleSide = ' ';
+	private State currentState = State.START;
 
 	//Paths
 	private Path startToScaleLeft = new StartLeftToScaleLeft();
