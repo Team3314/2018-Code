@@ -1,9 +1,6 @@
 package org.usfirst.frc.team3314.robot.autos;
 
 import org.usfirst.frc.team3314.robot.paths.Path;
-import org.usfirst.frc.team3314.robot.paths.StartCenterToSwitchLeft;
-import org.usfirst.frc.team3314.robot.paths.StartCenterToSwitchRight;
-import org.usfirst.frc.team3314.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoCubeToSwitchFromCenter extends Autonomous {
@@ -14,9 +11,6 @@ public class AutoCubeToSwitchFromCenter extends Autonomous {
 		RELEASE_CUBE,
 		DONE
 	}
-	
-	private Path startToSwitchLeft = new StartCenterToSwitchLeft();
-	private Path startToSwitchRight = new StartCenterToSwitchRight();
 	
 	private Path selectedPath = null;
 	
@@ -32,7 +26,7 @@ public class AutoCubeToSwitchFromCenter extends Autonomous {
 		switch (currentState) {
 		case START:
 			resetSensors();
-			selectedPath = selectPath(startToSwitchLeft, startToSwitchRight, "switch");
+			selectedPath = getPath("StartC" + getSwitch());
 			loadPath(selectedPath);
 			startPathFollower();
 			currentState = State.DRIVE;
@@ -43,8 +37,10 @@ public class AutoCubeToSwitchFromCenter extends Autonomous {
 			}	
 			break;
 		case RELEASE_CUBE:
-			Intake.getInstance().setDesiredSpeed(-1);
-			currentState = State.DONE;
+			outtakeCube();
+			if(!hasCube()) {
+				currentState = State.DONE;
+			}
 			break;
 		case DONE:
 			break;

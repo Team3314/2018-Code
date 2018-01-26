@@ -6,7 +6,7 @@ import org.usfirst.frc.team3314.robot.paths.StartLeftToScaleRight;
 import org.usfirst.frc.team3314.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class AutoCubeToScaleFromLeft extends Autonomous {
+public class AutoCubeToScale extends Autonomous {
 
 	enum State {
 		START,
@@ -15,20 +15,9 @@ public class AutoCubeToScaleFromLeft extends Autonomous {
 		DONE
 	}
 	
-	//Switch and Scale sides
-	private char switchSide = ' ';
-	private char scaleSide = ' ';
-	
-	private State currentState;
-	
-	private Path startToScaleRight = new StartLeftToScaleRight();
-	private Path startToScaleLeft = new StartLeftToScaleLeft();
+	private State currentState = State.START;
 	
 	private Path selectedPath = null;
-	
-	public AutoCubeToScaleFromLeft() {
-		currentState = State.START;
-	}
 	
 	@Override
 	public void reset() {
@@ -40,7 +29,7 @@ public class AutoCubeToScaleFromLeft extends Autonomous {
 		switch (currentState) {
 		case START:
 			resetSensors();
-			selectedPath = selectPath(startToScaleLeft, startToScaleRight, "switch");
+			selectedPath = getPath(getStart() + getScale());
 			loadPath(selectedPath);
 			startPathFollower();
 			currentState = State.DRIVE;
@@ -51,8 +40,10 @@ public class AutoCubeToScaleFromLeft extends Autonomous {
 			}
 			break;
 		case RELEASE_CUBE:
-			Intake.getInstance().setDesiredSpeed(-1);
-			currentState = State.DONE;
+			outtakeCube();
+			if(!hasCube()) {
+				currentState = State.DONE;
+			}
 			break;
 		case DONE:
 			break;
@@ -60,11 +51,4 @@ public class AutoCubeToScaleFromLeft extends Autonomous {
 		
 		SmartDashboard.putString("Auto state", currentState.toString());
 	}
-	
-	public void setGameData(String data) {
-		// TODO Auto-generated method stub
-		switchSide = data.charAt(0);
-		scaleSide = data.charAt(1);
-	}
-
 }

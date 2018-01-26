@@ -84,14 +84,10 @@ public class HumanInput {
 		}
 		return 0;
 	}
-	public boolean getRed() {
-		return buttonBox.getRawButton(12);
-	}
-	public boolean getBlue() {
-		boolean result = false;
-		if (!buttonBox.getRawButton(12)) {
-			result = true;
+	public String  getLeftRight() {
+		if(buttonBox.getRawButton(12)) {
+			return "StartL"; // Start Left
 		}
-		return result;
+		return "StartR"; // Start Right
 	}
 }

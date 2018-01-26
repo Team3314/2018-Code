@@ -15,30 +15,19 @@ public class MotionProfile extends Autonomous {
 		RUNPROFILE,
 		DONE
 	}
-	private char switchSide = ' ';
-	private char scaleSide = ' ';
-	
-     // Wheelbase Width = 27.5 in
-	
-     // Do something with the new Trajectories...
-
 	 Path pathOne = new PathOne();
 	 Path pathTwo = new PathTwo();
 	
 	 private Path selectedPath = null;
      
-     State currentState;
+     State currentState = State.START;
      
      double time = 0;
-     
-     public MotionProfile() {
-    	 currentState = State.START;
-     }
      	@Override
     	 public void update() {
      		switch (currentState) {
 			case START:
-				selectedPath = selectPath(pathOne, pathTwo, "switch");
+				selectedPath = getPath("StartLSwitchL");
 				loadPath(selectedPath);
 				setHighGear(false);
 				startPathFollower();
