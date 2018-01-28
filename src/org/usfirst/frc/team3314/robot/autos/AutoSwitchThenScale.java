@@ -1,10 +1,6 @@
 package org.usfirst.frc.team3314.robot.autos;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.usfirst.frc.team3314.robot.paths.Path;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoSwitchThenScale extends Autonomous {
@@ -42,11 +38,13 @@ public class AutoSwitchThenScale extends Autonomous {
 		case DRIVE_TO_SWITCH:
 			if(isPathDone()) {
 				currentState = State.RELEASE_CUBE;
+				releaseCube();
+				time = 25;
 			}
 			break;
 		case RELEASE_CUBE:
-			outtakeCube();
-			if(!hasCube()) {
+			time--;
+			if(time == 0) {
 				currentState = State.PICKUP_CUBE;
 			}
 			break;
@@ -61,12 +59,15 @@ public class AutoSwitchThenScale extends Autonomous {
 		case DRIVE_TO_SCALE:
 			if(isPathDone()) {
 				currentState = State.RELEASE_CUBE2;
+				releaseCube();
+				time = 25;
 			}
 			break;
 		case RELEASE_CUBE2:
-			outtakeCube();
-			if(!hasCube()) {
+			time--;
+			if(time == 0) {
 				currentState = State.DONE;
+				stopIntake();
 			}
 		case DONE:
 			break;

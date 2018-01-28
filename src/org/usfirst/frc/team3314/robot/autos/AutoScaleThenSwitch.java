@@ -1,7 +1,6 @@
 package org.usfirst.frc.team3314.robot.autos;
 
 import org.usfirst.frc.team3314.robot.paths.Path;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoScaleThenSwitch extends Autonomous {
@@ -17,6 +16,8 @@ public class AutoScaleThenSwitch extends Autonomous {
 	}
 	
 	private State currentState = State.START;
+	
+	private int time = 0;
 	
 	private Path firstPath = null;
 	private Path secondPath = null;
@@ -39,12 +40,15 @@ public class AutoScaleThenSwitch extends Autonomous {
 		case DRIVE_TO_SCALE:
 			if(isPathDone()) {
 				currentState = State.RELEASE_CUBE;
+				releaseCube();
+				time = 25;
 			}
 			break;
 		case RELEASE_CUBE:
-			outtakeCube();
-			if(!hasCube()) {
+			time--;
+			if(time == 0) {
 				currentState = State.DRIVE_TO_SWITCH;
+				stopIntake();
 				loadPath(secondPath);
 				startPathFollower();
 			}
@@ -58,13 +62,16 @@ public class AutoScaleThenSwitch extends Autonomous {
 			intakeCube();
 			if(hasCube()) {
 				currentState = State.RELEASE_CUBE2;
+				time = 25;
+				releaseCube();
 			}
 			break;
 		case RELEASE_CUBE2:
 			//TODO add move arm command
-			outtakeCube();
-			if(!hasCube()) {
+			time--;
+			if(time == 0) {
 				currentState = State.DONE;
+				stopIntake();
 			}
 		case DONE:
 			break;

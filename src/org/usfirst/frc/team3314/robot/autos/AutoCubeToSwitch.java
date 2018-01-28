@@ -1,7 +1,7 @@
 package org.usfirst.frc.team3314.robot.autos;
 
+import org.usfirst.frc.team3314.robot.autos.AutoCubeToScale.State;
 import org.usfirst.frc.team3314.robot.paths.Path;
-import org.usfirst.frc.team3314.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoCubeToSwitch extends Autonomous {
@@ -36,11 +36,14 @@ public class AutoCubeToSwitch extends Autonomous {
 			case DRIVE:
 				if(isPathDone()) {
 					currentState = State.RELEASE_CUBE;
+					releaseCube();
+					time = 25;
 				}
 				break;
 			case RELEASE_CUBE:
-				outtakeCube();
-				if(!hasCube()) {
+				time--;
+				if(time == 0) {
+					stopIntake();
 					currentState = State.DONE;
 				}
 				break;

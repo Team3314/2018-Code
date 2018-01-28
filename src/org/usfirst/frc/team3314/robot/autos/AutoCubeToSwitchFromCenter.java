@@ -14,7 +14,8 @@ public class AutoCubeToSwitchFromCenter extends Autonomous {
 	
 	private Path selectedPath = null;
 	
-	private State currentState = State.START;;
+	private State currentState = State.START;
+	private int time = 0;
 	
 	@Override
 	public void reset() {
@@ -34,12 +35,15 @@ public class AutoCubeToSwitchFromCenter extends Autonomous {
 		case DRIVE:
 			if (isPathDone()) {
 				currentState = State.RELEASE_CUBE;
+				time = 25;
+				releaseCube();
 			}	
 			break;
 		case RELEASE_CUBE:
-			outtakeCube();
-			if(!hasCube()) {
+			time--;
+			if(time == 0) {
 				currentState = State.DONE;
+				stopIntake();
 			}
 			break;
 		case DONE:

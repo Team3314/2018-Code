@@ -3,13 +3,14 @@ package org.usfirst.frc.team3314.robot.autos;
 import java.io.File;
 
 import org.usfirst.frc.team3314.robot.HumanInput;
-import org.usfirst.frc.team3314.robot.motion.CSVParser;
 import org.usfirst.frc.team3314.robot.motion.PathFollower;
 import org.usfirst.frc.team3314.robot.paths.Path;
 import org.usfirst.frc.team3314.robot.paths.PathList;
 import org.usfirst.frc.team3314.robot.subsystems.Arm;
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
 import org.usfirst.frc.team3314.robot.subsystems.Intake;
+import org.usfirst.frc.team3314.robot.subsystems.Intake.IntakeState;
+import edu.wpi.first.wpilibj.Timer;
 
 public abstract class Autonomous {
 	
@@ -21,7 +22,7 @@ public abstract class Autonomous {
 	private Arm arm = Arm.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
 	private PathFollower pathFollower = new PathFollower();
-	private CSVParser parser = new CSVParser();
+	private Timer timer = new Timer();
 	
 	public abstract void reset();
 
@@ -66,14 +67,29 @@ public abstract class Autonomous {
 			System.out.println("NO MATCH DATA RECIEVED");
 		}
 	}
-	public void intakeCube() {
-		intake.setDesiredSpeed(1);
+	public void resetTimer() {
+		timer.reset();
 	}
-	public void outtakeCube() {
-		intake.setDesiredSpeed(-1);
+	public void startTimer() {
+		timer.start();
+	}
+	public double getTime() {
+		return timer.get();
+	}
+	public void intakeCube() {
+		intake.setDesiredState(IntakeState.INTAKING);
+	}
+	public void releaseCube() {
+		intake.setDesiredState(IntakeState.RELEASING);
+	}
+	public void stopIntake()  {
+		intake.setDesiredState(IntakeState.HOLDING);
 	}
 	public boolean hasCube() {
-		return true;
+		return intake.getState() == IntakeState.HOLDING && intake.senseCube();
+	}
+	public boolean hasNoCube() {
+		return intake.getState() == IntakeState.HOLDING && !intake.senseCube();
 	}
 
 }

@@ -49,13 +49,31 @@ public class HumanInput {
 	public boolean getFullSpeedForward() {
 		return rightStick.getRawButton(11) && rightStick.getRawButton(10);
 	}
-	
 	public boolean getIntake() {
-		return gamepad.getRawButton(1);
+		return gamepad.getRawButton(5);
+	}
+	
+	public boolean getIntakePressed() {
+		return gamepad.getRawButtonPressed(5);
 	}
 	
 	public boolean getOuttake() {
 		return gamepad.getRawButton(2);
+	}
+	public boolean getUnjam() {
+		return gamepad.getRawButton(3);
+	}
+	public boolean getUnjamPressed() {
+		return gamepad.getRawButtonPressed(3);
+	}
+	public boolean getIntakeOverride() {
+		return gamepad.getRawButton(1);
+	}
+	public double getArmSetpoint() {
+		return gamepad.getRawAxis(1);
+	}
+	public double getTelescopeSetpoint() {
+		return gamepad.getRawAxis(4);
 	}
 	public int getBinaryOne() {
 		if(buttonBox.getRawButton(13)) {

@@ -19,6 +19,7 @@ public class AutoNothing extends Autonomous {
 	public void update() {
 		switch (currentState) {
 		case START:
+			System.out.println(getStart() + getSwitch() + getScale());
 			resetSensors();
 			currentState = State.DONE;
 			break;

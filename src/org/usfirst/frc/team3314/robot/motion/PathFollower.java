@@ -37,7 +37,7 @@ public class PathFollower {
 	
 	public void start() {
 		pathFinished = false;
-		drive.currentDriveMode = driveMode.MOTION_PROFILE;
+		drive.setDriveMode(driveMode.MOTION_PROFILE);
 		drive.setMotionProfileStatus(1);
 		notifier.startPeriodic(0.002);
 	}
