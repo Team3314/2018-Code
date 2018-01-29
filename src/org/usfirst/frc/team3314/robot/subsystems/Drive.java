@@ -1,6 +1,5 @@
 package org.usfirst.frc.team3314.robot.subsystems;
 
-
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -193,7 +192,6 @@ public class Drive implements Subsystem {
     	
     	mRightSlave2 = new WPI_TalonSRX(5);
     	mRightSlave2.follow(mRightMaster);
-    	
     	
     	resetSensors();
     	

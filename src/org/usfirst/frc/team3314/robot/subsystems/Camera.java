@@ -1,5 +1,7 @@
 package org.usfirst.frc.team3314.robot.subsystems;
 
+import org.usfirst.frc.team3314.robot.Tracking;
+
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,6 +15,8 @@ public class Camera {
 			targetVertOffset = limelight.getEntry("ty").getDouble(0);
 			targetArea = limelight.getEntry("ta").getDouble(0);
 			targetSkew = limelight.getEntry("ts").getDouble(0);
+			
+			Tracking.getInstance().update();
 			outputToSmartDashboard();
 		}
 	}
@@ -47,6 +51,10 @@ public class Camera {
 	
 	public double getError() {
 		return targetHorizOffset;
+	}
+	
+	public double getSteeringAdjust() {
+		return steeringAdjust;
 	}
 	
 	public String getLEDMode() {

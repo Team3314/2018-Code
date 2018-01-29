@@ -12,12 +12,13 @@ public class Arm implements Subsystem {
 		return mInstance;
 	}
 	
-	WPI_TalonSRX telescopingTalon, armMaster, armSlave;
+	private WPI_TalonSRX telescopingTalon, armMaster, armSlave;
+	private double desiredArmPos, desiredTelescopePos;
 	
 	private Arm() {
 		telescopingTalon = new WPI_TalonSRX(8);
     	telescopingTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 0);
-		
+    	
     	armMaster = new WPI_TalonSRX(9);
 		armMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 0);
 		
@@ -27,11 +28,21 @@ public class Arm implements Subsystem {
 		resetSensors();
 	}
 	
+	public void setArmPosition(double armPosition) {
+		desiredArmPos = armPosition;
+	}
+	
+	public void setTelescopePosition(double telescopingPosition) {
+		desiredTelescopePos = telescopingPosition;
+	}
+		
 	@Override
 	public void update() {
+		telescopingTalon.set(ControlMode.Position, desiredTelescopePos);
+		armMaster.set(ControlMode.Position, desiredArmPos);
 		outputToSmartDashboard();
 	}
-
+	
 	private void outputToSmartDashboard() {
 	}
 

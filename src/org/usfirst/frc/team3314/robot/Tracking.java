@@ -10,7 +10,7 @@ public class Tracking {
 		START,
 		//SEEK,
 		TRACK,
-		STOP,
+		//STOP,
 		DRIVE,
 		DONE
 	}
@@ -46,7 +46,7 @@ public class Tracking {
 		switch (currentState) {
 		case START:
 			if (camera.trackingRequest) {
-				drive.setDriveMode(driveMode.VISION_CONTROL);
+				//drive.setDriveMode(driveMode.VISION_CONTROL);
 				currentState = /*State.SEEK;*/ State.TRACK;
 			}
 			break;
@@ -57,21 +57,26 @@ public class Tracking {
 			}
 			break;*/
 		case TRACK:
+			drive.setDriveMode(driveMode.VISION_CONTROL);
 			camera.setSteeringAdjust(Constants.kGyroLock_kP*camera.getError());
 			if (Math.abs(camera.getError()) < 0.1) {
-				currentState = State.STOP;
+				currentState = /*State.STOP;*/ State.DRIVE;
 			}
 			break;
-		case STOP:
+		/*case STOP:
 			drive.setDriveMode(driveMode.GYROLOCK);
 			drive.setDesiredSpeed(0);
 			currentState = State.DRIVE;
-			break;
+			break;*/
 		case DRIVE:
+			drive.setDriveMode(driveMode.GYROLOCK);
 			drive.setDesiredAngle(drive.getAngle());
 			drive.setDesiredSpeed(0.25);
 			intake.setDesiredSpeed(1);
-			if (!camera.isTargetInView()) {
+			
+			if (camera.getError() > 1) {
+				currentState = State.TRACK;
+			} else if (!camera.isTargetInView()) {
 				currentState = State.DONE;
 			}
 			break;
@@ -86,5 +91,6 @@ public class Tracking {
 		}
 		
 		SmartDashboard.putString("Tracking state", currentState.toString());
+		SmartDashboard.putNumber("Steering adjust", camera.getSteeringAdjust());
 	}
 }

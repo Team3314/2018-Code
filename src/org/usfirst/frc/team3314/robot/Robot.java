@@ -31,7 +31,6 @@ public class Robot extends IterativeRobot {
 	private Arm arm = Arm.getInstance();
 	
 	private Camera camera = Camera.getInstance();
-	private Tracking tracking = Tracking.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
 	
 	//private AutoModeExecuter autoExecuter = new AutoModeExecuter();
@@ -100,7 +99,6 @@ public class Robot extends IterativeRobot {
 		drive.update();
 		intake.update();
 		arm.update();
-		tracking.update();
 		selectedAutoMode.update();
 	}
 
@@ -122,7 +120,6 @@ public class Robot extends IterativeRobot {
 		drive.update();
 		intake.update();
 		arm.update();
-		tracking.update();
 		
 		if(hi.getGyrolock()) {
 			if(!lastGyrolock) {
