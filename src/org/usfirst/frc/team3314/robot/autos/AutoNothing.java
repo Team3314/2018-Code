@@ -10,11 +10,7 @@ public class AutoNothing extends Autonomous {
 		DONE
 	}
 	
-	State currentState;
-	
-	public AutoNothing() {
-		currentState = State.START;
-	}
+	State currentState = State.START;
 	
 	public void reset() {
 		currentState = State.START;
@@ -23,6 +19,7 @@ public class AutoNothing extends Autonomous {
 	public void update() {
 		switch (currentState) {
 		case START:
+			System.out.println(getStart() + getSwitch() + getScale());
 			resetSensors();
 			currentState = State.DONE;
 			break;
@@ -32,11 +29,5 @@ public class AutoNothing extends Autonomous {
 		}
 
 		SmartDashboard.putString("Auto state", currentState.toString());
-	}
-
-	@Override
-	public void setGameData(String data) {
-		// TODO Auto-generated method stub
-		
 	}
 }

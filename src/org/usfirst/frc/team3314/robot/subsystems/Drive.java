@@ -19,6 +19,7 @@ import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class Drive implements Subsystem {
@@ -38,7 +39,7 @@ public class Drive implements Subsystem {
 	}
 	
 	//Control mode
-	public driveMode currentDriveMode = driveMode.OPEN_LOOP;
+	private driveMode currentDriveMode = driveMode.OPEN_LOOP;
 	ControlMode controlMode = ControlMode.PercentOutput;
 	
 	//Hardware
@@ -134,8 +135,8 @@ public class Drive implements Subsystem {
 		//Sets the PID controller to treat 180 and -180 to be the same point, 
 		//so that when turning the robot takes the shortest path instead of going the long way around
 		//Effectively changes PID input from a line to a circle
-	    gyroControl.setContinuous(); 
 		gyroControl.setInputRange(-180, 180);
+	    gyroControl.setContinuous(); 
 		gyroControl.setOutputRange(-.7, .7);		// Limits speed of turn to prevent overshoot
 		gyroControl.setAbsoluteTolerance(1);
     	
@@ -155,10 +156,10 @@ public class Drive implements Subsystem {
     	mLeftMaster.config_kF(0, Constants.kMotionProfile_kF, 0);
     	
     	//Gyrolock gains
-    	mLeftMaster.config_kP(0, Constants.kGyroLock_kP, 0); //slot, value, timeout
-    	mLeftMaster.config_kI(0, Constants.kGyroLock_kI, 0);
-    	mLeftMaster.config_kD(0, Constants.kGyroLock_kD, 0);
-    	mLeftMaster.config_kF(0, Constants.kGyroLock_kF, 0);
+    	mLeftMaster.config_kP(Constants.kGyroLockSlot, Constants.kGyroLock_kP, 0); //slot, value, timeout
+    	mLeftMaster.config_kI(Constants.kGyroLockSlot, Constants.kGyroLock_kI, 0);
+    	mLeftMaster.config_kD(Constants.kGyroLockSlot, Constants.kGyroLock_kD, 0);
+    	mLeftMaster.config_kF(Constants.kGyroLockSlot, Constants.kGyroLock_kF, 0);
     	
     	mLeftSlave1 = new WPI_TalonSRX(1);
     	mLeftSlave1.follow(mLeftMaster);
@@ -175,16 +176,16 @@ public class Drive implements Subsystem {
     	mRightMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
     	//Motion Profile Gains
     	mRightMaster.selectProfileSlot(0, 0);
-    	mRightMaster.config_kP(0, Constants.kMotionProfile_kP, 0); //slot, value, timeout
-    	mRightMaster.config_kI(0, Constants.kMotionProfile_kI, 0);
-    	mRightMaster.config_kD(0, Constants.kMotionProfile_kD, 0);
-    	mRightMaster.config_kF(0, Constants.kMotionProfile_kF, 0);
+    	mRightMaster.config_kP(Constants.kMotionProfileSlot, Constants.kMotionProfile_kP, 0); //slot, value, timeout
+    	mRightMaster.config_kI(Constants.kMotionProfileSlot, Constants.kMotionProfile_kI, 0);
+    	mRightMaster.config_kD(Constants.kMotionProfileSlot, Constants.kMotionProfile_kD, 0);
+    	mRightMaster.config_kF(Constants.kMotionProfileSlot, Constants.kMotionProfile_kF, 0);
     	
     	//Gyrolock gains
-    	mRightMaster.config_kP(0, Constants.kGyroLock_kP, 0); //slot, value, timeout
-    	mRightMaster.config_kI(0, Constants.kGyroLock_kI, 0);
-    	mRightMaster.config_kD(0, Constants.kGyroLock_kD, 0);
-    	mRightMaster.config_kF(0, Constants.kGyroLock_kF, 0);
+    	mRightMaster.config_kP(Constants.kGyroLockSlot, Constants.kGyroLock_kP, 0); //slot, value, timeout
+    	mRightMaster.config_kI(Constants.kGyroLockSlot, Constants.kGyroLock_kI, 0);
+    	mRightMaster.config_kD(Constants.kGyroLockSlot, Constants.kGyroLock_kD, 0);
+    	mRightMaster.config_kF(Constants.kGyroLockSlot, Constants.kGyroLock_kF, 0);
     	
     	
     	mRightSlave1 = new WPI_TalonSRX(4);

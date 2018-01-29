@@ -3,13 +3,11 @@ package org.usfirst.frc.team3314.robot;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-//import org.usfirst.frc.team3314.robot.autos.AutoModeExecuter;
 import org.usfirst.frc.team3314.robot.autos.Autonomous;
 import org.usfirst.frc.team3314.robot.motion.PathFollower;
 import org.usfirst.frc.team3314.robot.subsystems.*;
 import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
-
+import org.usfirst.frc.team3314.robot.subsystems.Intake.IntakeState;
 import com.cruzsbrian.robolog.Log;
 
 //import com.ctre.*;
@@ -33,7 +31,6 @@ public class Robot extends IterativeRobot {
 	private Camera camera = Camera.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
 	
-	//private AutoModeExecuter autoExecuter = new AutoModeExecuter();
 	private AutoModeSelector selector = new AutoModeSelector();
 	private PathFollower pathFollower = new PathFollower();
 
@@ -74,7 +71,6 @@ public class Robot extends IterativeRobot {
 	public void disabledInit() {
 		pathFollower.stop();
 		drive.setDriveMode(driveMode.IDLE);
-		//autoExecuter.stop();
 	}
 	
 	@Override
@@ -88,7 +84,6 @@ public class Robot extends IterativeRobot {
 		drive.setDriveMode(driveMode.IDLE);
 		selectedAutoMode = selector.getSelectedAutoMode();
 		drive.logger.createNewFile("Auto");
-		//autoExecuter.start();
 	}
 
 	/**
@@ -97,8 +92,11 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		drive.update();
+		/* XXX Temporarily commented out until these subsystems are installed on the robot
+		arm.update();
 		intake.update();
 		arm.update();
+		*/
 		selectedAutoMode.update();
 	}
 
@@ -120,6 +118,21 @@ public class Robot extends IterativeRobot {
 		drive.update();
 		intake.update();
 		arm.update();
+		
+		// Intake Controls
+		intake.setOverride(hi.getIntakeOverride());
+		if(hi.getIntakePressed()) {
+			intake.setDesiredState(IntakeState.INTAKING);
+		}
+		else if(hi.getOuttake()) {
+			intake.setDesiredState(IntakeState.RELEASING);
+		}
+		else if(hi.getUnjamPressed()) {
+			intake.setDesiredState(IntakeState.UNJAMMING);
+		}
+		else if(!hi.getIntake() && !hi.getUnjam() && !hi.getOuttake()) {
+			intake.setDesiredState(IntakeState.HOLDING);
+		}
 		
 		if(hi.getGyrolock()) {
 			if(!lastGyrolock) {
@@ -145,14 +158,6 @@ public class Robot extends IterativeRobot {
 		
 		if(hi.getFullSpeedForward()) {
 			drive.setDesiredSpeed(1);
-		}
-		
-		if(hi.getIntake()) {
-			intake.setDesiredSpeed(1);
-		}
-		
-		if(hi.getOuttake()) {
-			intake.setDesiredSpeed(-1);
 		}
 		
 		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());

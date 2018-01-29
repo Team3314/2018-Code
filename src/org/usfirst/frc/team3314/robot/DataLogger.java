@@ -17,12 +17,7 @@ public class DataLogger {
 	PrintWriter pw;
 	StringBuilder sb;
     boolean run = false;
-    
-    
-	
-	public DataLogger() {
-	}
-	
+
 	public void createNewFile(String name) {
 		run = false;
 		data = new File("/home/lvuser/"+ name + System.currentTimeMillis() + ".csv");
