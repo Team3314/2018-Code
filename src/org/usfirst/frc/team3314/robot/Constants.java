@@ -1,7 +1,6 @@
 package org.usfirst.frc.team3314.robot;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import jaci.pathfinder.Trajectory;
 
 public class Constants {
 	

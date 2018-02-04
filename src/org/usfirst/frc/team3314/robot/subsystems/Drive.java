@@ -19,7 +19,6 @@ import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class Drive implements Subsystem {
@@ -99,8 +98,8 @@ public class Drive implements Subsystem {
     			controlMode = ControlMode.PercentOutput;
     			break;
     		case VISION_CONTROL:
-    			rawLeftSpeed = leftStickInput + camera.steeringAdjust;
-    			rawRightSpeed = leftStickInput - camera.steeringAdjust;
+    			rawLeftSpeed = leftStickInput + camera.getSteeringAdjust();
+    			rawRightSpeed = leftStickInput - camera.getSteeringAdjust();
     			controlMode = ControlMode.PercentOutput;
     			break;
     		case MOTION_PROFILE:

@@ -3,7 +3,6 @@ package org.usfirst.frc.team3314.robot.subsystems;
 import org.usfirst.frc.team3314.robot.Constants;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;

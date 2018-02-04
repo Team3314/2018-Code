@@ -33,8 +33,8 @@ public class Camera {
 	
 	private double targetsInView, targetHorizOffset, targetVertOffset, targetArea, targetSkew, ledMode;
 	
-	public double steeringAdjust;
-	public boolean trackingRequest = false;
+	private double steeringAdjust;
+	private boolean trackingRequest = false;
 	
 	public void start() {
 		// camera = 90 fps/hz = 1 frame per 11.1 ms = 0.0111 sec
@@ -57,6 +57,10 @@ public class Camera {
 		return steeringAdjust;
 	}
 	
+	public boolean getTrackingRequest() {
+		return trackingRequest;
+	}
+	
 	public String getLEDMode() {
 		if (ledMode == 1) {
 			return "OFF";
@@ -65,6 +69,10 @@ public class Camera {
 		
 	public void setSteeringAdjust(double adjust) {
 		steeringAdjust = adjust;
+	}
+	
+	public void setTrackingRequest(boolean request) {
+		trackingRequest = request;
 	}
 	
 	public void setLEDMode(int ledMode) {

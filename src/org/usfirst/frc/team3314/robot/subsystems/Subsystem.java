@@ -4,6 +4,5 @@ public interface Subsystem {
 
 	public void update();
 		
-	public void resetSensors();
-	
+	public void resetSensors();	
 }

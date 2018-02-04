@@ -146,7 +146,7 @@ public class Robot extends IterativeRobot {
 		}
 		
 		if (hi.getVisionCtrl()) {
-			camera.trackingRequest = true;
+			camera.setTrackingRequest(true);
 		}
 		
 		if(hi.getHighGear()) {

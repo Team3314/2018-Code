@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Tracking {
 
-	enum State {
+	enum TrackingState {
 		START,
 		//SEEK,
 		TRACK,
@@ -25,29 +25,28 @@ public class Tracking {
 	private Intake intake = Intake.getInstance();
 	private Camera camera = Camera.getInstance();
 	
-	State currentState;
-	double time = 0;
+	TrackingState currentState;
 	
 	public Tracking() {
-		currentState = State.START;
+		currentState = TrackingState.START;
 	}
 	
 	public void reset() {
 		// TODO Auto-generated method stub
-		currentState = State.START;
+		currentState = TrackingState.START;
 	}
 	
 	public void update() {
 		// TODO Auto-generated method stub
-		if (!camera.trackingRequest) {
-			currentState = State.DONE;
+		if (camera.getTrackingRequest() == false) {
+			currentState = TrackingState.DONE;
 		}
 		
 		switch (currentState) {
 		case START:
-			if (camera.trackingRequest) {
+			if (camera.getTrackingRequest() == true) {
 				//drive.setDriveMode(driveMode.VISION_CONTROL);
-				currentState = /*State.SEEK;*/ State.TRACK;
+				currentState = /*State.SEEK;*/ TrackingState.TRACK;
 			}
 			break;
 		/*case SEEK:
@@ -60,7 +59,7 @@ public class Tracking {
 			drive.setDriveMode(driveMode.VISION_CONTROL);
 			camera.setSteeringAdjust(Constants.kGyroLock_kP*camera.getError());
 			if (Math.abs(camera.getError()) < 0.1) {
-				currentState = /*State.STOP;*/ State.DRIVE;
+				currentState = /*State.STOP;*/ TrackingState.DRIVE;
 			}
 			break;
 		/*case STOP:
@@ -75,22 +74,22 @@ public class Tracking {
 			intake.setDesiredSpeed(1);
 			
 			if (camera.getError() > 1) {
-				currentState = State.TRACK;
+				currentState = TrackingState.TRACK;
 			} else if (!camera.isTargetInView()) {
-				currentState = State.DONE;
+				currentState = TrackingState.DONE;
 			}
 			break;
 		case DONE:
 			drive.setDesiredSpeed(0);
 			intake.setDesiredSpeed(0);
 			drive.setDriveMode(driveMode.OPEN_LOOP);
-			
-			camera.trackingRequest = false;
-			currentState = State.START;
+			camera.setTrackingRequest(false);
+			currentState = TrackingState.START;
 			break;
 		}
 		
 		SmartDashboard.putString("Tracking state", currentState.toString());
 		SmartDashboard.putNumber("Steering adjust", camera.getSteeringAdjust());
+		SmartDashboard.putBoolean("Tracking request", camera.getTrackingRequest());
 	}
 }
