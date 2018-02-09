@@ -22,12 +22,12 @@ public class Intake {
 
 	private static Intake mInstance = new Intake();
 	
-	//TODO add intake sensor, finish state machine
+	//TODO add intake sensor
 	
 	private WPI_TalonSRX mRollerLeft, mRollerRight;
 	private DigitalInput cubeSensor;
 	private double leftSpeed, rightSpeed;
-	private int time = 0, stallTimer = 0;
+	private int stallTimer = 0;
 	private Timer timer = new Timer();
 	
 	private boolean override = false;
@@ -43,6 +43,8 @@ public class Intake {
 		switch(currentState) {
 			case HOLDING:
 				setDesiredSpeed(0);
+				timer.stop();
+				timer.reset();
 				break;
 			case INTAKING:
 				setDesiredSpeed(1);
@@ -60,7 +62,7 @@ public class Intake {
 						currentState = IntakeState.UNJAMMING;
 					}
 					*/
-				if(motorsStalled()) {
+				if(!motorsStalled()) {
 						currentState = IntakeState.UNJAMMING;
 						timer.start();
 					}
@@ -77,6 +79,7 @@ public class Intake {
 					*/
 					if(getTime() >= .3) {
 						currentState = IntakeState.INTAKING;
+						timer.stop();
 						timer.reset();
 					}
 				}

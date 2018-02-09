@@ -66,6 +66,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledInit() {
 		pathFollower.stop();
+		arm.stop();
 		drive.setDriveMode(driveMode.IDLE);
 	}
 	
@@ -77,6 +78,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		drive.flushTalonBuffer();
+		arm.start();
 		drive.setDriveMode(driveMode.IDLE);
 		selectedAutoMode = selector.getSelectedAutoMode();
 		drive.logger.createNewFile("Auto");
@@ -103,6 +105,7 @@ public class Robot extends IterativeRobot {
 		drive.logger.createNewFile("Teleop");
 		pathFollower.stop();
 		drive.resetSensors();
+		arm.start();
 		drive.flushTalonBuffer();
 	}
 	
@@ -152,6 +155,10 @@ public class Robot extends IterativeRobot {
 		}
 		else if(hi.getLowGear()) {
 			drive.setHighGear(false);
+		}
+		
+		if(hi.getPTO()) {
+			drive.setPTO(!drive.getPTO());
 		}
 		
 		if(hi.getFullSpeedForward()) {

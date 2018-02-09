@@ -36,14 +36,14 @@ public class AutoCubeToSwitch extends Autonomous {
 			case DRIVE:
 				if(isPathDone()) {
 					currentState = State.RELEASE_CUBE;
+					startTimer();
 					releaseCube();
-					time = 25;
 				}
 				break;
 			case RELEASE_CUBE:
-				time--;
-				if(time == 0) {
+				if(getTime() >= .5) {
 					stopIntake();
+					resetTimer();
 					currentState = State.DONE;
 				}
 				break;

@@ -25,11 +25,15 @@ public class PathFollower {
 	private double updateRate = 1/50;
 	private long waitTime = (long) (updateRate * 1000.0);
 	private Thread thread = null;
+	private boolean running = false;
 	private MotionProfileStatus leftStatus = new MotionProfileStatus(), rightStatus = new MotionProfileStatus();
 	
 	class PeriodicRunnable implements java.lang.Runnable {
 		@Override
 		public void run() {
+			if(!running) {
+				notifier.stop();
+			}
 			drive.processMotionProfilePoints();
 		}
 	}
@@ -40,11 +44,12 @@ public class PathFollower {
 		drive.setDriveMode(driveMode.MOTION_PROFILE);
 		drive.setMotionProfileStatus(1);
 		notifier.startPeriodic(0.002);
+		running = true;
 	}
 	
 	public void stop() {
 		drive.setMotionProfileStatus(0);
-		notifier.stop();
+		running = false;
 	}
 	
 	public void loadPoints(Path path) {

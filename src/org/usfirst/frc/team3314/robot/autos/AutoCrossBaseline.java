@@ -15,13 +15,8 @@ public class AutoCrossBaseline extends Autonomous {
 		DONE
 	}
 	
-	//Switch and Scale sides
-	private char switchSide = ' ';
-	private char scaleSide = ' ';
-	
 	private Drive drive = Drive.getInstance();
 	private State currentState;
-	private double time = 50;
 	
 	public AutoCrossBaseline() {
 		currentState = State.START;
@@ -38,20 +33,17 @@ public class AutoCrossBaseline extends Autonomous {
 		case START:
 			resetSensors();
 			currentState = State.DRIVE;
+			startTimer();
 			break;
 		case DRIVE:
-			drive.setDesiredAngle(0);
-			drive.setDriveMode(driveMode.GYROLOCK);
 			drive.setDesiredSpeed(0.25);
-			if (drive.getAveragePosition() > 100) { //placeholder
+			if (getTime() >= 10) { //placeholder
 				currentState = State.STOP;
 			}
 			break;
 		case STOP:
 			drive.setDesiredSpeed(0);
-			if (time <= 0) {
-				currentState = State.DONE;
-			}
+			currentState = State.DONE;
 			break;
 		case DONE:
 			break;

@@ -42,8 +42,8 @@ public class AutoCubeToScale extends Autonomous {
 		case RELEASE_CUBE:
 			if(getTime() >= .5) {
 				stopIntake();
-				currentState = State.DONE;
 				resetTimer();
+				currentState = State.DONE;
 			}
 			break;
 		case DONE:

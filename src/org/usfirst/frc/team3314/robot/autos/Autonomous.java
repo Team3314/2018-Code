@@ -7,6 +7,7 @@ import org.usfirst.frc.team3314.robot.motion.PathFollower;
 import org.usfirst.frc.team3314.robot.paths.Path;
 import org.usfirst.frc.team3314.robot.paths.PathList;
 import org.usfirst.frc.team3314.robot.subsystems.Arm;
+import org.usfirst.frc.team3314.robot.subsystems.Arm.ArmState;
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
 import org.usfirst.frc.team3314.robot.subsystems.Intake;
 import org.usfirst.frc.team3314.robot.subsystems.Intake.IntakeState;
@@ -68,6 +69,7 @@ public abstract class Autonomous {
 		}
 	}
 	public void resetTimer() {
+		timer.stop();
 		timer.reset();
 	}
 	public void startTimer() {
@@ -90,6 +92,21 @@ public abstract class Autonomous {
 	}
 	public boolean hasNoCube() {
 		return intake.getState() == IntakeState.HOLDING && !intake.senseCube();
+	}
+	public void armToScale() {
+		arm.goToScalePosition();
+	}
+	public void armToSwitch() {
+		arm.goToSwitchPosition();
+	}
+	public void armToPickUp() {
+		arm.goToPickUpPosition();
+	}
+	public void armToHolding() {
+		arm.goToHoldingPosition();
+	}
+	public boolean armStopped() {
+		return arm.getState() == ArmState.HOLDING;
 	}
 
 }

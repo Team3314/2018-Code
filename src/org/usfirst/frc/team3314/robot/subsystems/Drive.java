@@ -45,12 +45,13 @@ public class Drive {
 	
 	//Hardware
 	private WPI_TalonSRX mLeftMaster, mLeftSlave1, mLeftSlave2, mRightMaster, mRightSlave1, mRightSlave2;
-	private DoubleSolenoid shifter;
+	private DoubleSolenoid shifter ,pto;
 	private PowerDistributionPanel pdp;
 	private AHRS navx;
 	
 	//Hardware states
 	private boolean mIsHighGear;
+	private boolean mIsPTO;
     private boolean mIsBrakeMode;
     
     //Data Logging
@@ -74,6 +75,12 @@ public class Drive {
     	}
     	else {
     		shifter.set(Constants.kLowGear);
+    	}
+    	if(mIsPTO) {
+    		pto.set(Constants.kPTOIn);
+    	}
+    	else {
+    		pto.set(Constants.kPTOOut);
     	}
     	outputToSmartDashboard();
     	updateSpeedAndPosition();
@@ -126,7 +133,8 @@ public class Drive {
     	
 		//Hardware
     	pdp  = new PowerDistributionPanel();
-    	shifter = new DoubleSolenoid(2, 3);
+    	shifter = new DoubleSolenoid(0, 1);
+    	pto = new DoubleSolenoid(2, 3);
     	navx = new AHRS(SPI.Port.kMXP);
     	
     	//Gyro PID
@@ -199,6 +207,7 @@ public class Drive {
     	resetSensors();
     	
     	mIsHighGear = false;
+    	mIsPTO = false;
     }
     
     public void setStickInputs(double leftInput, double rightInput) {
@@ -244,7 +253,7 @@ public class Drive {
     }
     
     public void setDesiredSpeed(double leftSpeed, double rightSpeed) {
-    	rawLeftSpeed = leftSpeed; //makes sure 
+    	rawLeftSpeed = leftSpeed;
     	rawRightSpeed = rightSpeed;
     }
     
@@ -258,6 +267,14 @@ public class Drive {
     
     public void setHighGear(boolean highGear) {
     	mIsHighGear = highGear;
+    }
+    
+    public void setPTO(boolean pto) {
+    	mIsPTO = pto;
+    }
+    
+    public boolean getPTO() {
+    	return mIsPTO;
     }
     
     private void logSpeed() {
