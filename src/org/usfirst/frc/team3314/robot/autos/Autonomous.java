@@ -93,20 +93,23 @@ public abstract class Autonomous {
 	public boolean hasNoCube() {
 		return intake.getState() == IntakeState.HOLDING && !intake.senseCube();
 	}
-	public void armToScale() {
-		arm.goToScalePosition();
+	public void armToScaleHigh() {
+		arm.setDesiredState(ArmState.TO_SCALE_HIGH);
+	}
+	public void armToScaleLow() {
+		arm.setDesiredState(ArmState.TO_SCALE_LOW);
 	}
 	public void armToSwitch() {
-		arm.goToSwitchPosition();
+		arm.setDesiredState(ArmState.TO_SWITCH);
 	}
 	public void armToPickUp() {
-		arm.goToPickUpPosition();
+		arm.setDesiredState(ArmState.TO_PICKUP);
 	}
 	public void armToHolding() {
-		arm.goToHoldingPosition();
+		arm.setDesiredState(ArmState.TO_HOLDING);
 	}
 	public boolean armStopped() {
-		return arm.getState() == ArmState.HOLDING;
+		return arm.getState() == ArmState.STOPPED;
 	}
 
 }

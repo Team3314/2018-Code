@@ -82,7 +82,6 @@ public class Drive {
     	else {
     		pto.set(Constants.kPTOOut);
     	}
-    	outputToSmartDashboard();
     	updateSpeedAndPosition();
     	logSpeed();
     	switch(currentDriveMode) {
@@ -128,7 +127,6 @@ public class Drive {
     private Drive() {
     	// Logger
     	 logger = DataLogger.getInstance();
-    	 
     	 camera = Camera.getInstance();
     	
 		//Hardware
@@ -178,7 +176,7 @@ public class Drive {
     	mLeftSlave2.follow(mLeftMaster);
     	mLeftSlave2.setInverted(true);
     	
-    	mRightMaster = new WPI_TalonSRX(3);
+    	mRightMaster = new WPI_TalonSRX(7);
     	mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
     	mRightMaster.setSensorPhase(true);
     	mRightMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
@@ -197,10 +195,10 @@ public class Drive {
     	mRightMaster.config_kF(Constants.kGyroLockSlot, Constants.kGyroLock_kF, 0);
     	
     	
-    	mRightSlave1 = new WPI_TalonSRX(4);
+    	mRightSlave1 = new WPI_TalonSRX(8);
     	mRightSlave1.follow(mRightMaster);
     	
-    	mRightSlave2 = new WPI_TalonSRX(5);
+    	mRightSlave2 = new WPI_TalonSRX(9);
     	mRightSlave2.follow(mRightMaster);
     	
     	
@@ -295,7 +293,7 @@ public class Drive {
 
     }
     
-    private void outputToSmartDashboard() {
+    public void outputToSmartDashboard() {
     	SmartDashboard.putNumber("Left Encoder Ticks", leftDrivePositionTicks);
     	SmartDashboard.putNumber("Right Encoder Ticks", rightDrivePositionTicks);
     	SmartDashboard.putNumber("Left Encoder Position", leftDrivePositionInches);
@@ -355,8 +353,12 @@ public class Drive {
     
     public void resetSensors() {
     	navx.reset();
+    	mRightMaster.disable();
+    	mLeftMaster.disable();
     	resetDriveEncoders();
     }
+    
+    
     
     public void pushPoints(TrajectoryPoint leftPoint, TrajectoryPoint rightPoint) {
     	mLeftMaster.pushMotionProfileTrajectory(leftPoint);
@@ -386,6 +388,6 @@ public class Drive {
     }
     
     public void setMotionProfileStatus(int status) { //0,1,2
-    	motionProfileMode = status;
-    }
+		motionProfileMode = status;
+	}
 }

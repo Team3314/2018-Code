@@ -57,7 +57,7 @@ public class AutoSwitchThenScale extends Autonomous {
 				currentState = State.DRIVE_TO_SCALE;
 				loadPath(secondPath);
 				startPathFollower();
-				armToScale();
+				armToScaleHigh();
 			}
 			break;
 		case DRIVE_TO_SCALE:

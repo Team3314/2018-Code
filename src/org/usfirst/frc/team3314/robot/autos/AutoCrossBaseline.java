@@ -31,7 +31,6 @@ public class AutoCrossBaseline extends Autonomous {
 	public void update() {
 		switch (currentState) {
 		case START:
-			resetSensors();
 			currentState = State.DRIVE;
 			startTimer();
 			break;

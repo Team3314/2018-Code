@@ -26,7 +26,6 @@ public class AutoCubeToScale extends Autonomous {
 	public void update() {
 		switch (currentState) {
 		case START:
-			resetSensors();
 			selectedPath = getPath(getStart() + getScale());
 			loadPath(selectedPath);
 			startPathFollower();

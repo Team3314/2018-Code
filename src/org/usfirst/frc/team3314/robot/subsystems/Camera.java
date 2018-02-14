@@ -27,8 +27,6 @@ public class Camera {
 		targetVertOffset = limelight.getEntry("ty").getDouble(0);
 		targetArea = limelight.getEntry("ta").getDouble(0);
 		targetSkew = limelight.getEntry("ts").getDouble(0);
-		
-		outputToSmartDashboard();
 	}
 		
 	public boolean isTargetInView() {

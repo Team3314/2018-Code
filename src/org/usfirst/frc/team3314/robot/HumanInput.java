@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Joystick;
  *Dpad Down - Arm to pickup position
  *Dpad Left - Arm to holding position
  *Dpad Right - Arm to Switch Position
- *Right Bumper - Arm Free Move mode
+ *Right Bumper - Arm To Outer Position
  *Left Trigger - Intake Override
  *Left Stick Y-Axis - Arm Rotation
  *Right Stick X-Axis - Telescoping
@@ -92,32 +92,40 @@ public class HumanInput {
 	public boolean getIntakeOverride() {
 		return gamepad.getRawAxis(2) > .5;
 	}
-	public double getArmSetpoint() {
-		return -gamepad.getRawAxis(1);
+	public double getArmSpeed() {
+		return Math.abs(gamepad.getRawAxis(1));
 	}
-	public double getTelescopeSetpoint() {
-		return -gamepad.getRawAxis(4);
+	public boolean getLowerArm() {
+		return -gamepad.getRawAxis(1) < -.01;
 	}
-	
-	public boolean getArmFreeMove() {
+	public boolean getRaiseArm() {
+		return -gamepad.getRawAxis(1) > .01;
+	}
+	public boolean getClimb() {
+		return gamepad.getRawButton(4) && gamepad.getRawAxis(3) > .5;
+	}
+
+	public boolean getScaleHigh() {
+		return getRaiseArm() && getArmOuterPosition();
+	}
+	public boolean getScaleLow() {
+		return getRaiseArm() && !getArmOuterPosition();
+	}
+	public boolean getPickup() {
+		return getLowerArm() && getArmOuterPosition();
+	}
+	public boolean getHold() {
+		return getLowerArm() && !getArmOuterPosition();
+	}
+	public boolean getStop() {
+		return !getLowerArm() && !getRaiseArm();
+	}
+	public boolean getArmOuterPosition() {
 		return gamepad.getRawButton(6);
 	}
 	
 	public boolean getPTO() {
 		return gamepad.getRawButton(8) && gamepad.getRawButton(7);
-	}
-	
-	public boolean  getArmPickup() {
-		return gamepad.getPOV() == 180;
-	}
-	public boolean getArmScale() {
-		return gamepad.getPOV() == 0;
-	}
-	public boolean getArmSwitch() {
-		return gamepad.getPOV() == 270;
-	}
-	public boolean getArmHolding() {
-		return gamepad.getPOV() == 90;
 	}
 	public int getLLBinaryOne() {
 		if(autoSelector.getRawButton(1))

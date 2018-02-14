@@ -26,7 +26,7 @@ public class CSVParser {
 	private boolean finishedParsing = false;
 	private Thread thread = null;
 	private boolean firstRun = true;
-	
+//	dab
 	 public void run(File leftPath, File rightPath) {
 		 if(leftPath != null && rightPath != null) {
 			 firstRun = true;

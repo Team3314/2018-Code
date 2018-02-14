@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team3314.robot.autos.Autonomous;
 import org.usfirst.frc.team3314.robot.motion.PathFollower;
 import org.usfirst.frc.team3314.robot.subsystems.*;
+import org.usfirst.frc.team3314.robot.subsystems.Arm.ArmState;
 import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 import org.usfirst.frc.team3314.robot.subsystems.Intake.IntakeState;
 import com.cruzsbrian.robolog.Log;
@@ -35,7 +36,7 @@ public class Robot extends IterativeRobot {
 	
 	Autonomous selectedAutoMode = null;
 	
-	private boolean lastGyrolock = false;
+	private boolean lastGyrolock = false, lastScaleHigh, lastScaleLow, lastPickup, lastHold, lastStop, lastClimb;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -44,12 +45,11 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {	
 		Log.startServer(1099);
-		drive.resetSensors();
 	}
 	
 	@Override
 	public void robotPeriodic() {
-		//drive.update();
+		outputToSmartDashboard();
 	}
 
 	/**
@@ -66,20 +66,18 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledInit() {
 		pathFollower.stop();
-		arm.stop();
-		drive.setDriveMode(driveMode.IDLE);
 	}
 	
 	@Override
 	public void disabledPeriodic() {
-		//drive.flushTalonBuffer();
 	}
 	
 	@Override
 	public void autonomousInit() {
 		drive.flushTalonBuffer();
-		arm.start();
 		drive.setDriveMode(driveMode.IDLE);
+		drive.resetSensors();
+		arm.startUp();
 		selectedAutoMode = selector.getSelectedAutoMode();
 		drive.logger.createNewFile("Auto");
 	}
@@ -89,23 +87,17 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		drive.update();
-		/* XXX Temporarily commented out until these subsystems are installed on the robot
-		arm.update();
-		intake.update();
-		camera.update();
-		tracking.update();
-		*/
+		allPeriodic();
 		selectedAutoMode.update();
 	}
 
-	
+
 	@Override
 	public void teleopInit() {
 		drive.logger.createNewFile("Teleop");
 		pathFollower.stop();
 		drive.resetSensors();
-		arm.start();
+		arm.startUp();
 		drive.flushTalonBuffer();
 	}
 	
@@ -114,11 +106,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		drive.update();
-		arm.update();
-		intake.update();
-		camera.update();
-		tracking.update();
+		allPeriodic();
 		
 		// Intake Controls
 		intake.setOverride(hi.getIntakeOverride());
@@ -134,6 +122,7 @@ public class Robot extends IterativeRobot {
 		else if(!hi.getIntake() && !hi.getUnjam() && !hi.getOuttake()) {
 			intake.setDesiredState(IntakeState.HOLDING);
 		}
+
 		
 		if(hi.getGyrolock()) {
 			if(!lastGyrolock) {
@@ -155,19 +144,54 @@ public class Robot extends IterativeRobot {
 		}
 		else if(hi.getLowGear()) {
 			drive.setHighGear(false);
-		}
-		
+		}	
 		if(hi.getPTO()) {
 			drive.setPTO(!drive.getPTO());
 		}
 		
-		if(hi.getFullSpeedForward()) {
-			drive.setDesiredSpeed(1);
+		//Arm Controls
+		if(hi.getScaleHigh() && !lastScaleHigh) {
+			arm.setDesiredState(ArmState.TO_SCALE_HIGH);
 		}
-		
+		else if(hi.getScaleLow() && !lastScaleLow) {
+			arm.setDesiredState(ArmState.TO_SCALE_LOW);
+		}
+		else if(hi.getPickup() && !lastPickup) {
+			arm.setDesiredState(ArmState.TO_PICKUP);
+		}
+		else if(hi.getHold() && !lastHold) {
+			arm.setDesiredState(ArmState.TO_HOLDING);
+		}
+		else if(hi.getClimb() && !lastClimb) {
+			arm.setDesiredState(ArmState.TO_CLIMB);
+		}
+		else if(hi.getStop() && !lastStop) {
+			arm.setDesiredState(ArmState.STOP);
+		}
+		arm.setTargetSpeed(hi.getArmSpeed());
 		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
 		SmartDashboard.putBoolean("Gyrolock", hi.getGyrolock());
 		lastGyrolock = hi.getGyrolock();
+		lastScaleHigh = hi.getScaleHigh();
+		lastScaleLow = hi.getScaleLow();
+		lastPickup = hi.getPickup();
+		lastHold = hi.getHold();
+		lastStop = hi.getStop();
+		lastClimb = hi.getClimb();
 		
+	}
+	public void allPeriodic() {
+		drive.update();
+		arm.update();
+		intake.update();
+		//camera.update();
+		//tracking.update();
+	}
+	
+	public void outputToSmartDashboard() {
+		arm.outputToSmartDashboard();
+		drive.outputToSmartDashboard();
+		intake.outputToSmartDashboard();
+		camera.outputToSmartDashboard();
 	}
 }

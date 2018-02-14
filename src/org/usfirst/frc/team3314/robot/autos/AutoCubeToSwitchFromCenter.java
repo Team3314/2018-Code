@@ -25,7 +25,6 @@ public class AutoCubeToSwitchFromCenter extends Autonomous {
 	public void update() {
 		switch (currentState) {
 		case START:
-			resetSensors();
 			selectedPath = getPath("StartC" + getSwitch());
 			loadPath(selectedPath);
 			startPathFollower();

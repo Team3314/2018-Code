@@ -36,7 +36,7 @@ public class AutoScaleThenSwitch extends Autonomous {
 			secondPath = getPath(getScale() + getSwitch());
 			loadPath(firstPath);
 			startPathFollower();
-			armToScale();
+			armToScaleHigh();
 			currentState = State.DRIVE_TO_SCALE;
 			break;
 		case DRIVE_TO_SCALE:
