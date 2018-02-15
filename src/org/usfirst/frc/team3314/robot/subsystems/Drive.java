@@ -98,9 +98,9 @@ public class Drive implements Subsystem {
     			controlMode = ControlMode.PercentOutput;
     			break;
     		case VISION_CONTROL:
-    			rawLeftSpeed = leftStickInput + camera.getSteeringAdjust();
-    			rawRightSpeed = leftStickInput - camera.getSteeringAdjust();
-    			controlMode = ControlMode.PercentOutput;
+    			rawLeftSpeed = camera.getSteeringAdjust();
+    			rawRightSpeed = -camera.getSteeringAdjust();
+    			controlMode = ControlMode.MotionMagic;
     			break;
     		case MOTION_PROFILE:
     			log();
@@ -147,14 +147,25 @@ public class Drive implements Subsystem {
     	mLeftMaster.setSensorPhase(true);
     	mLeftMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
     	mLeftMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
-    	mLeftMaster.selectProfileSlot(0, 0);
-    	//Gyrolock gains
+
+    	//motion profile gains
+    	mLeftMaster.selectProfileSlot(Constants.kMotionProfileSlot, 0);
     	mLeftMaster.config_kP(0, Constants.kMotionProfile_kP, 0); //slot, value, timeout
     	mLeftMaster.config_kI(0, Constants.kMotionProfile_kI, 0);
     	mLeftMaster.config_kD(0, Constants.kMotionProfile_kD, 0);
     	mLeftMaster.config_kF(0, Constants.kMotionProfile_kF, 0);
     	
+    	//vision ctrl gains
+    	mLeftMaster.selectProfileSlot(Constants.kVisionCtrlSlot, 0);
+    	mLeftMaster.config_kP(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kP, 0); //slot, value, timeout
+    	mLeftMaster.config_kI(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kI, 0);
+    	mLeftMaster.config_kD(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kD, 0);
+    	mLeftMaster.config_kF(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kF, 0);
+    	mLeftMaster.configMotionCruiseVelocity(Constants.kDrivetrainCruiseVelocity, 0);
+    	mLeftMaster.configMotionAcceleration(Constants.kDrivetrainAcceleration, 0);
+    	
     	//Gyrolock gains
+    	mLeftMaster.selectProfileSlot(Constants.kGyroLockSlot, 0);
     	mLeftMaster.config_kP(Constants.kGyroLockSlot, Constants.kGyroLock_kP, 0); //slot, value, timeout
     	mLeftMaster.config_kI(Constants.kGyroLockSlot, Constants.kGyroLock_kI, 0);
     	mLeftMaster.config_kD(Constants.kGyroLockSlot, Constants.kGyroLock_kD, 0);
@@ -168,29 +179,39 @@ public class Drive implements Subsystem {
     	mLeftSlave2.follow(mLeftMaster);
     	mLeftSlave2.setInverted(true);
     	
-    	mRightMaster = new WPI_TalonSRX(3);
+    	mRightMaster = new WPI_TalonSRX(9);
     	mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
     	mRightMaster.setSensorPhase(true);
     	mRightMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
     	mRightMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
     	//Motion Profile Gains
-    	mRightMaster.selectProfileSlot(0, 0);
+    	mRightMaster.selectProfileSlot(Constants.kMotionProfileSlot, 0);
     	mRightMaster.config_kP(Constants.kMotionProfileSlot, Constants.kMotionProfile_kP, 0); //slot, value, timeout
     	mRightMaster.config_kI(Constants.kMotionProfileSlot, Constants.kMotionProfile_kI, 0);
     	mRightMaster.config_kD(Constants.kMotionProfileSlot, Constants.kMotionProfile_kD, 0);
     	mRightMaster.config_kF(Constants.kMotionProfileSlot, Constants.kMotionProfile_kF, 0);
     	
+    	//vision ctrl gains
+    	mRightMaster.selectProfileSlot(Constants.kVisionCtrlSlot, 0);
+    	mRightMaster.config_kP(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kP, 0); //slot, value, timeout
+    	mRightMaster.config_kI(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kI, 0);
+    	mRightMaster.config_kD(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kD, 0);
+    	mRightMaster.config_kF(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kF, 0);
+    	mRightMaster.configMotionCruiseVelocity(Constants.kDrivetrainCruiseVelocity, 0);
+    	mRightMaster.configMotionAcceleration(Constants.kDrivetrainAcceleration, 0);
+    	
     	//Gyrolock gains
+    	mRightMaster.selectProfileSlot(Constants.kGyroLockSlot, 0);
     	mRightMaster.config_kP(Constants.kGyroLockSlot, Constants.kGyroLock_kP, 0); //slot, value, timeout
     	mRightMaster.config_kI(Constants.kGyroLockSlot, Constants.kGyroLock_kI, 0);
     	mRightMaster.config_kD(Constants.kGyroLockSlot, Constants.kGyroLock_kD, 0);
     	mRightMaster.config_kF(Constants.kGyroLockSlot, Constants.kGyroLock_kF, 0);
     	
     	
-    	mRightSlave1 = new WPI_TalonSRX(4);
+    	mRightSlave1 = new WPI_TalonSRX(8);
     	mRightSlave1.follow(mRightMaster);
     	
-    	mRightSlave2 = new WPI_TalonSRX(5);
+    	mRightSlave2 = new WPI_TalonSRX(7);
     	mRightSlave2.follow(mRightMaster);
     	
     	resetSensors();

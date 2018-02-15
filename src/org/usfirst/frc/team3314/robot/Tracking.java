@@ -26,18 +26,17 @@ public class Tracking {
 	private Camera camera = Camera.getInstance();
 	
 	TrackingState currentState;
+	private double minMotorCmd = 0.095;
 	
 	public Tracking() {
 		currentState = TrackingState.START;
 	}
 	
 	public void reset() {
-		// TODO Auto-generated method stub
 		currentState = TrackingState.START;
 	}
 	
 	public void update() {
-		// TODO Auto-generated method stub
 		if (camera.getTrackingRequest() == false) {
 			currentState = TrackingState.DONE;
 		}
@@ -45,6 +44,7 @@ public class Tracking {
 		switch (currentState) {
 		case START:
 			if (camera.getTrackingRequest() == true) {
+				camera.setCamMode(0);
 				//drive.setDriveMode(driveMode.VISION_CONTROL);
 				currentState = /*State.SEEK;*/ TrackingState.TRACK;
 			}
@@ -56,17 +56,17 @@ public class Tracking {
 			}
 			break;*/
 		case TRACK:
-			drive.setDriveMode(driveMode.VISION_CONTROL);
-			camera.setSteeringAdjust(Constants.kGyroLock_kP*camera.getError());
-			if (Math.abs(camera.getError()) < 0.1) {
-				currentState = /*State.STOP;*/ TrackingState.DRIVE;
+			if (Math.abs(camera.getError()) < 0.2) {
+				currentState = TrackingState.DRIVE;
+			}
+			//drive.setDriveMode(driveMode.VISION_CONTROL);
+			//camera.setSteeringAdjust(Math.toDegrees(camera.getArcLength())*Constants.kDegToTicksConvFactor);
+			if (camera.getError() > 0.2) {
+				camera.setSteeringAdjust((camera.getError()*Constants.kGyroLock_kP)+minMotorCmd);
+			} else {
+				camera.setSteeringAdjust((camera.getError()*Constants.kGyroLock_kP)-minMotorCmd);
 			}
 			break;
-		/*case STOP:
-			drive.setDriveMode(driveMode.GYROLOCK);
-			drive.setDesiredSpeed(0);
-			currentState = State.DRIVE;
-			break;*/
 		case DRIVE:
 			drive.setDriveMode(driveMode.GYROLOCK);
 			drive.setDesiredAngle(drive.getAngle());
@@ -75,7 +75,7 @@ public class Tracking {
 			
 			if (camera.getError() > 1) {
 				currentState = TrackingState.TRACK;
-			} else if (!camera.isTargetInView()) {
+			} else if (camera.getDistance() > 22 && camera.getDistance() < 24) {
 				currentState = TrackingState.DONE;
 			}
 			break;
@@ -84,6 +84,7 @@ public class Tracking {
 			intake.setDesiredSpeed(0);
 			drive.setDriveMode(driveMode.OPEN_LOOP);
 			camera.setTrackingRequest(false);
+			camera.setCamMode(1);
 			currentState = TrackingState.START;
 			break;
 		}

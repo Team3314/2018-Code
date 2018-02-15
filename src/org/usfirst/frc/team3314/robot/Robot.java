@@ -92,11 +92,8 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		drive.update();
-		/* XXX Temporarily commented out until these subsystems are installed on the robot
-		arm.update();
 		intake.update();
 		arm.update();
-		*/
 		selectedAutoMode.update();
 	}
 
@@ -134,6 +131,7 @@ public class Robot extends IterativeRobot {
 			intake.setDesiredState(IntakeState.HOLDING);
 		}
 		
+		// Drive Controls
 		if(hi.getGyrolock()) {
 			if(!lastGyrolock) {
 				drive.setDriveMode(driveMode.GYROLOCK);
@@ -147,6 +145,8 @@ public class Robot extends IterativeRobot {
 		
 		if (hi.getVisionCtrl()) {
 			camera.setTrackingRequest(true);
+		} else {
+			camera.setTrackingRequest(false);
 		}
 		
 		if(hi.getHighGear()) {
@@ -164,5 +164,9 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putBoolean("Gyrolock", hi.getGyrolock());
 		lastGyrolock = hi.getGyrolock();
 		
+	}
+	
+	public void testInit() {
+		camera.setLEDMode(1);
 	}
 }
