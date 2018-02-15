@@ -18,8 +18,6 @@ public class AutoScaleThenSwitch extends Autonomous {
 	
 	private State currentState = State.START;
 	
-	private int time = 0;
-	
 	private Path firstPath = null;
 	private Path secondPath = null;
 	

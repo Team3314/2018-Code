@@ -1,11 +1,11 @@
 package org.usfirst.frc.team3314.robot;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import jaci.pathfinder.Trajectory;
 
 public class Constants {
 	
 	public static int kDriveEncoderCodesPerRev = 8192;
+	public static double kDegToTicksConvFactor = .038888888888888;
 	public static double kRevToInConvFactor = 7.90274223082;
 	
 	//PIDF Values for Motion Profile 
@@ -23,6 +23,13 @@ public class Constants {
 		public static int kGyroLockSlot = 1;
 		
 		public static double kMotionProfileGyro_kP = .025;
+		
+		//pidf for vision control
+		public static double kVisionCtrl_kP = 0;
+		public static double kVisionCtrl_kI = 0;
+		public static double kVisionCtrl_kD = 0;
+		public static double kVisionCtrl_kF = 0;
+		public static int kVisionCtrlSlot = 2;
 		
 		//Arm PIDF
 		public static double kArm_kP = 4;
@@ -66,6 +73,11 @@ public class Constants {
 		public static double kPulleyDiameter = 3.75; //inches
 		public static double kMaxVelocity = 15.0; //fps
 		public static double kWheelbaseWidth = 27.5 / 12; // inches to feet
+		
+		public static int kDrivetrainAcceleration = 0;
+		public static int kDrivetrainCruiseVelocity = 0;
+		public static double kDistanceCOR = 0; //inches; from front of camera
+		public static double kRadiusCOR = 0;
 		
 		//Arm Motion Profile
 		public static int kArmMotionControlFramePeriod = 5; //5 ms

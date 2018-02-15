@@ -11,6 +11,9 @@ import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 import org.usfirst.frc.team3314.robot.subsystems.Intake.IntakeState;
 import com.cruzsbrian.robolog.Log;
 
+//import com.ctre.*;
+//import com.ctre.phoenix.motorcontrol.ControlMode;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -25,8 +28,8 @@ public class Robot extends IterativeRobot {
 	private Drive drive = Drive.getInstance();
 	private Intake intake = Intake.getInstance();
 	private Arm arm = Arm.getInstance();
+	
 	private Camera camera = Camera.getInstance();
-	private Tracking tracking = Tracking.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
 	
 	private AutoModeSelector selector = new AutoModeSelector();
@@ -45,6 +48,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {	
 		Log.startServer(1099);
+		camera.start();
 	}
 	
 	@Override
@@ -99,6 +103,7 @@ public class Robot extends IterativeRobot {
 		drive.resetSensors();
 		arm.startUp();
 		drive.flushTalonBuffer();
+		camera.setLEDMode(1);
 	}
 	
 	/**
@@ -124,6 +129,7 @@ public class Robot extends IterativeRobot {
 		}
 
 		
+		// Drive Controls
 		if(hi.getGyrolock()) {
 			if(!lastGyrolock) {
 				drive.setDriveMode(driveMode.GYROLOCK);
@@ -136,7 +142,9 @@ public class Robot extends IterativeRobot {
 		}
 		
 		if (hi.getVisionCtrl()) {
-			camera.trackingRequest = true;
+			camera.setTrackingRequest(true);
+		} else {
+			camera.setTrackingRequest(false);
 		}
 		
 		if(hi.getHighGear()) {
@@ -178,8 +186,8 @@ public class Robot extends IterativeRobot {
 		lastHold = hi.getHold();
 		lastStop = hi.getStop();
 		lastClimb = hi.getClimb();
-		
 	}
+
 	public void allPeriodic() {
 		drive.update();
 		arm.update();
@@ -193,5 +201,9 @@ public class Robot extends IterativeRobot {
 		drive.outputToSmartDashboard();
 		intake.outputToSmartDashboard();
 		camera.outputToSmartDashboard();
+	}
+	
+	public void testInit() {
+		camera.setLEDMode(1);
 	}
 }

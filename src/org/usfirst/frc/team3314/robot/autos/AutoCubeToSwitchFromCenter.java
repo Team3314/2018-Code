@@ -33,12 +33,12 @@ public class AutoCubeToSwitchFromCenter extends Autonomous {
 		case DRIVE:
 			if (isPathDone()) {
 				currentState = State.RELEASE_CUBE;
-				startTimer();
 				releaseCube();
+				startTimer();
 			}	
 			break;
 		case RELEASE_CUBE:
-			if(getTime() >= .5) {
+			if (getTime() >= .5) {
 				stopIntake();
 				resetTimer();
 				currentState = State.DONE;

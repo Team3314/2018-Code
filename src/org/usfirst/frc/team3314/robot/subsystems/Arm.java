@@ -31,7 +31,6 @@ public class Arm implements Subsystem {
 	private double radius;
 	private double radiusAngle;
 	private double armEncPos;
-	
 	private double armAngularVelocity, telescopeVelocity;
    
 	private double targetArmAngle = 0;
@@ -301,8 +300,6 @@ public class Arm implements Subsystem {
 		return currentState;
 	}
 	
-	
-	@Override
 	public void outputToSmartDashboard() {
 		SmartDashboard.putNumber("Arm Angle (Degrees)", armAngle);
 		SmartDashboard.putNumber("Arm Length (Inches) ", armLength);

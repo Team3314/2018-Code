@@ -2,7 +2,6 @@
 package org.usfirst.frc.team3314.robot.autos;
 
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
-import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
