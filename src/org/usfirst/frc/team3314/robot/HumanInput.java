@@ -11,14 +11,9 @@ import edu.wpi.first.wpilibj.Joystick;
  *A - Intake Cube
  *B - Release Cube
  *X - Unjam Intake
- *DPad Up - Arm to scale position
- *Dpad Down - Arm to pickup position
- *Dpad Left - Arm to holding position
- *Dpad Right - Arm to Switch Position
- *Right Bumper - Arm To Outer Position
- *Left Trigger - Intake Override
- *Left Stick Y-Axis - Arm Rotation
- *Right Stick X-Axis - Telescoping
+ *Right Bumper - Intake Override
+ *Left Trigger - Arm To Outer Position
+ *Left Stick Y-Axis - Move Arm
  *Start + Select - PTO toggle
  *
  *
@@ -45,41 +40,37 @@ public class HumanInput {
 		buttonBox = new Joystick(3);
 		autoSelector = new Joystick(4);
 	}
-	
 	public double getLeftThrottle() {
 		return leftStick.getRawAxis(1);
 	}
-	
 	public double getRightThrottle() {
 		return rightStick.getRawAxis(1);
 	}
 	public boolean getLowGear() {
 		return leftStick.getRawButton(2);
 	}
-	
 	public boolean getHighGear() {
 		return leftStick.getRawButton(3);
 	}
-	
 	public boolean getGyrolock() {
 		return rightStick.getRawButton(1);
 	}
-	
+	public boolean getPTO() {
+		return gamepad.getRawButton(8) && gamepad.getRawButton(7);
+	}
 	public boolean getVisionCtrl() {
 		return leftStick.getRawButton(1);
 	}
-	
 	public boolean getFullSpeedForward() {
 		return rightStick.getRawButton(11) && rightStick.getRawButton(10);
 	}
+	
 	public boolean getIntake() {
 		return gamepad.getRawButton(1);
 	}
-	
 	public boolean getIntakePressed() {
 		return gamepad.getRawButtonPressed(1);
 	}
-	
 	public boolean getOuttake() {
 		return gamepad.getRawButton(2);
 	}
@@ -90,8 +81,9 @@ public class HumanInput {
 		return gamepad.getRawButtonPressed(3);
 	}
 	public boolean getIntakeOverride() {
-		return gamepad.getRawAxis(2) > .5;
+		return gamepad.getRawButton(6);
 	}
+	
 	public double getArmSpeed() {
 		return Math.abs(gamepad.getRawAxis(1));
 	}
@@ -104,7 +96,6 @@ public class HumanInput {
 	public boolean getClimb() {
 		return gamepad.getRawButton(4) && gamepad.getRawAxis(3) > .5;
 	}
-
 	public boolean getScaleHigh() {
 		return getRaiseArm() && getArmOuterPosition();
 	}
@@ -121,12 +112,10 @@ public class HumanInput {
 		return !getLowerArm() && !getRaiseArm();
 	}
 	public boolean getArmOuterPosition() {
-		return gamepad.getRawButton(6);
+		return gamepad.getRawButton(5);
 	}
 	
-	public boolean getPTO() {
-		return gamepad.getRawButton(8) && gamepad.getRawButton(7);
-	}
+	
 	public int getLLBinaryOne() {
 		if(autoSelector.getRawButton(1))
 			return 1;

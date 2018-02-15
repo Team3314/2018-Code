@@ -33,12 +33,10 @@ public class Tracking {
 	}
 	
 	public void reset() {
-		// TODO Auto-generated method stub
 		currentState = State.START;
 	}
 	
 	public void update() {
-		// TODO Auto-generated method stub
 		if (!camera.trackingRequest) {
 			currentState = State.DONE;
 		}

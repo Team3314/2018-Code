@@ -13,7 +13,6 @@ public class AutoCubeToScale extends Autonomous {
 	}
 	
 	private State currentState = State.START;
-	private int time;
 	
 	private Path selectedPath = null;
 	
