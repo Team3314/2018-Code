@@ -17,12 +17,11 @@ public class Camera {
 			targetArea = limelight.getEntry("ta").getDouble(0);
 			targetSkew = limelight.getEntry("ts").getDouble(0);
 			
-			//TODO find way to differentiate from height of 11 and 13
 			//TODO calibrate distance correctly, find physical horiz offset
 			rawDistance = ((cubeHeight - cameraHeight) / Math.tan(Math.toRadians(targetVertOffset)));
-			linearAdjustedDistance = 1.24126 * rawDistance - 2.92415;
-			expAdjustedDistance = 11.1327 * Math.pow(1.03709, rawDistance);
-			linearHorizOffset = rawDistance * Math.tan(Math.toRadians(targetHorizOffset));
+			adjustedDistance = //1.24126 * rawDistance - 2.92415;
+									 -1337.254;
+			linearHorizOffset = adjustedDistance * Math.tan(Math.toRadians(targetHorizOffset));
 			//TODO find center of rotation in order to find radius then theta+arclength
 			thetaCOR = Math.atan(linearHorizOffset / (rawDistance + Constants.kDistanceCOR));
 			arcLengthCOR = thetaCOR * Constants.kRadiusCOR;
@@ -45,8 +44,10 @@ public class Camera {
 	private double targetsInView, targetHorizOffset, targetVertOffset, targetArea, targetSkew;
 	private double ledMode, camMode;
 	
-	public double cubeHeight = 11, cameraHeight = 4;
-	private double /*cubeHeight, */rawDistance, linearAdjustedDistance, expAdjustedDistance, linearHorizOffset, thetaCOR, arcLengthCOR;
+	//TODO find way to differentiate from height of 11 and 13
+	private double cubeHeight = 11, cameraHeight = 4;
+	private double rawDistance, adjustedDistance;
+	private double linearHorizOffset, thetaCOR, arcLengthCOR;
 	private double steeringAdjust;
 	private boolean trackingRequest = false;
 	
@@ -124,8 +125,7 @@ public class Camera {
 		
 		SmartDashboard.putNumber("Cube height", cubeHeight);
 		SmartDashboard.putNumber("Raw distance", getDistance());
-		SmartDashboard.putNumber("Linear adjusted distance", linearAdjustedDistance);
-		SmartDashboard.putNumber("Exponential adjusted distance", expAdjustedDistance);
+		SmartDashboard.putNumber("Linear adjusted distance", adjustedDistance);
 		SmartDashboard.putNumber("Linear horiz offset", linearHorizOffset);
 		//SmartDashboard.putNumber("Theta from COR", thetaCOR);
 		//SmartDashboard.putNumber("Arc length from COR", getArcLength());
