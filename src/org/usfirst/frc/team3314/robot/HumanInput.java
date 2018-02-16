@@ -196,7 +196,7 @@ public class HumanInput {
 			return 1;
 		return 0;
 	}
-	public String  getLeftRight() {
+	public String getLeftRight() {
 		if(buttonBox.getRawButton(12)) {
 			return "StartL"; // Start Left
 		}

@@ -1,7 +1,5 @@
 package org.usfirst.frc.team3314.robot.autos;
 
-import java.io.File;
-
 import org.usfirst.frc.team3314.robot.HumanInput;
 import org.usfirst.frc.team3314.robot.motion.PathFollower;
 import org.usfirst.frc.team3314.robot.paths.Path;
@@ -32,9 +30,15 @@ public abstract class Autonomous {
 	protected void resetSensors() {
 		drive.resetSensors();
 	}
+	
+	//gear
+	
 	protected void setHighGear(boolean highGear) {
 		drive.setHighGear(highGear);
 	}
+	
+	//motion profiling
+	
 	protected void loadPath(Path path) {
 		pathFollower.loadPoints(path);
 	}
@@ -50,6 +54,9 @@ public abstract class Autonomous {
 	protected Path getPath(String path) {
 		return PathList.getPath(path);
 	}
+	
+	//fms information
+	
 	protected String getSwitch() {
 		return "Switch" + switchSide;
 	}
@@ -68,6 +75,9 @@ public abstract class Autonomous {
 			System.out.println("NO MATCH DATA RECIEVED");
 		}
 	}
+	
+	//timer
+	
 	public void resetTimer() {
 		timer.stop();
 		timer.reset();
@@ -78,6 +88,9 @@ public abstract class Autonomous {
 	public double getTime() {
 		return timer.get();
 	}
+	
+	//intake
+	
 	public void intakeCube() {
 		intake.setDesiredState(IntakeState.INTAKING);
 	}
@@ -87,12 +100,18 @@ public abstract class Autonomous {
 	public void stopIntake()  {
 		intake.setDesiredState(IntakeState.HOLDING);
 	}
+	
+	//cube sensor
+	
 	public boolean hasCube() {
 		return intake.getState() == IntakeState.HOLDING && intake.senseCube();
 	}
 	public boolean hasNoCube() {
 		return intake.getState() == IntakeState.HOLDING && !intake.senseCube();
 	}
+	
+	//arm
+	
 	public void armToScaleHigh() {
 		arm.setDesiredState(ArmState.TO_SCALE_HIGH);
 	}

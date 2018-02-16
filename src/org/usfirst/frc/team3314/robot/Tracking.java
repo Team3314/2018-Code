@@ -6,11 +6,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Tracking {
 
-	enum State {
+	enum TrackingState {
 		START,
 		//SEEK,
 		TRACK,
-		STOP,
+		//STOP,
 		DRIVE,
 		DONE
 	}
@@ -25,27 +25,28 @@ public class Tracking {
 	private Intake intake = Intake.getInstance();
 	private Camera camera = Camera.getInstance();
 	
-	State currentState;
-	double time = 0;
+	TrackingState currentState;
+	private double minMotorCmd = 0.095;
 	
 	public Tracking() {
-		currentState = State.START;
+		currentState = TrackingState.START;
 	}
 	
 	public void reset() {
-		currentState = State.START;
+		currentState = TrackingState.START;
 	}
 	
 	public void update() {
-		if (!camera.trackingRequest) {
-			currentState = State.DONE;
+		if (camera.getTrackingRequest() == false) {
+			currentState = TrackingState.DONE;
 		}
 		
 		switch (currentState) {
 		case START:
-			if (camera.trackingRequest) {
-				drive.setDriveMode(driveMode.VISION_CONTROL);
-				currentState = /*State.SEEK;*/ State.TRACK;
+			if (camera.getTrackingRequest() == true) {
+				camera.setCamMode(0);
+				//drive.setDriveMode(driveMode.VISION_CONTROL);
+				currentState = /*State.SEEK;*/ TrackingState.TRACK;
 			}
 			break;
 		/*case SEEK:
@@ -55,34 +56,49 @@ public class Tracking {
 			}
 			break;*/
 		case TRACK:
-			camera.setSteeringAdjust(Constants.kGyroLock_kP*camera.getError());
-			if (Math.abs(camera.getError()) < 0.1) {
-				currentState = State.STOP;
+			/**this is a basic implementation of turning using just the minimum speed the motor can spin at
+			 *and a proportional constant. the degree deadband is a quarter degree on each side of the x axis
+			 *
+			 *the plan is to replace this with a more accurate calculation that incorporates the robots center
+			 *of rotation to find the arc length of travel needed and puts that into a position closed loop
+			 */
+			
+			if (Math.abs(camera.getError()) < 0.25) {
+				currentState = TrackingState.DRIVE;
+			}
+			
+			//drive.setDriveMode(driveMode.VISION_CONTROL);
+			//camera.setSteeringAdjust(Math.toDegrees(camera.getArcLength())*Constants.kDegToTicksConvFactor);
+			
+			if (camera.getError() > 0.25) {
+				camera.setSteeringAdjust((camera.getError()*Constants.kGyroLock_kP)+minMotorCmd);
+			} else {
+				camera.setSteeringAdjust((camera.getError()*Constants.kGyroLock_kP)-minMotorCmd);
 			}
 			break;
-		case STOP:
-			drive.setDriveMode(driveMode.GYROLOCK);
-			drive.setDesiredSpeed(0);
-			currentState = State.DRIVE;
-			break;
 		case DRIVE:
+			drive.setDriveMode(driveMode.GYROLOCK);
 			drive.setDesiredAngle(drive.getAngle());
 			drive.setDesiredSpeed(0.25);
 			intake.setDesiredSpeed(1);
-			if (!camera.isTargetInView()) {
-				currentState = State.DONE;
+			
+			if (camera.getError() > 1) {
+				currentState = TrackingState.TRACK;
+			} else if (camera.getDistance() > 22 && camera.getDistance() < 24) {
+				currentState = TrackingState.DONE;
 			}
 			break;
 		case DONE:
 			drive.setDesiredSpeed(0);
 			intake.setDesiredSpeed(0);
-			drive.setDriveMode(driveMode.OPEN_LOOP);
-			
-			camera.trackingRequest = false;
-			currentState = State.START;
+			camera.setTrackingRequest(false);
+			camera.setCamMode(1);
+			currentState = TrackingState.START;
 			break;
 		}
 		
 		SmartDashboard.putString("Tracking state", currentState.toString());
+		SmartDashboard.putNumber("Steering adjust", camera.getSteeringAdjust());
+		SmartDashboard.putBoolean("Tracking request", camera.getTrackingRequest());
 	}
 }
