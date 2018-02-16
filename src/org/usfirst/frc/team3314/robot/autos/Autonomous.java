@@ -109,6 +109,9 @@ public abstract class Autonomous {
 	public boolean hasNoCube() {
 		return intake.getState() == IntakeState.HOLDING && !intake.senseCube();
 	}
+	
+	//arm
+	
 	public void armToScaleHigh() {
 		arm.setDesiredState(ArmState.TO_SCALE_HIGH);
 	}

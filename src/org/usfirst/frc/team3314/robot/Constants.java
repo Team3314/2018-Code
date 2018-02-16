@@ -25,7 +25,7 @@ public class Constants {
 		public static double kMotionProfileGyro_kP = .025;
 		
 		//pidf for vision control
-		public static double kVisionCtrl_kP = 0;
+		public static double kVisionCtrl_kP = .04;
 		public static double kVisionCtrl_kI = 0;
 		public static double kVisionCtrl_kD = 0;
 		public static double kVisionCtrl_kF = 0;
@@ -69,7 +69,14 @@ public class Constants {
 		public static Value kPTOIn = Value.kForward;
 		public static Value kPTOOut = Value.kReverse;
 		
-		//Robot characteristiqcs
+		//camera
+		public static double kLEDOn = 0;
+		public static double kLEDOff = 1;
+		public static double kLEDBlink = 2;
+		public static double kVisionProcessorMode = 0;
+		public static double kDriverCameraMode = 1;
+		
+		//Robot characteristics
 		public static double kPulleyDiameter = 3.75; //inches
 		public static double kMaxVelocity = 15.0; //fps
 		public static double kWheelbaseWidth = 27.5 / 12; // inches to feet

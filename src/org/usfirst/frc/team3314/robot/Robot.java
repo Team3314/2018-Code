@@ -145,6 +145,7 @@ public class Robot extends IterativeRobot {
 			camera.setTrackingRequest(true);
 		} else {
 			camera.setTrackingRequest(false);
+			drive.setDriveMode(driveMode.OPEN_LOOP);
 		}
 		
 		if(hi.getHighGear()) {

@@ -16,8 +16,9 @@ public class Camera {
 			targetVertOffset = limelight.getEntry("ty").getDouble(0);
 			targetArea = limelight.getEntry("ta").getDouble(0);
 			targetSkew = limelight.getEntry("ts").getDouble(0);
+			targetLatency = limelight.getEntry("tl").getDouble(0);
 			
-			//TODO calibrate distance correctly, find physical horiz offset
+			//TODO after remounting of camera, calibrate distance correctly+find physical horiz offset
 			rawDistance = ((cubeHeight - cameraHeight) / Math.tan(Math.toRadians(targetVertOffset)));
 			adjustedDistance = //1.24126 * rawDistance - 2.92415;
 									 -1337.254;
@@ -41,7 +42,7 @@ public class Camera {
 	private NetworkTable limelight = networktables.getTable("limelight");
 	private Notifier notifier = new Notifier(new PeriodicRunnable());
 	
-	private double targetsInView, targetHorizOffset, targetVertOffset, targetArea, targetSkew;
+	private double targetsInView, targetHorizOffset, targetVertOffset, targetArea, targetSkew, targetLatency;
 	private double ledMode, camMode;
 	
 	//TODO find way to differentiate from height of 11 and 13
@@ -70,7 +71,7 @@ public class Camera {
 	}
 	
 	public double getDistance() {
-		return rawDistance;
+		return adjustedDistance;
 	}
 	
 	public double getArcLength() {
@@ -86,15 +87,21 @@ public class Camera {
 	}
 	
 	public String getLEDMode() {
-		if (ledMode == 1) {
+		if (ledMode == Constants.kLEDOff) {
 			return "OFF";
-		} else return "ON";
+		} else if (ledMode == Constants.kLEDOn) {
+			return "ON";
+		} else if (ledMode == Constants.kLEDBlink) {
+			return "BLINK";
+		} else return null;
 	}
 	
 	public String getCamMode() {
-		if (camMode == 0) {
+		if (camMode == Constants.kVisionProcessorMode) {
 			return "VISION PROCESSOR";
-		} else return "DRIVER CAMERA";
+		} else if (camMode == Constants.kDriverCameraMode) {
+			return "DRIVER CAMERA";
+		} else return null;
 	}
 		
 	//setters
@@ -120,12 +127,13 @@ public class Camera {
 		SmartDashboard.putNumber("Target vert offset", targetVertOffset);
 		SmartDashboard.putNumber("Target area", targetArea);
 		SmartDashboard.putNumber("Target skew", targetSkew);
+		SmartDashboard.putNumber("Target latency", targetLatency);
 		SmartDashboard.putString("LED mode", getLEDMode());
 		SmartDashboard.putString("Camera mode", getCamMode());
 		
 		SmartDashboard.putNumber("Cube height", cubeHeight);
-		SmartDashboard.putNumber("Raw distance", getDistance());
-		SmartDashboard.putNumber("Linear adjusted distance", adjustedDistance);
+		SmartDashboard.putNumber("Raw distance", rawDistance);
+		SmartDashboard.putNumber("Linear adjusted distance", getDistance());
 		SmartDashboard.putNumber("Linear horiz offset", linearHorizOffset);
 		//SmartDashboard.putNumber("Theta from COR", thetaCOR);
 		//SmartDashboard.putNumber("Arc length from COR", getArcLength());

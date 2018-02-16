@@ -56,12 +56,21 @@ public class Tracking {
 			}
 			break;*/
 		case TRACK:
-			if (Math.abs(camera.getError()) < 0.2) {
+			/**this is a basic implementation of turning using just the minimum speed the motor can spin at
+			 *and a proportional constant. the degree deadband is a quarter degree on each side of the x axis
+			 *
+			 *the plan is to replace this with a more accurate calculation that incorporates the robots center
+			 *of rotation to find the arc length of travel needed and puts that into a position closed loop
+			 */
+			
+			if (Math.abs(camera.getError()) < 0.25) {
 				currentState = TrackingState.DRIVE;
 			}
+			
 			//drive.setDriveMode(driveMode.VISION_CONTROL);
 			//camera.setSteeringAdjust(Math.toDegrees(camera.getArcLength())*Constants.kDegToTicksConvFactor);
-			if (camera.getError() > 0.2) {
+			
+			if (camera.getError() > 0.25) {
 				camera.setSteeringAdjust((camera.getError()*Constants.kGyroLock_kP)+minMotorCmd);
 			} else {
 				camera.setSteeringAdjust((camera.getError()*Constants.kGyroLock_kP)-minMotorCmd);
@@ -82,7 +91,6 @@ public class Tracking {
 		case DONE:
 			drive.setDesiredSpeed(0);
 			intake.setDesiredSpeed(0);
-			drive.setDriveMode(driveMode.OPEN_LOOP);
 			camera.setTrackingRequest(false);
 			camera.setCamMode(1);
 			currentState = TrackingState.START;
