@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Camera {
-	
 	private static Camera mInstance = new Camera();
 	
 	public static Camera getInstance() {
@@ -51,7 +50,7 @@ public class Camera {
 			outputToSmartDashboard();
 		}
 	}
-	
+
 	public void start() {
 		// camera = 90 fps/hz = 1 frame per 11.1 ms = 0.0111 sec
 		notifier.startPeriodic(0.0111);
@@ -130,12 +129,12 @@ public class Camera {
 		SmartDashboard.putNumber("Target latency", targetLatency);
 		SmartDashboard.putString("LED mode", getLEDMode());
 		SmartDashboard.putString("Camera mode", getCamMode());
-		
+
 		//SmartDashboard.putNumber("Cube height", cubeHeight);
 		SmartDashboard.putNumber("Raw distance", rawDistance);
 		SmartDashboard.putNumber("Linear adjusted distance", getDistance());
 		SmartDashboard.putNumber("Linear horiz offset", linearHorizOffset);
 		SmartDashboard.putNumber("Theta from COR", thetaCOR);
 		SmartDashboard.putNumber("Arc length from COR", getArcLength());
-		}	
-	}
+	}	
+}

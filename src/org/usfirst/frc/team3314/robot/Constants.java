@@ -34,22 +34,22 @@ public class Constants {
 		//Arm PIDF
 		public static double kArm_kP = 4;
 		public static double kArm_kI = 0;
-		public static double kArm_kD = 40;
+		public static double kArm_kD = 160;
 		public static double kArm_kF = 6.42;
 		
 		//Arm Values
 		public static double kArmTicksToAngle = 0.087890625; //TODO radians
 		public static int kMaxArmAngularVelocity = (int) (140 / kArmTicksToAngle / 10); //radians/sec
 		public static int kMaxArmAcceleceration = (int)(70 / kArmTicksToAngle / 10); // radians/sec/sec
-		public static int kArmEncoderOffset = -1411; //Comp robot : -3174 Practice : -1411
+		public static int kArmEncoderOffset = -3174; //Comp robot : -3174 Practice : -1411
 		public static int kArmMinPosition = -765;
 		public static int kMaxArmPosition = 1162;
-		public static double kArmTargetThreshold = .5 / kArmTicksToAngle;
+		public static double kArmTargetThreshold = 3 / kArmTicksToAngle;
 		
 		//Telescope PIDF
 		public static double kTelescope_kP = 2;
 		public static double kTelescope_kI = 0;
-		public static double kTelescope_kD = 10;
+		public static double kTelescope_kD = 40;
 		public static double kTelescope_kF = 3.41;
 		
 		//Telescope Characterisitcs
@@ -57,9 +57,9 @@ public class Constants {
 		public static int kMaxTelescopeVelocity = (int)(18 / kTelescopeTicksToInches / 10); // inches/sec
 		public static int kMaxTelescopeAcceleration = (int)(18 / kTelescopeTicksToInches / 10); // inches/sec/sec
 		public static int kTelescopeMinPosition = 0;
-		public static int kTelescopeEncoderOffset = -289; //Comp robot : -950 Practice : this shit fucked
+		public static int kTelescopeEncoderOffset = -1440; //Comp robot : -1576 Practice : TODO this shit fucked
 		public static int kMaxTelescopePosition = (int)(19 / kTelescopeTicksToInches); 
-		public static double kTelescopeTargetThreshold = .5 / kTelescopeTicksToInches;
+		public static double kTelescopeTargetThreshold = 3 / kTelescopeTicksToInches;
 		
 		//Gears
 		public static Value kHighGear = Value.kReverse;
@@ -111,19 +111,19 @@ public class Constants {
 		public static double kPivotPointHeight = 42.557; //inches
 		
 		//Arm positions (inches)
-		public static double kPickUpAngle = -45 / kArmTicksToAngle;
-		public static double kPickUpTelescopePosition  = kMaxTelescopePosition;
+		public static double kPickUpAngle = -48 / kArmTicksToAngle;
+		public static double kPickUpTelescopePosition  = 15 / kTelescopeTicksToInches;
 		public static double kScaleLowAngle = 100 / kArmTicksToAngle;; //100
 		public static double kScaleLowTelescopePosition = 0;
 		public static int kScaleHighAngle =  (int)(100 / kArmTicksToAngle);
-		public static double kScaleHighTelescopePosition = kMaxTelescopePosition;
-		public static double kHoldAngle = -60 / kArmTicksToAngle;
+		public static double kScaleHighTelescopePosition = 12 / kTelescopeTicksToInches;
+		public static double kHoldAngle = -65 / kArmTicksToAngle;
 		public static double kHoldTelescopePosition = 0;
 		public static double kSwitchAngle = 0;
 		public static double kSwitchTelescopePosition = 0;
-		public static double kClimbRaisedAngle = 60 / kArmTicksToAngle; // 100
+		public static double kClimbRaisedAngle = 90 / kArmTicksToAngle; // 100
 		public static double kClimbRaisedTelescopePosition = kMaxTelescopePosition;
-		public static double kBarAngle = 0;
+		public static double kBarAngle = 60 / kArmTicksToAngle;
 		public static double kBarTelescopePosition = kMaxTelescopePosition;
 		
 }

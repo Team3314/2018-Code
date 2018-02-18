@@ -54,7 +54,13 @@ public class Arm implements Subsystem {
 	public Arm() {
 		telescopeTalon = new WPI_TalonSRX(3);
 		telescopeTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-		telescopeTalon.setSelectedSensorPosition(telescopeTalon.getSensorCollection().getPulseWidthPosition() + Constants.kTelescopeEncoderOffset, 0, 0);
+		telescopeTalon.getSensorCollection().setPulseWidthPosition(0, 0);
+		if(telescopeTalon.getSensorCollection().getPulseWidthPosition() >= 1300) {
+			telescopeTalon.setSelectedSensorPosition((telescopeTalon.getSensorCollection().getPulseWidthPosition() + Constants.kTelescopeEncoderOffset), 0, 0);
+		}
+		else {
+			telescopeTalon.setSelectedSensorPosition((telescopeTalon.getSensorCollection().getPulseWidthPosition() - Constants.kTelescopeEncoderOffset), 0, 0);
+		}
 		telescopeTalon.setSensorPhase(false);
 		telescopeTalon.setInverted(false);
 		telescopeTalon.selectProfileSlot(0, 0);
@@ -71,7 +77,8 @@ public class Arm implements Subsystem {
 		
 		armTalon = new WPI_TalonSRX(6);
 		armTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-		armTalon.setSelectedSensorPosition(armTalon.getSensorCollection().getPulseWidthPosition() + Constants.kArmEncoderOffset, 0, 0);
+		armTalon.getSensorCollection().setPulseWidthPosition(0, 0);
+		armTalon.setSelectedSensorPosition((armTalon.getSensorCollection().getPulseWidthPosition() + Constants.kArmEncoderOffset), 0, 0);
 		armTalon.setSensorPhase(false);
 		armTalon.setInverted(true);
 		armTalon.selectProfileSlot(0, 0);
@@ -218,7 +225,13 @@ public class Arm implements Subsystem {
 			}
 		}
 		else if(desiredState == ArmState.TO_PICKUP) {
+			if(getArmAngle() < Constants.kPickUpAngle - 3 || getArmAngle() > Constants.kPickUpAngle) {
 				currentState = ArmState.TO_INTERMEDIATE_LOW;
+			}
+			else {
+				currentState = desiredState;
+			}
+				
 		}
 		else if(desiredState == ArmState.TO_SCALE_HIGH || desiredState == ArmState.TO_SCALE_LOW) {
 			if(radiusAngle < -20) {

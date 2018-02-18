@@ -107,7 +107,7 @@ public class Robot extends IterativeRobot {
 		drive.resetSensors();
 		arm.startUp();
 		drive.flushTalonBuffer();
-		
+
 		camera.setTrackingRequest(false);
 		camera.setLEDMode(Constants.kLEDOff);
 		camera.setCamMode(Constants.kDriverCameraMode);
@@ -166,22 +166,25 @@ public class Robot extends IterativeRobot {
 		}
 		
 		//Arm Controls
-		if(hi.getScaleHigh() && !lastScaleHigh) {
+		if(hi.getClimb() && !lastClimb) {
+			if(hi.getRaiseArm())
+				arm.setDesiredState(ArmState.TO_CLIMB);
+			else if(hi.getLowerArm()) 
+				arm.setDesiredState(ArmState.LOWER_TO_BAR);
+		}
+		else if(hi.getScaleHigh() && !lastScaleHigh && !hi.getClimb()) {
 			arm.setDesiredState(ArmState.TO_SCALE_HIGH);
 		}
-		else if(hi.getScaleLow() && !lastScaleLow) {
+		else if(hi.getScaleLow() && !lastScaleLow && !hi.getClimb()) {
 			arm.setDesiredState(ArmState.TO_SCALE_LOW);
 		}
-		else if(hi.getPickup() && !lastPickup) {
+		else if(hi.getPickup() && !lastPickup && !hi.getClimb()) {
 			arm.setDesiredState(ArmState.TO_PICKUP);
 		}
-		else if(hi.getHold() && !lastHold) {
+		else if(hi.getHold() && !lastHold && !hi.getClimb()) {
 			arm.setDesiredState(ArmState.TO_HOLDING);
 		}
-		else if(hi.getClimb() && !lastClimb) {
-			arm.setDesiredState(ArmState.TO_CLIMB);
-		}
-		else if(hi.getStop() && !lastStop) {
+		else if(hi.getStop() && !lastStop && !hi.getClimb()) {
 			arm.setDesiredState(ArmState.STOP);
 		}
 		arm.setTargetSpeed(hi.getArmSpeed());
