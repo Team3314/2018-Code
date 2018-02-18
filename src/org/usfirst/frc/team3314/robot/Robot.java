@@ -70,6 +70,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledInit() {
 		pathFollower.stop();
+		camera.setLEDMode(Constants.kLEDOff);
 	}
 	
 	@Override
@@ -84,6 +85,9 @@ public class Robot extends IterativeRobot {
 		arm.startUp();
 		selectedAutoMode = selector.getSelectedAutoMode();
 		drive.logger.createNewFile("Auto");
+		
+		camera.setLEDMode(Constants.kLEDOff);
+		camera.setCamMode(Constants.kVisionProcessorMode);
 	}
 
 	/**
@@ -103,7 +107,10 @@ public class Robot extends IterativeRobot {
 		drive.resetSensors();
 		arm.startUp();
 		drive.flushTalonBuffer();
-		camera.setLEDMode(1);
+		
+		camera.setTrackingRequest(false);
+		camera.setLEDMode(Constants.kLEDOff);
+		camera.setCamMode(Constants.kDriverCameraMode);
 	}
 	
 	/**
@@ -205,6 +212,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void testInit() {
-		camera.setLEDMode(1);
+		camera.setLEDMode(Constants.kLEDOff);
+		camera.setCamMode(Constants.kVisionProcessorMode);
 	}
 }

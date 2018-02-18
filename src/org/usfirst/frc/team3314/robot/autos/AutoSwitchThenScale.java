@@ -51,9 +51,9 @@ public class AutoSwitchThenScale extends Autonomous {
 			}
 			break;
 		case PICKUP_CUBE:
-			//TODO Add cube tracking
-			intakeCube();
+			startTracking();
 			if(hasCube()) {
+				endTracking();
 				currentState = State.DRIVE_TO_SCALE;
 				loadPath(secondPath);
 				startPathFollower();

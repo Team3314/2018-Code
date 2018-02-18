@@ -94,7 +94,7 @@ public class Intake {
 	}
 	
 	private Intake() {
-		mRollerLeft = new WPI_TalonSRX(4); //May be talons or victors, not decided yet
+		mRollerLeft = new WPI_TalonSRX(4);
 		mRollerLeft.configContinuousCurrentLimit(Constants.kIntakeCurrentLimit, 0);
 		mRollerLeft.configPeakCurrentLimit(Constants.kIntakePeakCurrentLimit, 0);
 		mRollerLeft.configPeakCurrentDuration(Constants.kIntakePeakCurrentDuration, 0);
@@ -103,7 +103,7 @@ public class Intake {
 		mRollerLeft.configPeakOutputForward(1, 0);
 		mRollerLeft.configPeakOutputReverse(-1, 0);
 		
-		mRollerRight = new WPI_TalonSRX(5);//May be talons or victors, not decided yet
+		mRollerRight = new WPI_TalonSRX(5);
 		mRollerRight.configContinuousCurrentLimit(Constants.kIntakeCurrentLimit, 0);
 		mRollerRight.configPeakCurrentLimit(Constants.kIntakePeakCurrentLimit, 0);
 		mRollerRight.configPeakCurrentDuration(Constants.kIntakePeakCurrentDuration, 0);

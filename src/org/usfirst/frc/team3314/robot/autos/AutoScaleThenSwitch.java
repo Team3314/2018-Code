@@ -60,9 +60,9 @@ public class AutoScaleThenSwitch extends Autonomous {
 			}
 			break;
 		case PICKUP_CUBE:
-			//TODO Add cube tracking
-			intakeCube();
+			startTracking();
 			if(hasCube()) {
+				endTracking();
 				currentState = State.RAISE_ARM_TO_SWITCH;
 				armToSwitch();
 			}

@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3314.robot.autos;
 
 import org.usfirst.frc.team3314.robot.HumanInput;
+import org.usfirst.frc.team3314.robot.subsystems.Camera;
 import org.usfirst.frc.team3314.robot.motion.PathFollower;
 import org.usfirst.frc.team3314.robot.paths.Path;
 import org.usfirst.frc.team3314.robot.paths.PathList;
@@ -20,6 +21,8 @@ public abstract class Autonomous {
 	private Intake intake = Intake.getInstance();
 	private Arm arm = Arm.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
+	private Camera camera = Camera.getInstance();
+	
 	private PathFollower pathFollower = new PathFollower();
 	private Timer timer = new Timer();
 	
@@ -130,5 +133,12 @@ public abstract class Autonomous {
 	public boolean armStopped() {
 		return arm.getState() == ArmState.STOPPED;
 	}
-
+	
+	public void startTracking() {
+		camera.setTrackingRequest(true);
+	}
+	
+	public void endTracking() {
+		camera.setTrackingRequest(false);
+	}
 }

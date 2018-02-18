@@ -9,9 +9,9 @@ public class AutoTwoCubeScale extends Autonomous {
 		START,
 		DRIVE_TO_SCALE,
 		RELEASE_CUBE,
-		//DRIVE_TO_SWITCH,
+		DRIVE_TO_SWITCH,
 		PICKUP_CUBE,
-		//DRIVE_TO_SCALE2,
+		DRIVE_TO_SCALE2,
 		RELEASE_CUBE2,
 		DONE
 	}
@@ -36,8 +36,55 @@ public class AutoTwoCubeScale extends Autonomous {
 				thirdPath = getPath(getSwitch()+getScale());
 				loadPath(firstPath);
 				startPathFollower();
+				armToScaleHigh();
+				currentState = State.DRIVE_TO_SCALE;
 				break;
-			//TODO finish state machine
+			case DRIVE_TO_SCALE:
+				if(isPathDone()) {
+					currentState = State.RELEASE_CUBE;
+					startTimer();
+					releaseCube();
+				}
+				break;
+			case RELEASE_CUBE:
+				if(getTime() >= .5) {
+					stopIntake();
+					resetTimer();
+					currentState = State.DRIVE_TO_SWITCH;
+					loadPath(secondPath);
+					startPathFollower();
+					armToPickUp();
+				}
+				break;
+			case DRIVE_TO_SWITCH:
+				if(isPathDone()) {
+					currentState = State.PICKUP_CUBE;
+				}
+				break;
+			case PICKUP_CUBE:
+				startTracking();
+				if(hasCube()) {
+					endTracking();
+					currentState = State.DRIVE_TO_SCALE2;
+					loadPath(thirdPath);
+					startPathFollower();
+					armToScaleHigh();
+				}
+				break;
+			case DRIVE_TO_SCALE2:
+				if(isPathDone() && armStopped()) {
+					currentState = State.RELEASE_CUBE2;
+					startTimer();
+					releaseCube();
+				}
+				break;
+			case RELEASE_CUBE2:
+				if(getTime() >= .5) {
+					stopIntake();
+					resetTimer();
+					currentState = State.DONE;
+				}
+				break;
 			case DONE:
 				break;
 		}

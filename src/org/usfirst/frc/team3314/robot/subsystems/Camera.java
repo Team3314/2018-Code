@@ -8,29 +8,6 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Camera {
-
-	public class PeriodicRunnable implements java.lang.Runnable {
-		public void run() {
-			targetsInView = limelight.getEntry("tv").getDouble(0);
-			targetHorizOffset = limelight.getEntry("tx").getDouble(0);
-			targetVertOffset = limelight.getEntry("ty").getDouble(0);
-			targetArea = limelight.getEntry("ta").getDouble(0);
-			targetSkew = limelight.getEntry("ts").getDouble(0);
-			targetLatency = limelight.getEntry("tl").getDouble(0);
-			
-			//TODO after remounting of camera, calibrate distance correctly+find physical horiz offset
-			rawDistance = ((cubeHeight - cameraHeight) / Math.tan(Math.toRadians(targetVertOffset)));
-			adjustedDistance = //1.24126 * rawDistance - 2.92415;
-									 -1337.254;
-			linearHorizOffset = adjustedDistance * Math.tan(Math.toRadians(targetHorizOffset));
-			//TODO find center of rotation in order to find radius then theta+arclength
-			thetaCOR = Math.atan(linearHorizOffset / (rawDistance + Constants.kDistanceCOR));
-			arcLengthCOR = thetaCOR * Constants.kRadiusCOR;
-			
-			Tracking.getInstance().update();
-			outputToSmartDashboard();
-		}
-	}
 	
 	private static Camera mInstance = new Camera();
 	
@@ -51,6 +28,29 @@ public class Camera {
 	private double linearHorizOffset, thetaCOR, arcLengthCOR;
 	private double steeringAdjust;
 	private boolean trackingRequest = false;
+	
+	public class PeriodicRunnable implements java.lang.Runnable {
+		public void run() {
+			targetsInView = limelight.getEntry("tv").getDouble(0);
+			targetHorizOffset = limelight.getEntry("tx").getDouble(0);
+			targetVertOffset = limelight.getEntry("ty").getDouble(0);
+			targetArea = limelight.getEntry("ta").getDouble(0);
+			targetSkew = limelight.getEntry("ts").getDouble(0);
+			targetLatency = limelight.getEntry("tl").getDouble(0);
+			
+			rawDistance = ((cubeHeight - cameraHeight) / Math.tan(Math.toRadians(targetVertOffset)));
+			//TODO recalibrate adjusted distance
+			adjustedDistance = //1.24126 * rawDistance - 2.92415;
+							   -1337.254;
+			//TODO make sure calcs work
+			linearHorizOffset = adjustedDistance * Math.tan(Math.toRadians(targetHorizOffset));
+			thetaCOR = Math.atan(linearHorizOffset / (rawDistance + Constants.kDistanceCOR));
+			arcLengthCOR = thetaCOR * Constants.kRadiusCOR;
+			
+			Tracking.getInstance().update();
+			outputToSmartDashboard();
+		}
+	}
 	
 	public void start() {
 		// camera = 90 fps/hz = 1 frame per 11.1 ms = 0.0111 sec
@@ -135,7 +135,7 @@ public class Camera {
 		SmartDashboard.putNumber("Raw distance", rawDistance);
 		SmartDashboard.putNumber("Linear adjusted distance", getDistance());
 		SmartDashboard.putNumber("Linear horiz offset", linearHorizOffset);
-		//SmartDashboard.putNumber("Theta from COR", thetaCOR);
-		//SmartDashboard.putNumber("Arc length from COR", getArcLength());
+		SmartDashboard.putNumber("Theta from COR", thetaCOR);
+		SmartDashboard.putNumber("Arc length from COR", getArcLength());
 		}	
 	}

@@ -70,9 +70,9 @@ public class Constants {
 		public static Value kPTOOut = Value.kReverse;
 		
 		//camera
-		public static double kLEDOn = 0;
-		public static double kLEDOff = 1;
-		public static double kLEDBlink = 2;
+		public static int kLEDOn = 0;
+		public static int kLEDOff = 1;
+		public static int kLEDBlink = 2;
 		public static double kVisionProcessorMode = 0;
 		public static double kDriverCameraMode = 1;
 		
@@ -83,8 +83,8 @@ public class Constants {
 		
 		public static int kDrivetrainAcceleration = 0;
 		public static int kDrivetrainCruiseVelocity = 0;
-		public static double kDistanceCOR = 0; //inches; from front of camera
-		public static double kRadiusCOR = 0;
+		public static double kDistanceCOR = 7.1; //inches; from front of camera
+		public static double kRadiusCOR = 12.5; //inches
 		
 		//Arm Motion Profile
 		public static int kArmMotionControlFramePeriod = 5; //5 ms
