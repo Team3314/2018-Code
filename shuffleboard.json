@@ -1,0 +1,668 @@
+{
+  "dividerPosition": 0.2424400417101147,
+  "tabPane": [
+    {
+      "title": "LiveWindow",
+      "autoPopulate": true,
+      "autoPopulatePrefix": "LiveWindow/",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "tiles": {
+          "0,0": {
+            "size": [
+              6,
+              6
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_source0": "network_table:///LiveWindow/Ungrouped",
+              "_title": "Ungrouped",
+              "_children": [
+                {
+                  "_type": "PDP",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/PowerDistributionPanel[0]",
+                  "_title": "PowerDistributionPanel[0]",
+                  "showIndicatorText": true
+                },
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Compressor[0]/Enabled",
+                  "_title": "Compressor[0]/Enabled",
+                  "colorWhenTrue": "#7CFC00FF",
+                  "colorWhenFalse": "#8B0000FF"
+                },
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Compressor[0]/Pressure switch",
+                  "_title": "Compressor[0]/Pressure switch",
+                  "colorWhenTrue": "#7CFC00FF",
+                  "colorWhenFalse": "#8B0000FF"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [0]",
+                  "_title": "Talon SRX [0]",
+                  "controllable": false,
+                  "orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [1]",
+                  "_title": "Talon SRX [1]",
+                  "controllable": false,
+                  "orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [2]",
+                  "_title": "Talon SRX [2]",
+                  "controllable": false,
+                  "orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [3]",
+                  "_title": "Talon SRX [3]",
+                  "controllable": false,
+                  "orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [4]",
+                  "_title": "Talon SRX [4]",
+                  "controllable": false,
+                  "orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [5]",
+                  "_title": "Talon SRX [5]",
+                  "controllable": false,
+                  "orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [6]",
+                  "_title": "Talon SRX [6]",
+                  "controllable": false,
+                  "orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [7]",
+                  "_title": "Talon SRX [7]",
+                  "controllable": false,
+                  "orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [8]",
+                  "_title": "Talon SRX [8]",
+                  "controllable": false,
+                  "orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [9]",
+                  "_title": "Talon SRX [9]",
+                  "controllable": false,
+                  "orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/DoubleSolenoid[0,0]/Value",
+                  "_title": "DoubleSolenoid[0,0]/Value"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/DoubleSolenoid[0,2]/Value",
+                  "_title": "DoubleSolenoid[0,2]/Value"
+                },
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/DigitalInput[0]/Value",
+                  "_title": "DigitalInput[0]/Value",
+                  "colorWhenTrue": "#7CFC00FF",
+                  "colorWhenFalse": "#8B0000FF"
+                },
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/DigitalInput[1]/Value",
+                  "_title": "DigitalInput[1]/Value",
+                  "colorWhenTrue": "#7CFC00FF",
+                  "colorWhenFalse": "#8B0000FF"
+                },
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/DigitalInput[2]/Value",
+                  "_title": "DigitalInput[2]/Value",
+                  "colorWhenTrue": "#7CFC00FF",
+                  "colorWhenFalse": "#8B0000FF"
+                },
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/DigitalInput[3]/Value",
+                  "_title": "DigitalInput[3]/Value",
+                  "colorWhenTrue": "#7CFC00FF",
+                  "colorWhenFalse": "#8B0000FF"
+                },
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/DigitalInput[5]/Value",
+                  "_title": "DigitalInput[5]/Value",
+                  "colorWhenTrue": "#7CFC00FF",
+                  "colorWhenFalse": "#8B0000FF"
+                }
+              ]
+            }
+          },
+          "6,1": {
+            "size": [
+              4,
+              4
+            ],
+            "content": {
+              "_type": "Camera Stream",
+              "_title": ""
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "drive",
+      "autoPopulate": false,
+      "autoPopulatePrefix": "",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "tiles": {
+          "7,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Drive Mode",
+              "_title": "SmartDashboard/Drive Mode"
+            }
+          },
+          "3,0": {
+            "size": [
+              3,
+              5
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "List",
+              "_children": [
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Right Encoder Ticks",
+                  "_title": "SmartDashboard/Right Encoder Ticks"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Right Encoder Position",
+                  "_title": "SmartDashboard/Right Encoder Position"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Right Encoder Speed",
+                  "_title": "SmartDashboard/Right Encoder Speed"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Right Master Current",
+                  "_title": "SmartDashboard/Right Master Current"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Right Slave 1 Current",
+                  "_title": "SmartDashboard/Right Slave 1 Current"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Right Slave 2 Current",
+                  "_title": "SmartDashboard/Right Slave 2 Current"
+                }
+              ]
+            }
+          },
+          "0,0": {
+            "size": [
+              3,
+              5
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "List",
+              "_children": [
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Left Encoder Ticks",
+                  "_title": "SmartDashboard/Left Encoder Ticks"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Left Encoder Position",
+                  "_title": "SmartDashboard/Left Encoder Position"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Left Encoder Speed",
+                  "_title": "SmartDashboard/Left Encoder Speed"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Left Master Current",
+                  "_title": "SmartDashboard/Left Master Current"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Left Slave 1 Current",
+                  "_title": "SmartDashboard/Left Slave 1 Current"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Left Slave 2 Current",
+                  "_title": "SmartDashboard/Left Slave 2 Current"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "camera",
+      "autoPopulate": false,
+      "autoPopulatePrefix": "",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "tiles": {
+          "7,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Camera mode",
+              "_title": "/SmartDashboard/Camera mode"
+            }
+          },
+          "7,2": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/LED mode",
+              "_title": "/SmartDashboard/LED mode"
+            }
+          },
+          "7,4": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Tracking state",
+              "_title": "SmartDashboard/Tracking state"
+            }
+          },
+          "0,0": {
+            "size": [
+              3,
+              5
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "List",
+              "_children": [
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///SmartDashboard/Any targets in view?",
+                  "_title": "/SmartDashboard/Any targets in view?",
+                  "colorWhenTrue": "#7CFC00FF",
+                  "colorWhenFalse": "#8B0000FF"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Target horiz offset",
+                  "_title": "/SmartDashboard/Target horiz offset"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Target vert offset",
+                  "_title": "/SmartDashboard/Target vert offset"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Target area",
+                  "_title": "/SmartDashboard/Target area"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Target skew",
+                  "_title": "/SmartDashboard/Target skew"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Target latency",
+                  "_title": "SmartDashboard/Target latency"
+                }
+              ]
+            }
+          },
+          "3,0": {
+            "size": [
+              3,
+              6
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "List",
+              "_children": [
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Raw distance",
+                  "_title": "SmartDashboard/Raw distance"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Linear adjusted distance",
+                  "_title": "SmartDashboard/Linear adjusted distance"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Linear horiz offset",
+                  "_title": "/SmartDashboard/Linear horiz offset"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Theta from COR",
+                  "_title": "/SmartDashboard/Theta from COR"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Arc length from COR",
+                  "_title": "/SmartDashboard/Arc length from COR"
+                },
+                {
+                  "_type": "Boolean Box",
+                  "_source0": "network_table:///SmartDashboard/Tracking request",
+                  "_title": "SmartDashboard/Tracking request",
+                  "colorWhenTrue": "#7CFC00FF",
+                  "colorWhenFalse": "#8B0000FF"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Steering adjust",
+                  "_title": "SmartDashboard/Steering adjust"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "intake",
+      "autoPopulate": false,
+      "autoPopulatePrefix": "",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "tiles": {
+          "7,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Intake state",
+              "_title": "SmartDashboard/Intake state"
+            }
+          },
+          "7,2": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Intake Timer",
+              "_title": "SmartDashboard/Intake Timer"
+            }
+          },
+          "0,0": {
+            "size": [
+              3,
+              4
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "List",
+              "_children": [
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Intake Roller Left Current",
+                  "_title": "SmartDashboard/Intake Roller Left Current"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Intake Roller Left Voltage",
+                  "_title": "SmartDashboard/Intake Roller Left Voltage"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Intake Roller Left Output Percent",
+                  "_title": "SmartDashboard/Intake Roller Left Output Percent"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Intake Left Speed",
+                  "_title": "SmartDashboard/Intake Left Speed"
+                }
+              ]
+            }
+          },
+          "3,0": {
+            "size": [
+              3,
+              4
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "List",
+              "_children": [
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Intake Roller Right Current",
+                  "_title": "SmartDashboard/Intake Roller Right Current"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Intake Roller Right Voltage",
+                  "_title": "SmartDashboard/Intake Roller Right Voltage"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Intake Roller Right Output Percent",
+                  "_title": "SmartDashboard/Intake Roller Right Output Percent"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Intake Right Speed",
+                  "_title": "SmartDashboard/Intake Right Speed"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "arm",
+      "autoPopulate": false,
+      "autoPopulatePrefix": "",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "tiles": {
+          "7,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Arm Encoder Present",
+              "_title": "SmartDashboard/Arm Encoder Present",
+              "colorWhenTrue": "#7CFC00FF",
+              "colorWhenFalse": "#8B0000FF"
+            }
+          },
+          "7,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Arm State",
+              "_title": "SmartDashboard/Arm State"
+            }
+          },
+          "7,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Telescope Encoder Present",
+              "_title": "SmartDashboard/Telescope Encoder Present",
+              "colorWhenTrue": "#7CFC00FF",
+              "colorWhenFalse": "#8B0000FF"
+            }
+          },
+          "3,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "List",
+              "_children": [
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Radius (Inches)",
+                  "_title": "SmartDashboard/Radius (Inches)"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Radius angle",
+                  "_title": "SmartDashboard/Radius angle"
+                }
+              ]
+            }
+          },
+          "0,0": {
+            "size": [
+              3,
+              5
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "List",
+              "_children": [
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Arm Length (Inches) ",
+                  "_title": "SmartDashboard/Arm Length (Inches) "
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Arm Angle (Degrees)",
+                  "_title": "SmartDashboard/Arm Angle (Degrees)"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Arm Angle Ticks",
+                  "_title": "SmartDashboard/Arm Angle Ticks"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Arm Velocity",
+                  "_title": "SmartDashboard/Arm Velocity"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Target Arm Position",
+                  "_title": "SmartDashboard/Target Arm Position"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Target Arm Velocity",
+                  "_title": "SmartDashboard/Target Arm Velocity"
+                }
+              ]
+            }
+          },
+          "3,0": {
+            "size": [
+              3,
+              4
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "List",
+              "_children": [
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Telescope Position (Inches)",
+                  "_title": "SmartDashboard/Telescope Position (Inches)"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Telescope Position Ticks",
+                  "_title": "SmartDashboard/Telescope Position Ticks"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Telescope Velocity",
+                  "_title": "SmartDashboard/Telescope Velocity"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Target Telescope Position",
+                  "_title": "SmartDashboard/Target Telescope Position"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Target Telescsope Velocity",
+                  "_title": "SmartDashboard/Target Telescsope Velocity"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}
