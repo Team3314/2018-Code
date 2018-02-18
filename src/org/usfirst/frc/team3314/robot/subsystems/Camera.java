@@ -131,7 +131,7 @@ public class Camera {
 		SmartDashboard.putString("LED mode", getLEDMode());
 		SmartDashboard.putString("Camera mode", getCamMode());
 		
-		SmartDashboard.putNumber("Cube height", cubeHeight);
+		//SmartDashboard.putNumber("Cube height", cubeHeight);
 		SmartDashboard.putNumber("Raw distance", rawDistance);
 		SmartDashboard.putNumber("Linear adjusted distance", getDistance());
 		SmartDashboard.putNumber("Linear horiz offset", linearHorizOffset);
