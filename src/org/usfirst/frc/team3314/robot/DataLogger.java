@@ -17,6 +17,7 @@ public class DataLogger {
 	PrintWriter pw;
 	StringBuilder sb;
     boolean run = false;
+    private long timestamp;
 
 	public void createNewFile(String name) {
 		run = false;
@@ -49,8 +50,9 @@ public class DataLogger {
 		     }
 		     sb.append('\n');
 		     run = true;
+		     timestamp = System.currentTimeMillis();
 	     }
-	     sb.append(System.currentTimeMillis());
+	     sb.append(System.currentTimeMillis() - timestamp);
 	     sb.append(',');
 	     for(int i = 0; i < values.length; i++) {
 	    	 sb.append(values[i].toString());

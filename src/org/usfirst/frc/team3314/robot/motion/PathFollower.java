@@ -53,7 +53,7 @@ public class PathFollower {
 	}
 	
 	public void loadPoints(Path path) {
-		parser.start(path.getLeftPath(), path.getRightPath());
+		parser.start(path);
 	}
 	
 	public boolean isDone() {

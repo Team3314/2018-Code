@@ -8,11 +8,19 @@
 	<classpathentry kind="var" path="wpilib" sourcepath="wpilib.sources"/>
 	<classpathentry kind="var" path="wpiutil" sourcepath="wpiutil.sources"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix.jar"/>
+<<<<<<< HEAD
 	<classpathentry kind="var" path="USERLIBS_DIR/Pathfinder-Java-1.8.jar"/>
+=======
+	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix-sources.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/navx_frc.jar"/>
+>>>>>>> branch 'master' of https://github.com/Team3314/2018-Code.git
 	<classpathentry kind="var" path="USERLIBS_DIR/sf2-frc.jar"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/navx_frc.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/Pathfinder-Java.jar"/>
+<<<<<<< HEAD
 	<classpathentry kind="var" path="USERLIBS_DIR/robolog-server.jar"/>
+=======
+>>>>>>> branch 'master' of https://github.com/Team3314/2018-Code.git
 	<classpathentry kind="output" path="bin"/>
 </classpath>

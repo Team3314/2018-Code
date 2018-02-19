@@ -97,6 +97,7 @@ public class Tracking {
 				intake.setDesiredState(IntakeState.HOLDING);
 				currentState = TrackingState.DONE;
 			}
+			break;
 		case DONE:
 			camera.setTrackingRequest(false);
 			camera.setCamMode(Constants.kVisionProcessorMode);

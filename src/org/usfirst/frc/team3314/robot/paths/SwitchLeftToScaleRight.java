@@ -18,4 +18,10 @@ public class SwitchLeftToScaleRight implements Path {
 		return rightPath;
 	}
 
+	@Override
+	public boolean getBackwards() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
 }

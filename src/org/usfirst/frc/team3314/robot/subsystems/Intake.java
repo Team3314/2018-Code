@@ -48,9 +48,7 @@ public class Intake {
 			case INTAKING:
 				setDesiredSpeed(1);
 				if(!override) {
-					/*
 					if(senseCube() && !motorsStalled()) {
-					
 						setDesiredSpeed(0);
 						currentState = IntakeState.HOLDING;
 					}
@@ -60,22 +58,12 @@ public class Intake {
 					else if(!senseCube() && motorsStalled()) {
 						currentState = IntakeState.UNJAMMING;
 					}
-					*/
-				if(!motorsStalled()) {
-						currentState = IntakeState.UNJAMMING;
-						timer.start();
-					}
 				}
 				break;
 			case UNJAMMING:
 				leftSpeed = 0;//-.25;
 				rightSpeed = 1;
 				if(!override) {
-					/*
-					if(senseCube() && motorsStalled()) {
-						currentState = IntakeState.HOLDING;
-					}
-					*/
 					if(getTime() >= .3) {
 						currentState = IntakeState.INTAKING;
 						timer.stop();
@@ -99,7 +87,7 @@ public class Intake {
 		mRollerLeft.configPeakCurrentLimit(Constants.kIntakePeakCurrentLimit, 0);
 		mRollerLeft.configPeakCurrentDuration(Constants.kIntakePeakCurrentDuration, 0);
 		mRollerLeft.enableCurrentLimit(true);
-		mRollerLeft.setInverted(true);
+		mRollerLeft.setInverted(false);
 		mRollerLeft.configPeakOutputForward(1, 0);
 		mRollerLeft.configPeakOutputReverse(-1, 0);
 		
@@ -108,10 +96,11 @@ public class Intake {
 		mRollerRight.configPeakCurrentLimit(Constants.kIntakePeakCurrentLimit, 0);
 		mRollerRight.configPeakCurrentDuration(Constants.kIntakePeakCurrentDuration, 0);
 		mRollerRight.enableCurrentLimit(true);
+		mRollerRight.setInverted(true);
 		mRollerRight.configPeakOutputForward(1, 0);
 		mRollerRight.configPeakOutputReverse(-1, 0);
 		
-		cubeSensor = new DigitalInput(5);
+		cubeSensor = new DigitalInput(4);
 	}
 	
 	public void setDesiredSpeed(double speed) {
@@ -124,7 +113,7 @@ public class Intake {
 	}
 	
 	public boolean senseCube() {
-		return cubeSensor.get();
+		return !cubeSensor.get();
 	}
 	
 	public void setDesiredState(IntakeState desiredState) {
@@ -173,5 +162,6 @@ public class Intake {
 		SmartDashboard.putNumber("Intake Left Speed", leftSpeed);
 		SmartDashboard.putNumber("Intake Right Speed", rightSpeed);
 		SmartDashboard.putNumber("Intake Timer", timer.get());
+		SmartDashboard.putBoolean("Cube sensor", senseCube());
 	}
 }

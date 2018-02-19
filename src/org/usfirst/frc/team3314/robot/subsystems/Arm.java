@@ -1,9 +1,14 @@
 package org.usfirst.frc.team3314.robot.subsystems;
 
 import org.usfirst.frc.team3314.robot.Constants;
+import org.usfirst.frc.team3314.robot.DataLogger;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Arm implements Subsystem {
@@ -17,6 +22,9 @@ public class Arm implements Subsystem {
 		TO_SWITCH,
 		TO_PICKUP,
 		TO_HOLDING,
+		RAISE_CUBE,
+		
+		
 		TO_CLIMB,
 		LOWER_TO_BAR,
 		STOP,
@@ -47,6 +55,15 @@ public class Arm implements Subsystem {
 	private double armAngle;
 	private double telescopePosition;
 	
+	private double armOverrideSpeed = 0, telescopeOverrideSpeed = 0;
+	
+	private PowerDistributionPanel pdp;
+	
+	private boolean armOverride = false;
+	private boolean telescopeOverride = false;
+	
+	private DataLogger logger = new DataLogger();
+	
 	public static Arm getInstance() {
 		return mInstance;
 	}
@@ -55,7 +72,7 @@ public class Arm implements Subsystem {
 		telescopeTalon = new WPI_TalonSRX(3);
 		telescopeTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
 		telescopeTalon.getSensorCollection().setPulseWidthPosition(0, 0);
-		if(telescopeTalon.getSensorCollection().getPulseWidthPosition() >= 1300) {
+		if(telescopeTalon.getSensorCollection().getPulseWidthPosition() >= 2080) {
 			telescopeTalon.setSelectedSensorPosition((telescopeTalon.getSensorCollection().getPulseWidthPosition() + Constants.kTelescopeEncoderOffset), 0, 0);
 		}
 		else {
@@ -92,6 +109,10 @@ public class Arm implements Subsystem {
 		armTalon.configReverseSoftLimitThreshold(Constants.kArmMinPosition, 0);
 		armTalon.configForwardSoftLimitEnable(true, 0);
 		armTalon.configReverseSoftLimitEnable(true, 0);
+		
+		pdp  = new PowerDistributionPanel(0);
+		LiveWindow.disableTelemetry(pdp);
+		
 	}
 	
 	public void startUp() {
@@ -112,23 +133,25 @@ public class Arm implements Subsystem {
 		telescopeEncPos = getTelescopePositionTicks();
 		armAngle = getArmAngle();
 		telescopePosition = getTelescopePosition();
-		armLength = telescopePosition + Constants.kIntakeAdditionToLength + Constants.kMinArmLength;
+		armLength = telescopePosition + 40;
 		radius = Math.hypot(armLength, Constants.kShortSideOfArm);
-		radiusAngle = Math.atan(Constants.kShortSideOfArm/armLength) + armAngle;
+		radiusAngle = 12 + armAngle;
 		targetArmVelocity = (int)(targetSpeed * Constants.kMaxArmAngularVelocity);
 		targetTelescopeVelocity = (int)(targetSpeed * Constants.kMaxTelescopeVelocity);
 		if(radius >= 43) {
-			armAngleLimit = Math.acos(43/radius) - Math.atan(Constants.kShortSideOfArm/armLength);
+			armAngleLimit = (Math.toDegrees(Math.acos(43/radius)) +12) / Constants.kArmTicksToAngle;
 		}
 		else {
 			armAngleLimit = 0;
 		}
+		armLog();
 		switch(currentState) {
 		case TO_HOLDING:
 			targetArmAngle = Constants.kHoldAngle;
 			targetTelescopePosition = Constants.kHoldTelescopePosition;
 			if(inPosition()) {
-				currentState = ArmState.STOP;
+				targetArmAngle = getArmAngleTicks();
+				currentState = ArmState.STOPPED;
 			}
 			break;
 		case TELESCOPE_IN:
@@ -158,14 +181,28 @@ public class Arm implements Subsystem {
 			targetArmAngle = Constants.kPickUpAngle;
 			targetTelescopePosition = Constants.kPickUpTelescopePosition;
 			if(inPosition()) {
-				currentState = ArmState.STOP;
+				targetArmAngle = getArmAngleTicks();
+				currentState = ArmState.STOPPED;
+			}
+			break;
+		case RAISE_CUBE:
+			targetTelescopePosition = 0;
+			targetArmAngle = Math.min(-45 / Constants.kArmTicksToAngle, -armAngleLimit);
+			if(getArmAngle() > -49) {
+				if(desiredState == ArmState.TO_HOLDING || desiredState == ArmState.TO_PICKUP ) {
+					currentState = desiredState;
+				}
+				else{
+					currentState = ArmState.TO_HORIZONTAL;
+				}
 			}
 			break;
 		case TO_SWITCH:
 			targetArmAngle = Constants.kSwitchAngle;
 			targetTelescopePosition = Constants.kSwitchTelescopePosition;
 			if(inPosition()) {
-				currentState = ArmState.STOP;
+				targetArmAngle = getArmAngleTicks();
+				currentState = ArmState.STOPPED;
 			}
 			break;
 		case TO_SCALE_LOW:
@@ -175,7 +212,8 @@ public class Arm implements Subsystem {
 				targetTelescopeVelocity = 0;
 			}
 			if(inPosition()) {
-				currentState = ArmState.STOP;
+				targetArmAngle = getArmAngleTicks();
+				currentState = ArmState.STOPPED;
 			}
 			break;
 		case TO_SCALE_HIGH:
@@ -185,7 +223,8 @@ public class Arm implements Subsystem {
 				targetTelescopeVelocity = 0;
 			}
 			if(inPosition()) {
-				currentState = ArmState.STOP;
+				targetArmAngle = getArmAngleTicks();
+				currentState = ArmState.STOPPED;
 			}
 			break;
 		case TO_CLIMB:
@@ -200,6 +239,8 @@ public class Arm implements Subsystem {
 			targetTelescopePosition = Constants.kBarTelescopePosition;
 			break;
 		case STOP:
+			targetArmVelocity = 0;
+			targetTelescopeVelocity = 0;
 			if(getArmVelocity() == 0) {
 				currentState = ArmState.STOPPED;
 				targetArmAngle = getArmAngleTicks();
@@ -208,10 +249,21 @@ public class Arm implements Subsystem {
 		case STOPPED:
 			break;
 		}
-		armTalon.set(ControlMode.MotionMagic, targetArmAngle);
-		telescopeTalon.set(ControlMode.MotionMagic, targetTelescopePosition);
-		armTalon.configMotionCruiseVelocity(targetArmVelocity, 0);
-		telescopeTalon.configMotionCruiseVelocity(targetTelescopeVelocity, 0);
+
+		if(!armOverride) {
+			armTalon.set(ControlMode.MotionMagic, targetArmAngle);
+			armTalon.configMotionCruiseVelocity(targetArmVelocity, 0);
+		}
+		else if(armOverride) {
+			armTalon.set(ControlMode.PercentOutput, armOverrideSpeed);
+		}
+		if (!telescopeOverride) {
+			telescopeTalon.set(ControlMode.MotionMagic, targetTelescopePosition);
+			telescopeTalon.configMotionCruiseVelocity(targetTelescopeVelocity, 0);
+		}
+		else if(telescopeOverride) {
+			telescopeTalon.set(ControlMode.PercentOutput, telescopeOverrideSpeed);
+		}
 	}
 	
 	public void setDesiredState(ArmState desiredState) {
@@ -225,11 +277,11 @@ public class Arm implements Subsystem {
 			}
 		}
 		else if(desiredState == ArmState.TO_PICKUP) {
-			if(getArmAngle() < Constants.kPickUpAngle - 3 || getArmAngle() > Constants.kPickUpAngle) {
+			if(getArmAngle() < ((Constants.kPickUpAngle * Constants.kArmTicksToAngle) - 2) || getArmAngle() > ((Constants.kPickUpAngle * Constants.kArmTicksToAngle) + 3)) {
 				currentState = ArmState.TO_INTERMEDIATE_LOW;
 			}
 			else {
-				currentState = desiredState;
+				currentState = ArmState.TO_PICKUP;;
 			}
 				
 		}
@@ -261,13 +313,31 @@ public class Arm implements Subsystem {
 			}
 		}
 		else if (desiredState == ArmState.STOP) {
-			currentState = ArmState.STOP;
-			targetTelescopePosition = getTelescopePositionTicks();
-			targetArmAngle = getArmAngleTicks();
+			if((currentState == ArmState.STOPPED)) {
+				currentState = ArmState.STOPPED;
+			}
+			else if(!(currentState == ArmState.STOPPED)) {
+				currentState = ArmState.STOP;
+				targetTelescopePosition = getTelescopePositionTicks();
+				targetArmAngle = getArmAngleTicks();
+			}
+		}
+		if(currentState == ArmState.TELESCOPE_IN || currentState == ArmState.TO_INTERMEDIATE_LOW) {
+			if(radiusAngle < 0 && getTelescopePosition() > 10) {
+				currentState = ArmState.RAISE_CUBE;
+			}
 		}
 	}
 	public void setTargetSpeed(double targSpeed) {
 		targetSpeed = targSpeed;
+	}
+	
+	public void setArmOverrideSpeed(double armSpeed) {
+		armOverrideSpeed = armSpeed;
+	}
+	
+	public void setTelescopeOverrideSpeed(double speed) {
+		telescopeOverrideSpeed = speed;
 	}
 	
 	public double getArmAngle() {
@@ -289,6 +359,19 @@ public class Arm implements Subsystem {
 	}
 	public double getArmVelocity() {
 		return armTalon.getSelectedSensorVelocity(0) * Constants.kArmTicksToAngle * 10;
+	}
+	public double getArmVelocityTicks() {
+		return armTalon.getSelectedSensorVelocity(0);
+	}
+	public double getTelescopeVelocityTicks() {
+		return telescopeTalon.getSelectedSensorVelocity(0);
+	}
+	
+	public void setArmOverride(boolean armOverride) {
+		this.armOverride = armOverride;
+	}
+	public void setTelescopeOverride(boolean telescopeOverride) {
+		this.telescopeOverride = telescopeOverride;
 	}
 	
 	public boolean inPosition() {
@@ -313,8 +396,27 @@ public class Arm implements Subsystem {
 		return currentState;
 	}
 	
+	public void newFile(String name) {
+		logger.createNewFile(name);
+	}
+	
+	public void armLog() {
+		String[] names = {"Arm Position (Degrees)", "Telescope Position(Inches)", "Arm Position (Ticks)", "Telescope Position (Ticks)",
+				"Arm Velocity (degrees/sec)", "Telescope Velocity (Inches / sec)", "Arm Velocity(Ticks)", "Telescope Velocity (Ticks)",
+				"Arm Current", "Telescope Current", "Arm Voltage", "Telescope Voltage", "Battery Voltage", "Arm Target Position", 
+				"Telescope Target Position", "Arm Target Velocity", "Telescope Target Velocity"
+				};
+    	String[] values = {String.valueOf(getArmAngle()), String.valueOf(getTelescopePosition()),String.valueOf(getArmAngleTicks()), String.valueOf(getTelescopePositionTicks()),
+    			String.valueOf(getArmVelocity()), String.valueOf(getTelescopeVelocity()), String.valueOf(getArmVelocityTicks()), String.valueOf(getTelescopeVelocityTicks()),
+    			String.valueOf(armTalon.getOutputCurrent()), String.valueOf(telescopeTalon.getOutputCurrent()), String.valueOf(armTalon.getMotorOutputVoltage()), String.valueOf(telescopeTalon.getMotorOutputVoltage()), String.valueOf(pdp.getVoltage()),
+    			String.valueOf(armTalon.getActiveTrajectoryPosition()), String.valueOf(telescopeTalon.getActiveTrajectoryPosition()), String.valueOf(armTalon.getActiveTrajectoryVelocity()), String.valueOf(telescopeTalon.getActiveTrajectoryVelocity())    			
+    			};
+    	logger.logData(names, values);
+	}
+	
+	@Override
 	public void outputToSmartDashboard() {
-		SmartDashboard.putNumber("Arm Angle (Degrees)", armAngle);
+		SmartDashboard.putNumber("Arm Angle (Degrees)", getArmAngle());
 		SmartDashboard.putNumber("Arm Length (Inches) ", armLength);
 		SmartDashboard.putNumber("Telescope Position (Inches)", getTelescopePosition());
 		SmartDashboard.putNumber("Radius (Inches)", radius);
@@ -330,7 +432,9 @@ public class Arm implements Subsystem {
 		SmartDashboard.putNumber("Target Telescope Position", targetTelescopePosition);
 		SmartDashboard.putBoolean("Arm Encoder Present", armEncoderPresent());
 		SmartDashboard.putBoolean("Telescope Encoder Present", telescopeEncoderPresent());
-		
+		SmartDashboard.putNumber("Arm current", armTalon.getOutputCurrent());
+		SmartDashboard.putNumber("Telescope current", telescopeTalon.getOutputCurrent());
+		SmartDashboard.putNumber("Arm Angle Limit", armAngleLimit);
 	}
 	@Override
 	public void resetSensors() {

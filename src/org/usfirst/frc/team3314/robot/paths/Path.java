@@ -6,5 +6,6 @@ public interface Path {
 
 	public File getLeftPath();
 	public File getRightPath();
+	public boolean getBackwards();
 	
 }

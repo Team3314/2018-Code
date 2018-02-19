@@ -26,7 +26,7 @@ public class Camera {
 	private double steeringAdjust;
 	private boolean trackingRequest = false;
 	private String camString, ledString;
-	
+
 	public class PeriodicRunnable implements java.lang.Runnable {
 		public void run() {
 			targetsInView = limelight.getEntry("tv").getDouble(-1337.254);

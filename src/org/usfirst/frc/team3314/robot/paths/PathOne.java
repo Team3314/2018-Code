@@ -14,6 +14,11 @@ public class PathOne implements Path {
 	public File getRightPath() {
 		return rightPath;
 	}
+	@Override
+	public boolean getBackwards() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 
 }

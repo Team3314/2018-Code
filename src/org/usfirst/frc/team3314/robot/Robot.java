@@ -1,7 +1,7 @@
 package org.usfirst.frc.team3314.robot;
 
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team3314.robot.autos.Autonomous;
 import org.usfirst.frc.team3314.robot.motion.PathFollower;
@@ -34,17 +34,12 @@ public class Robot extends IterativeRobot {
 	
 	private AutoModeSelector selector = new AutoModeSelector();
 	private PathFollower pathFollower = new PathFollower();
-
-	Compressor pcm1 = new Compressor();
+	private Timer timer = new Timer();
 	
 	Autonomous selectedAutoMode = null;
 	
-	private boolean lastGyrolock = false, lastScaleHigh, lastScaleLow, lastPickup, lastHold, lastStop, lastClimb;
-
-	/**
-	 * This function is run when the robot is first started up and should be
-	 * used for any initialization code.
-	 */
+	private boolean lastGyrolock = false, lastScaleHigh, lastScaleLow, lastPickup, lastHold, lastStop, lastClimb, lastBar;
+	
 	@Override
 	public void robotInit() {	
 		Log.startServer(1099);
@@ -55,18 +50,6 @@ public class Robot extends IterativeRobot {
 	public void robotPeriodic() {
 		outputToSmartDashboard();
 	}
-
-	/**
-	 * This autonomous (along with the chooser code above) shows how to select
-	 * between different autonomous modes using the dashboard. The sendable
-	 * chooser code works with the Java SmartDashboard. If you prefer the
-	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * getString line to get the auto name from the text box below the Gyro
-	 *
-	 * You can add additional auto modes by adding additional comparisons to the
-	 * switch structure below with additional strings. If using the
-	 * SendableChooser make sure to add them to the chooser code above as well.
-	 */
 	@Override
 	public void disabledInit() {
 		pathFollower.stop();
@@ -86,38 +69,41 @@ public class Robot extends IterativeRobot {
 		drive.resetSensors();
 		arm.startUp();
 		selectedAutoMode = selector.getSelectedAutoMode();
-		drive.logger.createNewFile("Auto");
+		drive.newFile("DriveAuto");
+		arm.newFile("ArmAuto");
+		timer.start();
 		
 		camera.setLEDMode(Constants.kLEDOff);
 		camera.setCamMode(Constants.kVisionProcessorMode);
 	}
 
-	/**
-	 * This function is called periodically during autonomous
-	 */
 	@Override
 	public void autonomousPeriodic() {
-		allPeriodic();
-		selectedAutoMode.update();
+		if(selector.getGameData().length() == 0 && timer.get() < 5) {
+			selectedAutoMode = selector.getSelectedAutoMode();
+		}
+		else {
+			allPeriodic();
+			selectedAutoMode.update();
+			timer.stop();
+		}
 	}
 
 
 	@Override
 	public void teleopInit() {
-		drive.logger.createNewFile("Teleop");
 		pathFollower.stop();
 		drive.resetSensors();
 		arm.startUp();
 		drive.flushTalonBuffer();
-
+		
 		camera.setTrackingRequest(false);
 		camera.setLEDMode(Constants.kLEDOff);
 		camera.setCamMode(Constants.kVisionProcessorMode);
+		drive.newFile("DriveTele");
+		arm.newFile("ArmTele");
 	}
 	
-	/**
-	 * This function is called periodically during operator control
-	 */
 	@Override
 	public void teleopPeriodic() {
 		allPeriodic();
@@ -142,11 +128,10 @@ public class Robot extends IterativeRobot {
 		if(hi.getGyrolock()) {
 			if(!lastGyrolock) {
 				drive.setDriveMode(driveMode.GYROLOCK);
-				drive.setDesiredAngle(drive.getAngle());
 			}
 			drive.setDesiredSpeed(hi.getLeftThrottle());
 		}
-		else {
+		else if(!hi.getGyrolock()) {
 			drive.setDriveMode(driveMode.OPEN_LOOP);
 		}
 		
@@ -154,7 +139,7 @@ public class Robot extends IterativeRobot {
 			camera.setTrackingRequest(true);
 		} else {
 			camera.setTrackingRequest(false);
-			drive.setDriveMode(driveMode.OPEN_LOOP);
+			//drive.setDriveMode(driveMode.OPEN_LOOP);
 		}
 		
 		if(hi.getHighGear()) {
@@ -169,10 +154,10 @@ public class Robot extends IterativeRobot {
 		
 		//Arm Controls
 		if(hi.getClimb() && !lastClimb) {
-			if(hi.getRaiseArm())
 				arm.setDesiredState(ArmState.TO_CLIMB);
-			else if(hi.getLowerArm()) 
-				arm.setDesiredState(ArmState.LOWER_TO_BAR);
+		}
+		else if(hi.getBar() && !lastBar) {
+			arm.setDesiredState(ArmState.LOWER_TO_BAR);
 		}
 		else if(hi.getScaleHigh() && !lastScaleHigh && !hi.getClimb()) {
 			arm.setDesiredState(ArmState.TO_SCALE_HIGH);
@@ -189,6 +174,13 @@ public class Robot extends IterativeRobot {
 		else if(hi.getStop() && !lastStop && !hi.getClimb()) {
 			arm.setDesiredState(ArmState.STOP);
 		}
+		
+		arm.setArmOverride(hi.armPowerOverride());
+		arm.setArmOverrideSpeed(hi.getArmOverrideSpeed());
+		
+		arm.setTelescopeOverride(hi.telescopePowerOverride());
+		arm.setTelescopeOverrideSpeed(hi.getTelescopeOverrideSpeed());
+		
 		arm.setTargetSpeed(hi.getArmSpeed());
 		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
 		SmartDashboard.putBoolean("Gyrolock", hi.getGyrolock());
@@ -199,6 +191,7 @@ public class Robot extends IterativeRobot {
 		lastHold = hi.getHold();
 		lastStop = hi.getStop();
 		lastClimb = hi.getClimb();
+		lastBar = hi.getBar();
 	}
 
 	public void allPeriodic() {

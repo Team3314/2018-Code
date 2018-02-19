@@ -26,7 +26,8 @@ public class PathList {
 			 paths.put("ScaleLSwitchR", new ScaleLeftToSwitchRight());
 			 paths.put("ScaleRSwitchL", new ScaleRightToSwitchLeft());
 			 paths.put("ScaleRSwitchR", new ScaleRightToSwitchRight());
-			 
+			 paths.put("Turn" , new PathTwo());
+			 paths.put("Drive straight", new PathOne());
 		 }
 	 };
 	 public static Path getPath(String path) {
