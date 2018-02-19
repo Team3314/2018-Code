@@ -3,10 +3,13 @@ package org.usfirst.frc.team3314.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team3314.robot.Constants;
@@ -20,10 +23,11 @@ import com.ctre.phoenix.motion.SetValueMotionProfile;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-public class Drive {
+public class Drive implements Subsystem {
 	
 	public enum driveMode {
 		IDLE,
@@ -49,10 +53,12 @@ public class Drive {
 	private PowerDistributionPanel pdp;
 	private AHRS navx;
 	
+	private DigitalInput leftHighGearSensor, leftLowGearSensor, rightHighGearSensor, rightLowGearSensor;
+	
 	//Hardware states
 	private boolean mIsHighGear;
 	private boolean mIsPTO;
-    private boolean mIsBrakeMode;
+    private NeutralMode neutralMode;
     
     //Data Logging
     public DataLogger logger;
@@ -68,6 +74,8 @@ public class Drive {
     private int leftDrivePositionTicks, rightDrivePositionTicks, leftDriveSpeedTicks, rightDriveSpeedTicks, motionProfileMode = 0;
     
     private double leftDrivePositionInches, rightDrivePositionInches, leftDriveSpeedRPM, rightDriveSpeedRPM;
+    
+    Compressor pcm1;
     
     public void update() {
     	if(mIsHighGear) {
@@ -95,20 +103,19 @@ public class Drive {
     			rawRightSpeed = rightStickInput;
     			controlMode = ControlMode.PercentOutput;
     			break;
-    		case GYROLOCK:
-    			if (!gyroControl.isEnabled()){
-    				gyroControl.enable();
-    			}
-    			
-    			rawLeftSpeed = desiredLeftSpeed + gyroPIDOutput.turnSpeed;
-    			rawRightSpeed = desiredRightSpeed - gyroPIDOutput.turnSpeed;
+    		case GYROLOCK:    			
+    			rawLeftSpeed = desiredLeftSpeed;// + gyroPIDOutput.turnSpeed;
+    			rawRightSpeed = desiredRightSpeed;// - gyroPIDOutput.turnSpeed;
     			gyroControl.setSetpoint(desiredAngle);
     			controlMode = ControlMode.PercentOutput;
     			break;
     		case VISION_CONTROL:
-    			rawLeftSpeed = camera.getSteeringAdjust();
-    			rawRightSpeed = -camera.getSteeringAdjust();
-    			controlMode = ControlMode.MotionMagic;
+    			rawLeftSpeed = leftStickInput + camera.getSteeringAdjust();
+    			rawRightSpeed = rightStickInput - camera.getSteeringAdjust();
+    			controlMode = ControlMode.PercentOutput;
+    			//rawLeftSpeed = camera.getSteeringAdjust();
+    			//rawRightSpeed = -camera.getSteeringAdjust();
+    			//controlMode = ControlMode.MotionMagic;
     			break;
     		case MOTION_PROFILE:
     			log();
@@ -126,11 +133,11 @@ public class Drive {
 
     private Drive() {
     	// Logger
-    	 logger = DataLogger.getInstance();
+    	 logger = new DataLogger();
     	 camera = Camera.getInstance();
     	
 		//Hardware
-    	pdp  = new PowerDistributionPanel();
+    	pdp  = new PowerDistributionPanel(0);
     	shifter = new DoubleSolenoid(0, 1);
     	pto = new DoubleSolenoid(2, 3);
     	navx = new AHRS(SPI.Port.kMXP);
@@ -145,7 +152,6 @@ public class Drive {
 		gyroControl.setInputRange(-180, 180);
 	    gyroControl.setContinuous(); 
 		gyroControl.setOutputRange(-.7, .7);		// Limits speed of turn to prevent overshoot
-		gyroControl.setAbsoluteTolerance(1);
     	
 		
 		//Talons
@@ -185,6 +191,9 @@ public class Drive {
     	mLeftSlave2.follow(mLeftMaster);
     	mLeftSlave2.setInverted(false);
     	
+    	leftHighGearSensor = new DigitalInput(1);
+    	leftLowGearSensor = new DigitalInput(0);
+    	
     	mRightMaster = new WPI_TalonSRX(7);
     	mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
     	mRightMaster.setSensorPhase(true);
@@ -221,16 +230,23 @@ public class Drive {
     	mRightSlave2.follow(mRightMaster);
     	mRightSlave2.setInverted(true);
     	
+    	rightHighGearSensor = new DigitalInput(3);
+    	rightLowGearSensor = new DigitalInput(2);
+    	
+    	pcm1 = new Compressor();
+    	pcm1.setClosedLoopControl(true);
     	
     	resetSensors();
+    	LiveWindow.disableTelemetry(pdp);
+    	setNeutralMode(NeutralMode.Brake);
     	
     	mIsHighGear = false;
     	mIsPTO = false;
     }
     
     public void setStickInputs(double leftInput, double rightInput) {
-    	leftStickInput = -leftInput;
-    	rightStickInput = -rightInput;
+    	leftStickInput = leftInput;
+    	rightStickInput = rightInput;
     }
     
     public void setDesiredAngle(double angle) {
@@ -265,6 +281,19 @@ public class Drive {
     	return (leftDrivePositionInches+rightDrivePositionInches)/2;
     }
     
+    public boolean getLeftHighGear() {
+    	return !leftHighGearSensor.get();
+    }
+    public boolean getLeftLowGear() {
+    	return !leftLowGearSensor.get();
+    }
+    public boolean getRightHighGear() {
+    	return !rightHighGearSensor.get();
+    }
+    public boolean getRightLowGear() {
+    	return !rightLowGearSensor.get();
+    }
+    
     public void setDesiredSpeed(double speed) {
     	desiredLeftSpeed = speed;
     	desiredRightSpeed = speed;
@@ -277,14 +306,30 @@ public class Drive {
     
     public void setDriveMode(driveMode mode) {
     	if(mode == driveMode.GYROLOCK) {
+    		gyroControl.enable();
 			setDesiredAngle(getAngle());
-			mLeftMaster.selectProfileSlot(1, 0);
+    	}
+    	else {
+    		gyroControl.disable();
     	}
     	currentDriveMode = mode;
+    	
     }
     
     public void setHighGear(boolean highGear) {
     	mIsHighGear = highGear;
+    }
+    
+    public void setNeutralMode(NeutralMode mode) {
+    	if(neutralMode != mode) {
+    		neutralMode = mode;
+    		mLeftMaster.setNeutralMode(mode);
+    		mLeftSlave1.setNeutralMode(mode);
+    		mLeftSlave2.setNeutralMode(mode);
+    		mRightMaster.setNeutralMode(mode);
+    		mRightSlave1.setNeutralMode(mode);
+    		mRightSlave2.setNeutralMode(mode);
+    	}
     }
     
     public void setPTO(boolean pto) {
@@ -295,7 +340,11 @@ public class Drive {
     	return mIsPTO;
     }
     
-    private void logSpeed() {
+    public void newFile(String name) {
+    	logger.createNewFile(name);
+    }
+    
+    public void logSpeed() {
     	String[] names = {"Left Encoder Speed", "Right Encoder Speed", "Left Encoder Position", "Right Encoder Position", "Left Encoder Position Ticks","Right Encoder Position Ticks",
     			"Left Encoder Position Setpoint",  "Right Encoder Velocity Setpoint","Left Encoder Velocity Setpoint", "Right Encoder Velocity Setpoint", "NavX Y Acceleration", "NavX X Acceleration",
     			"Left Master Current", "Left Slave 1 Current","Left Slave 2 Current", "Right Master Current", "Right Slave 1 Current", "Right Slave 2 Current",
@@ -327,6 +376,21 @@ public class Drive {
     	SmartDashboard.putNumber("Right Slave 1 Current", mRightSlave1.getOutputCurrent());
     	SmartDashboard.putNumber("Right Slave 2 Current", mRightSlave2.getOutputCurrent());
     	SmartDashboard.putString("Drive Mode", String.valueOf(currentDriveMode));
+    	SmartDashboard.putString("Neutral Mode", String.valueOf(neutralMode));
+    	SmartDashboard.putBoolean("High Gear Left", getLeftHighGear());
+    	SmartDashboard.putBoolean("Low Gear Left", getLeftLowGear());
+    	SmartDashboard.putBoolean("High Gear Right", getRightHighGear());
+    	SmartDashboard.putBoolean("Low Gear Right", getRightLowGear());
+    	SmartDashboard.putBoolean("High Gear", getHighGear());
+    	SmartDashboard.putBoolean("Low Gear", getLowGear());
+    	SmartDashboard.putBoolean("Neutral", getNeutral());
+    	SmartDashboard.putNumber("Raw Left Speed", rawLeftSpeed);
+    	SmartDashboard.putNumber("Raw Right Speed", rawRightSpeed);
+    	SmartDashboard.putNumber("Desired Angle", desiredAngle);
+    	SmartDashboard.putNumber("Current angle", navx.getAngle());
+    	SmartDashboard.putNumber("Gyro adjustment", gyroPIDOutput.turnSpeed);
+    	SmartDashboard.putNumber("Desired Left Speed", desiredLeftSpeed);
+    	SmartDashboard.putNumber("Desired Right Speed", desiredRightSpeed);
     	
     }
     
@@ -378,7 +442,15 @@ public class Drive {
     	resetDriveEncoders();
     }
     
-    
+    public boolean getHighGear() {
+    	return leftHighGearSensor.get() && rightHighGearSensor.get();
+    }
+    public boolean getLowGear() {
+    	return leftLowGearSensor.get() && rightLowGearSensor.get();
+    }
+    public boolean getNeutral() {
+    	return !leftLowGearSensor.get() && !leftHighGearSensor.get() && !rightLowGearSensor.get() && !rightHighGearSensor.get();
+    }
     
     public void pushPoints(TrajectoryPoint leftPoint, TrajectoryPoint rightPoint) {
     	mLeftMaster.pushMotionProfileTrajectory(leftPoint);

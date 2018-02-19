@@ -2,7 +2,6 @@
 package org.usfirst.frc.team3314.robot.autos;
 
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
-import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -36,7 +35,7 @@ public class AutoCrossBaseline extends Autonomous {
 			break;
 		case DRIVE:
 			drive.setDesiredSpeed(0.25);
-			if (getTime() >= 10) { //placeholder
+			if (getTime() >= 5) { //placeholder
 				currentState = State.STOP;
 			}
 			break;

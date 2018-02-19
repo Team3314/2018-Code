@@ -25,4 +25,10 @@ public class PathTwo implements Path{
 		return rightPath;
 	}
 
+	@Override
+	public boolean getBackwards() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -7,15 +7,22 @@ import edu.wpi.first.wpilibj.Joystick;
  * @author 3314Programming
  *This class defines the controls for the robot 
  *
+ *LEFT STICK:
+ *Upper Middle Button - High Gear
+ *Lower Middle Button - Low gear
+ *
+ *RIGHT STICK:
+ *Trigger - Gyrolock
+ *
  *XBOX CONTROLLER :
  *A - Intake Cube
  *B - Release Cube
  *X - Unjam Intake
  *Right Bumper - Intake Override
- *Left Trigger - Arm To Outer Position
+ *Left Bumpers - Arm To Outer Position
  *Left Stick Y-Axis - Move Arm
  *Start + Select - PTO toggle
- *
+ *Right Trigger + Y button - climb
  *
  */
 
@@ -41,10 +48,10 @@ public class HumanInput {
 		autoSelector = new Joystick(4);
 	}
 	public double getLeftThrottle() {
-		return leftStick.getRawAxis(1);
+		return -leftStick.getRawAxis(1);
 	}
 	public double getRightThrottle() {
-		return rightStick.getRawAxis(1);
+		return -rightStick.getRawAxis(1);
 	}
 	public boolean getLowGear() {
 		return leftStick.getRawButton(2);
@@ -56,7 +63,7 @@ public class HumanInput {
 		return rightStick.getRawButton(1);
 	}
 	public boolean getPTO() {
-		return gamepad.getRawButton(8) && gamepad.getRawButton(7);
+		return gamepad.getRawButtonPressed(8) && gamepad.getRawButton(7);
 	}
 	public boolean getVisionCtrl() {
 		return leftStick.getRawButton(1);
@@ -84,17 +91,27 @@ public class HumanInput {
 		return gamepad.getRawButton(6);
 	}
 	
+	
+	public boolean armPowerOverride() {
+		return buttonBox.getRawButton(11);
+	}
+	public boolean telescopePowerOverride() {
+		return buttonBox.getRawButton(12);
+	}
 	public double getArmSpeed() {
 		return Math.abs(gamepad.getRawAxis(1));
 	}
 	public boolean getLowerArm() {
-		return -gamepad.getRawAxis(1) < -.01;
+		return -gamepad.getRawAxis(1) < -.05;
 	}
 	public boolean getRaiseArm() {
-		return -gamepad.getRawAxis(1) > .01;
+		return -gamepad.getRawAxis(1) > .05;
 	}
 	public boolean getClimb() {
-		return gamepad.getRawButton(4) && gamepad.getRawAxis(3) > .5;
+		return gamepad.getRawButton(4) && gamepad.getRawAxis(3) > .5 && getRaiseArm();
+	}
+	public boolean getBar() {
+		return gamepad.getRawButton(4) && gamepad.getRawAxis(3) > .5 && getLowerArm();
 	}
 	public boolean getScaleHigh() {
 		return getRaiseArm() && getArmOuterPosition();
@@ -115,6 +132,12 @@ public class HumanInput {
 		return gamepad.getRawButton(5);
 	}
 	
+	public double getArmOverrideSpeed() {
+		return -gamepad.getRawAxis(1);
+	}
+	public double getTelescopeOverrideSpeed() {
+		return -gamepad.getRawAxis(5);
+	}
 	
 	public int getLLBinaryOne() {
 		if(autoSelector.getRawButton(1))

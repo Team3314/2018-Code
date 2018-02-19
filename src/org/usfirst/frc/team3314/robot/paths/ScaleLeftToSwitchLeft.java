@@ -17,4 +17,8 @@ public class ScaleLeftToSwitchLeft implements Path {
 		// TODO Auto-generated method stub
 		return rightPath;
 	}
+	
+	public boolean getBackwards() {
+		return false;
+	}
 }

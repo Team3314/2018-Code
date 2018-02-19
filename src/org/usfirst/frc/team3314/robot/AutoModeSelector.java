@@ -19,8 +19,9 @@ public class AutoModeSelector {
 			auto4 = new AutoCubeToSwitchFromCenter(),
 			auto5 = new AutoScaleThenSwitch(),
 			auto6 = new AutoSwitchThenScale(),
-			auto7 = new AutoTwoCubeScale();
-	private  Autonomous[] autos = {auto0, auto1, auto2, auto3, auto4, auto5, auto6, auto7,};
+			auto7 = new AutoTwoCubeScale(),
+			auto8 = new MotionProfile();
+	private  Autonomous[] autos = {auto0, auto1, auto2, auto3, auto4, auto5, auto6, auto7, auto8};
 	
 	public Autonomous getSelectedAutoMode() {
 		pollFMS();
@@ -40,12 +41,15 @@ public class AutoModeSelector {
 			autoModeBinary = "" + hi.getRRBinaryEight() + hi.getRRBinaryFour() + hi.getRRBinaryTwo() + hi.getRRBinaryOne();
 		}
 		autoModeDecimal = Integer.parseInt(autoModeBinary, 2);
-		autoMode = autos[2];//autoModeDecimal];
+		autoMode = autos[8];//autoModeDecimal];
 		autoMode.setGameData(gameData);
 		autoMode.reset();
  		return autoMode;
 	}
 	public void pollFMS() {
 			gameData = fms.getGameSpecificMessage();
+	}
+	public String getGameData() {
+		return gameData;
 	}
 }
