@@ -104,9 +104,12 @@ public class Drive implements Subsystem {
     			controlMode = ControlMode.PercentOutput;
     			break;
     		case VISION_CONTROL:
-    			rawLeftSpeed = camera.getSteeringAdjust();
-    			rawRightSpeed = -camera.getSteeringAdjust();
-    			controlMode = ControlMode.MotionMagic;
+    			rawLeftSpeed = leftStickInput + camera.getSteeringAdjust();
+    			rawRightSpeed = rightStickInput - camera.getSteeringAdjust();
+    			controlMode = ControlMode.PercentOutput;
+    			//rawLeftSpeed = camera.getSteeringAdjust();
+    			//rawRightSpeed = -camera.getSteeringAdjust();
+    			//controlMode = ControlMode.MotionMagic;
     			break;
     		case MOTION_PROFILE:
     			log();

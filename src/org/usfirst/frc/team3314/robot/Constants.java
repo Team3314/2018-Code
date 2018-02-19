@@ -70,11 +70,13 @@ public class Constants {
 		public static Value kPTOOut = Value.kReverse;
 		
 		//camera
-		public static int kLEDOn = 0;
-		public static int kLEDOff = 1;
-		public static int kLEDBlink = 2;
-		public static double kVisionProcessorMode = 0;
-		public static double kDriverCameraMode = 1;
+		public static double kLEDOn = 0.0;
+		public static double kLEDOff = 1.0;
+		public static double kLEDBlink = 2.0;
+		public static double kVisionProcessorMode = 0.0;
+		public static double kDriverCameraMode = 1.0;
+		
+		public static double kTrackingHeight = 11-4; //cube - camera
 		
 		//Robot characteristics
 		public static double kPulleyDiameter = 3.75; //inches

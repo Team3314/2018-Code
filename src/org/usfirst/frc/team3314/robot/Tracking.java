@@ -3,7 +3,6 @@ package org.usfirst.frc.team3314.robot;
 import org.usfirst.frc.team3314.robot.subsystems.*;
 import org.usfirst.frc.team3314.robot.subsystems.Drive.*;
 import org.usfirst.frc.team3314.robot.subsystems.Intake.IntakeState;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Tracking {
@@ -25,9 +24,11 @@ public class Tracking {
 	private Drive drive = Drive.getInstance();
 	private Intake intake = Intake.getInstance();
 	private Camera camera = Camera.getInstance();
+	private HumanInput hi = HumanInput.getInstance();
 	
 	TrackingState currentState;
 	private double minMotorCmd = 0.095;
+	private double turn = camera.getError()*Constants.kVisionCtrl_kP;
 	
 	public Tracking() {
 		currentState = TrackingState.START;
@@ -44,7 +45,7 @@ public class Tracking {
 		
 		switch (currentState) {
 		case START:
-			if (camera.getTrackingRequest() == true) {
+			if (camera.getTrackingRequest() == true && camera.isTargetInView() == true) {
 				camera.setCamMode(Constants.kVisionProcessorMode);
 				currentState = TrackingState.TRACK;
 			}
@@ -62,27 +63,32 @@ public class Tracking {
 			}
 			
 			//hard implement
-			drive.setDriveMode(driveMode.VISION_CONTROL);
-			camera.setSteeringAdjust(camera.getArcLength()/Constants.kRevToInConvFactor*
-					Constants.kDriveEncoderCodesPerRev);
+			//drive.setDriveMode(driveMode.VISION_CONTROL);
+			//camera.setSteeringAdjust(camera.getArcLength()/Constants.kRevToInConvFactor*
+					//Constants.kDriveEncoderCodesPerRev);
 			
 			//basic implement
 			if (camera.getError() > 0.25) {
-				camera.setSteeringAdjust((camera.getError()*Constants.kGyroLock_kP)+minMotorCmd);
+				camera.setSteeringAdjust(turn+minMotorCmd);
 			} else {
-				camera.setSteeringAdjust((camera.getError()*Constants.kGyroLock_kP)-minMotorCmd);
+				camera.setSteeringAdjust(turn-minMotorCmd);
 			}
 			break;
 		case DRIVE:
-			drive.setDriveMode(driveMode.GYROLOCK);
-			drive.setDesiredAngle(drive.getAngle());
-			drive.setDesiredSpeed(0.25);
-			
-			if (camera.getError() > 1) {
-				currentState = TrackingState.TRACK;
-			} else if (camera.getDistance() > 22 && camera.getDistance() < 24) {
-				drive.setDesiredSpeed(0);
-				currentState = TrackingState.INTAKE;
+			if (camera.getTrackingRequest() == true && !hi.getVisionCtrl()) {
+				drive.setDriveMode(driveMode.GYROLOCK);
+				drive.setDesiredAngle(drive.getAngle());
+				drive.setDesiredSpeed(0.5);
+				
+				if (Math.abs(camera.getError()) > 1) {
+					currentState = TrackingState.TRACK;
+				} else if (camera.getDistance() > 23.75 && camera.getDistance() < 24.25) {
+					drive.setDesiredSpeed(0);
+					currentState = TrackingState.INTAKE;
+				}
+			} else {
+				drive.setDriveMode(driveMode.OPEN_LOOP);
+				currentState = TrackingState.DONE;
 			}
 			break;
 		case INTAKE:
@@ -93,13 +99,11 @@ public class Tracking {
 			}
 		case DONE:
 			camera.setTrackingRequest(false);
-			camera.setCamMode(Constants.kDriverCameraMode);
+			camera.setCamMode(Constants.kVisionProcessorMode);
 			currentState = TrackingState.START;
 			break;
 		}
 		
 		SmartDashboard.putString("Tracking state", currentState.toString());
-		SmartDashboard.putNumber("Steering adjust", camera.getSteeringAdjust());
-		SmartDashboard.putBoolean("Tracking request", camera.getTrackingRequest());
 	}
 }

@@ -70,7 +70,9 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void disabledInit() {
 		pathFollower.stop();
+		
 		camera.setLEDMode(Constants.kLEDOff);
+		camera.setCamMode(Constants.kVisionProcessorMode);
 	}
 	
 	@Override
@@ -110,7 +112,7 @@ public class Robot extends IterativeRobot {
 
 		camera.setTrackingRequest(false);
 		camera.setLEDMode(Constants.kLEDOff);
-		camera.setCamMode(Constants.kDriverCameraMode);
+		camera.setCamMode(Constants.kVisionProcessorMode);
 	}
 	
 	/**
@@ -203,8 +205,6 @@ public class Robot extends IterativeRobot {
 		drive.update();
 		arm.update();
 		intake.update();
-		//camera.update();
-		//tracking.update();
 	}
 	
 	public void outputToSmartDashboard() {
