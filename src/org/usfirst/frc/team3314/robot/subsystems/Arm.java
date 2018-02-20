@@ -23,8 +23,6 @@ public class Arm implements Subsystem {
 		TO_PICKUP,
 		TO_HOLDING,
 		RAISE_CUBE,
-		
-		
 		TO_CLIMB,
 		LOWER_TO_BAR,
 		STOP,
@@ -119,7 +117,7 @@ public class Arm implements Subsystem {
 		armTalon.configMotionCruiseVelocity(0, 0);
 		telescopeTalon.configMotionCruiseVelocity(0, 0);
 		targetArmAngle = getArmAngleTicks();
-		targetTelescopePosition = getTelescopePosition();
+		targetTelescopePosition = getTelescopePositionTicks();
 		armTalon.set(ControlMode.MotionMagic, targetArmAngle);
 		telescopeTalon.set(ControlMode.MotionMagic, targetTelescopePosition);
 		currentState = ArmState.STOPPED;
@@ -187,13 +185,13 @@ public class Arm implements Subsystem {
 			break;
 		case RAISE_CUBE:
 			targetTelescopePosition = 0;
-			targetArmAngle = Math.min(-45 / Constants.kArmTicksToAngle, -armAngleLimit);
+			targetArmAngle = Constants.raiseCubeAngle;
 			if(getArmAngle() > -49) {
 				if(desiredState == ArmState.TO_HOLDING || desiredState == ArmState.TO_PICKUP ) {
 					currentState = desiredState;
 				}
 				else{
-					currentState = ArmState.TO_HORIZONTAL;
+					currentState = ArmState.TELESCOPE_IN;
 				}
 			}
 			break;
@@ -438,4 +436,7 @@ public class Arm implements Subsystem {
 	@Override
 	public void resetSensors() {
 	}
+	 public void stopLogger() {
+	    	logger.stop();
+	 }
 }

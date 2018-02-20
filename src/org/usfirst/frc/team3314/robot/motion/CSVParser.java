@@ -131,13 +131,13 @@ public class CSVParser {
 						setpointsRight[i] = Double.parseDouble(tempRight[i]);
 					}
 					nextPointLeft.position = setpointsRight[3] * -Constants.kFeetToEncoderCodes;
-					nextPointLeft.velocity = setpointsLeft[4] * Constants.kFeetToEncoderCodes / 10;
+					nextPointLeft.velocity = setpointsRight[4] * -Constants.kFeetToEncoderCodes / 10;
 					nextPointLeft.timeDur =  TrajectoryPoint.TrajectoryDuration.Trajectory_Duration_0ms;
 					nextPointLeft.headingDeg = setpointsLeft[7];
 					nextPointLeft.isLastPoint = false;
 
 					nextPointRight.position = setpointsLeft[3] * -Constants.kFeetToEncoderCodes;
-					nextPointRight.velocity = setpointsRight[4] * Constants.kFeetToEncoderCodes / 10;
+					nextPointRight.velocity = setpointsLeft[4] * -Constants.kFeetToEncoderCodes / 10;
 					nextPointRight.timeDur =  TrajectoryPoint.TrajectoryDuration.Trajectory_Duration_0ms;
 					nextPointRight.headingDeg = setpointsRight[7];
 					nextPointRight.isLastPoint = false;

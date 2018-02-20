@@ -117,18 +117,23 @@ public abstract class Autonomous {
 	
 	public void armToScaleHigh() {
 		arm.setDesiredState(ArmState.TO_SCALE_HIGH);
+		arm.setTargetSpeed(1);
 	}
 	public void armToScaleLow() {
 		arm.setDesiredState(ArmState.TO_SCALE_LOW);
+		arm.setTargetSpeed(1);
 	}
 	public void armToSwitch() {
 		arm.setDesiredState(ArmState.TO_SWITCH);
+		arm.setTargetSpeed(1);
 	}
 	public void armToPickUp() {
 		arm.setDesiredState(ArmState.TO_PICKUP);
+		arm.setTargetSpeed(1);
 	}
 	public void armToHolding() {
 		arm.setDesiredState(ArmState.TO_HOLDING);
+		arm.setTargetSpeed(1);
 	}
 	public boolean armStopped() {
 		return arm.getState() == ArmState.STOPPED;

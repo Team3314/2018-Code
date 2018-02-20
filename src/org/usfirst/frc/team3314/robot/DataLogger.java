@@ -32,6 +32,11 @@ public class DataLogger {
 		}
 	}
 	
+	public void stop() {
+		if(pw != null)
+			pw.flush();
+	}
+	
 	public void logData(String[] names, String[] values) {
 	     if (!run) {
 	    	 try {
@@ -60,7 +65,6 @@ public class DataLogger {
 	     }
 	     sb.append('\n');
 	     pw.print(sb.toString());
-	     pw.flush(); //Forces Printwriter to write to file every loop instead of waiting for buffer to fill up
 	     sb.setLength(0);
 	     
 	}

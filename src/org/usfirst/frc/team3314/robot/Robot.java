@@ -44,18 +44,22 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {	
 		Log.startServer(1099);
+		Log.setDelay(20);
 	}
 	
 	@Override
 	public void robotPeriodic() {
 		outputToSmartDashboard();
+		camera.update();
 	}
 	@Override
 	public void disabledInit() {
 		pathFollower.stop();
-		
 		camera.setLEDMode(Constants.kLEDOff);
 		camera.setCamMode(Constants.kVisionProcessorMode);
+		drive.stopLogger();
+		arm.stopLogger();
+		
 	}
 	
 	@Override
@@ -73,9 +77,9 @@ public class Robot extends IterativeRobot {
 		drive.newFile("DriveAuto");
 		arm.newFile("ArmAuto");
 		timer.start();
-		
 		camera.setLEDMode(Constants.kLEDOff);
 		camera.setCamMode(Constants.kVisionProcessorMode);
+		drive.setPTO(false);
 	}
 
 	@Override
@@ -97,12 +101,12 @@ public class Robot extends IterativeRobot {
 		drive.resetSensors();
 		arm.startUp();
 		drive.flushTalonBuffer();
-		
 		camera.setTrackingRequest(false);
 		camera.setLEDMode(Constants.kLEDOff);
 		camera.setCamMode(Constants.kVisionProcessorMode);
 		drive.newFile("DriveTele");
 		arm.newFile("ArmTele");
+		drive.setPTO(false);
 	}
 	
 	@Override
@@ -199,7 +203,6 @@ public class Robot extends IterativeRobot {
 		drive.update();
 		arm.update();
 		intake.update();
-		camera.update();
 		tracking.update();
 	}
 	

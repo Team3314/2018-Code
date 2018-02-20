@@ -104,8 +104,8 @@ public class Drive implements Subsystem {
     			controlMode = ControlMode.PercentOutput;
     			break;
     		case GYROLOCK:    			
-    			rawLeftSpeed = desiredLeftSpeed;// + gyroPIDOutput.turnSpeed;
-    			rawRightSpeed = desiredRightSpeed;// - gyroPIDOutput.turnSpeed;
+    			rawLeftSpeed = desiredLeftSpeed + gyroPIDOutput.turnSpeed;
+    			rawRightSpeed = desiredRightSpeed - gyroPIDOutput.turnSpeed;
     			gyroControl.setSetpoint(desiredAngle);
     			controlMode = ControlMode.PercentOutput;
     			break;
@@ -124,6 +124,9 @@ public class Drive implements Subsystem {
     			rawRightSpeed = motionProfileMode;
     			break;
     	}
+    	if(mIsPTO) {
+			rawRightSpeed = rawLeftSpeed;
+		}
     	mLeftMaster.set(controlMode, rawLeftSpeed);
     	mRightMaster.set(controlMode, rawRightSpeed);
     
@@ -364,6 +367,10 @@ public class Drive implements Subsystem {
 
     }
     
+    public void stopLogger() {
+    	logger.stop();
+    }
+    
     public void outputToSmartDashboard() {
     	SmartDashboard.putNumber("Left Encoder Ticks", leftDrivePositionTicks);
     	SmartDashboard.putNumber("Right Encoder Ticks", rightDrivePositionTicks);
@@ -397,22 +404,14 @@ public class Drive implements Subsystem {
     }
     
     public void log() {
-    	Log.log("Left Position Setpoint", mLeftMaster.getActiveTrajectoryPosition());
-		Log.log("Right Poistion Setpoint", mRightMaster.getActiveTrajectoryPosition());
-		Log.log("Left Velocity Setpoint", mLeftMaster.getActiveTrajectoryVelocity());
-		Log.log("Right Velocity Setpoint", mRightMaster.getActiveTrajectoryVelocity());
-		Log.log("Left Position", leftDrivePositionTicks);
-		Log.log("Right Position", rightDrivePositionTicks);
-		Log.log("Left Velocity", leftDriveSpeedTicks);
-		Log.log("Right Velocity", rightDriveSpeedTicks);
 		Log.add("Left Position Setpoint", (double)mLeftMaster.getActiveTrajectoryPosition());
 		Log.add("Right Position Setpoint",(double) mRightMaster.getActiveTrajectoryPosition());
 		Log.add("Left Velocity Setpoint",(double) mLeftMaster.getActiveTrajectoryVelocity());
 		Log.add("Right Velocity Setpoint", (double)mRightMaster.getActiveTrajectoryVelocity());
-		Log.add("Left Position", (double)leftDrivePositionTicks);
-		Log.add("Right Position", (double)rightDrivePositionTicks);
-		Log.add("Left Velocity",(double) leftDriveSpeedTicks);
-		Log.add("Right Velocity",(double) rightDriveSpeedTicks);
+		Log.add("Left Position", (double)mLeftMaster.getSelectedSensorPosition(0));
+		Log.add("Right Position", (double)mRightMaster.getSelectedSensorPosition(0));
+		Log.add("Left Velocity",(double) mLeftMaster.getSelectedSensorVelocity(0));
+		Log.add("Right Velocity",(double) mRightMaster.getSelectedSensorVelocity(0));
     }
     
     private void updateSpeedAndPosition() {
