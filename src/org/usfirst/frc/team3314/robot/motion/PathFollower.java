@@ -11,6 +11,7 @@ import jaci.pathfinder.followers.EncoderFollower;
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
 import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 
+import com.cruzsbrian.robolog.Log;
 import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -22,9 +23,6 @@ public class PathFollower {
 	private Drive drive = Drive.getInstance();
 	private CSVParser parser = new CSVParser();
 	private boolean pathFinished = false;
-	private double updateRate = 1/50;
-	private long waitTime = (long) (updateRate * 1000.0);
-	private Thread thread = null;
 	private boolean running = false;
 	private MotionProfileStatus leftStatus = new MotionProfileStatus(), rightStatus = new MotionProfileStatus();
 	
@@ -35,6 +33,7 @@ public class PathFollower {
 				notifier.stop();
 			}
 			drive.processMotionProfilePoints();
+			
 		}
 	}
 	Notifier notifier = new Notifier(new PeriodicRunnable());

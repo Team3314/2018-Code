@@ -16,43 +16,36 @@ public class Camera {
 	
 	private NetworkTableInstance networktables = NetworkTableInstance.getDefault();
 	private NetworkTable limelight = networktables.getTable("limelight");
-	private Notifier notifier = new Notifier(new PeriodicRunnable());
 	
 	private double targetsInView, targetHorizOffset, targetVertOffset, targetArea, targetSkew, targetLatency;
 	private double ledMode, camMode;
+	private String camString, ledString;
 	
 	private double rawDistance, adjustedDistance;
 	private double linearHorizOffset, thetaCOR, arcLengthCOR;
+	
 	private double steeringAdjust;
 	private boolean trackingRequest = false;
-	private String camString, ledString;
 	
-	public class PeriodicRunnable implements java.lang.Runnable {
-		public void run() {
-			targetsInView = limelight.getEntry("tv").getDouble(-1337.254);
-			targetHorizOffset = limelight.getEntry("tx").getDouble(-1337.254);
-			targetVertOffset = limelight.getEntry("ty").getDouble(-1337.254);
-			targetArea = limelight.getEntry("ta").getDouble(-1337.254);
-			targetSkew = limelight.getEntry("ts").getDouble(-1337.254);
-			targetLatency = limelight.getEntry("tl").getDouble(-1337.254);
-			
-			rawDistance = Constants.kTrackingHeight / Math.tan(Math.toRadians(targetVertOffset));
-			//TODO recalibrate adjusted distance
-			adjustedDistance = //1.24126 * rawDistance - 2.92415;
-							   -1337.254;
-			
-			//TODO make sure calcs work
-			linearHorizOffset = adjustedDistance * Math.tan(Math.toRadians(targetHorizOffset));
-			thetaCOR = Math.atan(linearHorizOffset / (rawDistance + Constants.kDistanceCOR));
-			arcLengthCOR = thetaCOR * Constants.kRadiusCOR;
-			
-			Tracking.getInstance().update();
-		}
-	}
-
-	public void start() {
-		// camera = 90 fps/hz = 1 frame per 11.1 ms = 0.0111 sec
-		notifier.startPeriodic(0.0111);
+	public void update() {
+		targetsInView = limelight.getEntry("tv").getDouble(0);
+		//TODO Find way to get average tx and ty using an array of the latest 10 values
+		targetHorizOffset = limelight.getEntry("tx").getDouble(-1337.254);
+		targetVertOffset = limelight.getEntry("ty").getDouble(-1337.254);
+		targetArea = limelight.getEntry("ta").getDouble(0);
+		targetSkew = limelight.getEntry("ts").getDouble(0);
+		targetLatency = 11 + limelight.getEntry("tl").getDouble(11);
+		
+		rawDistance = Constants.kTrackingHeight / Math.tan(Math.toRadians(targetVertOffset +
+				Constants.kMountingAngle));
+		//TODO Re-calibrate adjusted distance
+		adjustedDistance = //1.24126 * rawDistance - 2.92415;
+						   -1337.254;
+		
+		//TODO Make sure calculations work
+		linearHorizOffset = adjustedDistance * Math.tan(Math.toRadians(targetHorizOffset));
+		thetaCOR = Math.atan(linearHorizOffset / (rawDistance + Constants.kDistanceCOR));
+		arcLengthCOR = thetaCOR * Constants.kRadiusCOR;
 	}
 		
 	//getters
@@ -113,11 +106,11 @@ public class Camera {
 		trackingRequest = request;
 	}
 	
-	public void setLEDMode(double ledMode) {
+	public void setLEDMode(int ledMode) {
 		limelight.getEntry("ledMode").setDouble(ledMode);
 	}
 	
-	public void setCamMode(double camMode) {
+	public void setCamMode(int camMode) {
 		limelight.getEntry("camMode").setDouble(camMode);
 	}
 	

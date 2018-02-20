@@ -16,7 +16,7 @@ public class Constants {
 		public static int kMotionProfileSlot = 0;
 	
 	//PIDF values for gyro
-		public static double kGyroLock_kP = .04;
+		public static double kGyroLock_kP = .05;
 		public static double kGyroLock_kI = 0;//.002;
 		public static double kGyroLock_kD = 0;//0.1;
 		public static double kGyroLock_kF = 0;
@@ -32,7 +32,7 @@ public class Constants {
 		public static int kVisionCtrlSlot = 2;
 		
 		//Arm PIDF
-		public static double kArm_kP = 5;
+		public static double kArm_kP = 6;
 		public static double kArm_kI = 0;
 		public static double kArm_kD = 400;
 		public static double kArm_kF = 6.42;
@@ -70,13 +70,14 @@ public class Constants {
 		public static Value kPTOOut = Value.kReverse;
 		
 		//camera
-		public static double kLEDOn = 0.0;
-		public static double kLEDOff = 1.0;
-		public static double kLEDBlink = 2.0;
-		public static double kVisionProcessorMode = 0.0;
-		public static double kDriverCameraMode = 1.0;
+		public static int kLEDOn = 0;
+		public static int kLEDOff = 1;
+		public static int kLEDBlink = 2;
+		public static int kVisionProcessorMode = 0;
+		public static int kDriverCameraMode = 1;
 		
 		public static double kTrackingHeight = 11-4; //cube - camera
+		public static double kMountingAngle = 10; //degrees
 		
 		//Robot characteristics
 		public static double kPulleyDiameter = 3.75; //inches
@@ -127,5 +128,6 @@ public class Constants {
 		public static double kClimbRaisedTelescopePosition = kMaxTelescopePosition;
 		public static double kBarAngle = 60 / kArmTicksToAngle;
 		public static double kBarTelescopePosition = kMaxTelescopePosition;
+		public static double raiseCubeAngle = -45 / kArmTicksToAngle;
 		
 }
