@@ -1,10 +1,7 @@
 package org.usfirst.frc.team3314.robot.subsystems;
 
 import org.usfirst.frc.team3314.robot.Constants;
-import org.usfirst.frc.team3314.robot.Tracking;
-
 import edu.wpi.first.networktables.*;
-import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Camera {
