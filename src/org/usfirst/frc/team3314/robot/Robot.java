@@ -27,6 +27,7 @@ public class Robot extends IterativeRobot {
 	private Arm arm = Arm.getInstance();
 	private Camera camera = Camera.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
+	private Tracking tracking = Tracking.getInstance();
 	
 	private AutoModeSelector selector = new AutoModeSelector();
 	private PathFollower pathFollower = new PathFollower();
