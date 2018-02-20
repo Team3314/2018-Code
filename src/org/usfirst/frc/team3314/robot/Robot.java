@@ -28,8 +28,9 @@ public class Robot extends IterativeRobot {
 	private Drive drive = Drive.getInstance();
 	private Intake intake = Intake.getInstance();
 	private Arm arm = Arm.getInstance();
-	
 	private Camera camera = Camera.getInstance();
+	
+	private Tracking tracking = Tracking.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
 	
 	private AutoModeSelector selector = new AutoModeSelector();
@@ -43,7 +44,6 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {	
 		Log.startServer(1099);
-		camera.start();
 	}
 	
 	@Override
@@ -60,6 +60,7 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void disabledPeriodic() {
+		camera.update();
 	}
 	
 	@Override
@@ -198,6 +199,8 @@ public class Robot extends IterativeRobot {
 		drive.update();
 		arm.update();
 		intake.update();
+		camera.update();
+		tracking.update();
 	}
 	
 	public void outputToSmartDashboard() {

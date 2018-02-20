@@ -28,7 +28,7 @@ public class Tracking {
 	
 	TrackingState currentState;
 	private double minMotorCmd = 0.095;
-	private double turn = camera.getError()*Constants.kVisionCtrl_kP;
+	private double turn = camera.getError() * Constants.kVisionCtrl_kP;
 	
 	public Tracking() {
 		currentState = TrackingState.START;
@@ -62,16 +62,16 @@ public class Tracking {
 				currentState = TrackingState.DRIVE;
 			}
 			
-			//hard implement
-			//drive.setDriveMode(driveMode.VISION_CONTROL);
-			//camera.setSteeringAdjust(camera.getArcLength()/Constants.kRevToInConvFactor*
-					//Constants.kDriveEncoderCodesPerRev);
+			/*//hard implement
+			drive.setDriveMode(driveMode.VISION_CONTROL);
+			camera.setSteeringAdjust(camera.getArcLength() / Constants.kRevToInConvFactor *
+					Constants.kDriveEncoderCodesPerRev);*/
 			
 			//basic implement
 			if (camera.getError() > 0.25) {
-				camera.setSteeringAdjust(turn+minMotorCmd);
+				camera.setSteeringAdjust(turn + minMotorCmd);
 			} else {
-				camera.setSteeringAdjust(turn-minMotorCmd);
+				camera.setSteeringAdjust(turn - minMotorCmd);
 			}
 			break;
 		case DRIVE:
@@ -82,7 +82,7 @@ public class Tracking {
 				
 				if (Math.abs(camera.getError()) > 1) {
 					currentState = TrackingState.TRACK;
-				} else if (camera.getDistance() > 23.75 && camera.getDistance() < 24.25) {
+				} else if (camera.getDistance() > 23.5 && camera.getDistance() < 24.5) {
 					drive.setDesiredSpeed(0);
 					currentState = TrackingState.INTAKE;
 				}

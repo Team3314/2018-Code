@@ -414,7 +414,6 @@ public class Arm implements Subsystem {
     	logger.logData(names, values);
 	}
 	
-	@Override
 	public void outputToSmartDashboard() {
 		SmartDashboard.putNumber("Arm Angle (Degrees)", getArmAngle());
 		SmartDashboard.putNumber("Arm Length (Inches) ", armLength);
