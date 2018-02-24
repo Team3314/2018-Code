@@ -17,7 +17,7 @@ public class PathOne implements Path {
 	@Override
 	public boolean getBackwards() {
 		// TODO Auto-generated method stub
-		return true;
+		return false;
 	}
 
 

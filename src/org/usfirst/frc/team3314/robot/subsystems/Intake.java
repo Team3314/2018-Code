@@ -16,6 +16,7 @@ public class Intake {
 		INTAKING,
 		UNJAMMING,
 		RELEASING,
+		RELEASE_SLOW,	
 		OVERRIDE
 	}
 
@@ -73,6 +74,9 @@ public class Intake {
 				break;
 			case RELEASING:
 				setDesiredSpeed(-1);
+				break;
+			case RELEASE_SLOW:
+				setDesiredSpeed(-.4);
 				break;
 			case OVERRIDE:
 				break;

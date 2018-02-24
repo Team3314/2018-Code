@@ -28,13 +28,14 @@ public class AutoCubeToSwitchFromCenter extends Autonomous {
 			selectedPath = getPath("StartC" + getSwitch());
 			loadPath(selectedPath);
 			startPathFollower();
+			armToScaleLow();
 			currentState = State.DRIVE;
 			break;
 		case DRIVE:
-			if (isPathDone()) {
+			if (isPathDone() && armStopped()) {
 				currentState = State.RELEASE_CUBE;
-				releaseCube();
 				startTimer();
+				releaseCube();
 			}	
 			break;
 		case RELEASE_CUBE:

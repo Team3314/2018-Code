@@ -67,7 +67,7 @@ public abstract class Autonomous {
 		return "Scale" + scaleSide;
 	}
 	protected String getStart() {
-		return hi.getLeftRight();
+		return "StartR";
 	}
 	public void setGameData(String data) {
 		if(data.length() >= 2) {
@@ -98,7 +98,7 @@ public abstract class Autonomous {
 		intake.setDesiredState(IntakeState.INTAKING);
 	}
 	public void releaseCube() {
-		intake.setDesiredState(IntakeState.RELEASING);
+		intake.setDesiredState(IntakeState.RELEASE_SLOW);
 	}
 	public void stopIntake()  {
 		intake.setDesiredState(IntakeState.HOLDING);

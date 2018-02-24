@@ -14,7 +14,9 @@ public class PathList {
 		 paths.put("StartLSwitchL", new StartLeftToSwitchLeft());
 		 paths.put("StartLSwitchR", new StartLeftToSwitchRight());
 		 paths.put("StartRSwitchL", new StartRightToSwitchLeft());
+		 paths.put("StartRSwitchL2", new StartRightToSwitchRight2());
 		 paths.put("StartRSwitchR", new StartRightToSwitchRight());
+		 paths.put("StartRSwitchR2", new StartRightToSwitchRight2());
 		 paths.put("StartCSwitchL", new StartCenterToSwitchLeft());
 		 paths.put("StartCSwitchR", new StartCenterToSwitchRight());
 		 paths.put("SwitchLScaleL", new SwitchLeftToScaleLeft());

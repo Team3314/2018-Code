@@ -27,9 +27,9 @@ public class MotionProfile extends Autonomous {
     	 public void update() {
      		switch (currentState) {
 			case START:
-				selectedPath = getPath("Drive straight");
+				selectedPath = getPath("Turn");
 				loadPath(selectedPath);
-				setHighGear(false);
+				setHighGear(true);
 				startPathFollower();
 				currentState = State.RUNPROFILE;
 				break;

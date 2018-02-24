@@ -2,7 +2,6 @@ package org.usfirst.frc.team3314.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team3314.robot.autos.Autonomous;
 import org.usfirst.frc.team3314.robot.motion.PathFollower;
 import org.usfirst.frc.team3314.robot.subsystems.*;
@@ -45,7 +44,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {	
 		Log.startServer(1099);
-		Log.setDelay(20);
+		Log.setDelay(200);
 	}
 	
 	@Override
@@ -74,10 +73,11 @@ public class Robot extends TimedRobot {
 		drive.resetSensors();
 		arm.startUp();
 		selectedAutoMode = selector.getSelectedAutoMode();
-		drive.newFile("DriveAuto");
-		arm.newFile("ArmAuto");
+		//drive.newFile("DriveAuto");
+		//arm.newFile("ArmAuto");
 		timer.start();
 		camera.setLEDMode(Constants.kLEDOff);
+		drive.setHighGear(true);
 		drive.setPTO(false);
 	}
 
@@ -97,13 +97,13 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		pathFollower.stop();
-		drive.resetSensors();
-		arm.startUp();
 		drive.flushTalonBuffer();
 		camera.setTrackingRequest(false);
 		camera.setLEDMode(Constants.kLEDOff);
-		drive.newFile("DriveTele");
-		arm.newFile("ArmTele");
+		//drive.newFile("DriveTele");
+		//arm.newFile("ArmTele");
+		drive.resetSensors();
+		arm.startUp();
 		drive.setPTO(false);
 	}
 	
@@ -142,7 +142,6 @@ public class Robot extends TimedRobot {
 			camera.setTrackingRequest(true);
 		} else {
 			camera.setTrackingRequest(false);
-			//drive.setDriveMode(driveMode.OPEN_LOOP);
 		}
 		
 		if(hi.getHighGear()) {
@@ -177,7 +176,6 @@ public class Robot extends TimedRobot {
 		else if(hi.getStop() && !lastStop && !hi.getClimb()) {
 			arm.setDesiredState(ArmState.STOP);
 		}
-		
 		arm.setArmOverride(hi.armPowerOverride());
 		arm.setArmOverrideSpeed(hi.getArmOverrideSpeed());
 		
@@ -186,7 +184,6 @@ public class Robot extends TimedRobot {
 		
 		arm.setTargetSpeed(hi.getArmSpeed());
 		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
-		SmartDashboard.putBoolean("Gyrolock", hi.getGyrolock());
 		lastGyrolock = hi.getGyrolock();
 		lastScaleHigh = hi.getScaleHigh();
 		lastScaleLow = hi.getScaleLow();

@@ -28,10 +28,11 @@ public class AutoCubeToScale extends Autonomous {
 			selectedPath = getPath(getStart() + getScale());
 			loadPath(selectedPath);
 			startPathFollower();
+			armToScaleLow();
 			currentState = State.DRIVE;
 			break;
 		case DRIVE:
-			if (isPathDone()) {
+			if (isPathDone() && armStopped()) {
 				currentState = State.RELEASE_CUBE;
 				startTimer();
 				releaseCube();
