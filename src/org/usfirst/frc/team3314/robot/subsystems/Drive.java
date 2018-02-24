@@ -93,7 +93,6 @@ public class Drive implements Subsystem {
     		pto.set(Constants.kPTOOut);
     	}
     	updateSpeedAndPosition();
-    	logSpeed();
     	switch(currentDriveMode) {
     		case IDLE:
     			controlMode = ControlMode.Disabled;

@@ -47,7 +47,9 @@ public class Constants {
 		public static int kArmMinPosition = -765;
 		public static int kMaxArmPosition = 1162;
 		public static double kArmTargetThreshold = 2 / kArmTicksToAngle;
-		public static int kArmContinuousCurrentLimit = 30;
+		public static int kArmContinuousCurrentLimit = 20;
+		public static int kArmPeakCurrentLimit = 30;
+		public static int kArmPeakCurrentDuration = 500;
 		
 		//Telescope PIDF
 		public static double kTelescope_kP = 2;
@@ -63,7 +65,9 @@ public class Constants {
 		public static int kTelescopeEncoderOffset = -1071; //Comp robot : -1600 Practice : TODO this shit fucked
 		public static int kMaxTelescopePosition = (int)(19 / kTelescopeTicksToInches); 
 		public static double kTelescopeTargetThreshold = 3 / kTelescopeTicksToInches;
-		public static int kTelescopeContinuousCurrentLimit = 30; //amps
+		public static int kTelescopeContinuousCurrentLimit = 20;
+		public static int kTelescopePeakCurrentLimit = 30;
+		public static int kTelescopePeakCurrentDuration = 500;
 		
 		//Gears
 		public static Value kHighGear = Value.kForward ;

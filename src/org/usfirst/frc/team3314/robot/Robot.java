@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
 		drive.resetSensors();
 		arm.startUp();
 		selectedAutoMode = selector.getSelectedAutoMode();
-		drive.newFile("DriveAuto");
+		//drive.newFile("DriveAuto");
 		//arm.newFile("ArmAuto");
 		timer.start();
 		camera.setLEDMode(Constants.kLEDOff);
@@ -98,7 +98,7 @@ public class Robot extends TimedRobot {
 		camera.setTrackingRequest(false);
 		camera.setLEDMode(Constants.kLEDOff);
 		camera.setCamMode(Constants.kVisionProcessorMode);
-		drive.newFile("DriveTele");
+		//drive.newFile("DriveTele");
 		//arm.newFile("ArmTele");
 		drive.resetSensors();
 		arm.startUp();
@@ -140,7 +140,6 @@ public class Robot extends TimedRobot {
 			camera.setTrackingRequest(true);
 		} else {
 			camera.setTrackingRequest(false);
-			//drive.setDriveMode(driveMode.OPEN_LOOP);
 		}
 		
 		if(hi.getHighGear()) {
@@ -175,7 +174,6 @@ public class Robot extends TimedRobot {
 		else if(hi.getStop() && !lastStop && !hi.getClimb()) {
 			arm.setDesiredState(ArmState.STOP);
 		}
-		
 		arm.setArmOverride(hi.armPowerOverride());
 		arm.setArmOverrideSpeed(hi.getArmOverrideSpeed());
 		
@@ -184,7 +182,6 @@ public class Robot extends TimedRobot {
 		
 		arm.setTargetSpeed(hi.getArmSpeed());
 		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
-		SmartDashboard.putBoolean("Gyrolock", hi.getGyrolock());
 		lastGyrolock = hi.getGyrolock();
 		lastScaleHigh = hi.getScaleHigh();
 		lastScaleLow = hi.getScaleLow();

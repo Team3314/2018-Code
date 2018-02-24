@@ -70,7 +70,7 @@ public class Arm implements Subsystem {
 		telescopeTalon = new WPI_TalonSRX(3);
 		telescopeTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
 		telescopeTalon.getSensorCollection().setPulseWidthPosition(0, 0);
-		if(telescopeTalon.getSensorCollection().getPulseWidthPosition() >= Math.abs(Constants.kTelescopeEncoderOffset)) {
+		if(telescopeTalon.getSensorCollection().getPulseWidthPosition() >= Math.abs(Constants.kTelescopeEncoderOffset + 120)) {
 			telescopeTalon.setSelectedSensorPosition((telescopeTalon.getSensorCollection().getPulseWidthPosition() + Constants.kTelescopeEncoderOffset), 0, 0);
 		}
 		else {
@@ -89,8 +89,11 @@ public class Arm implements Subsystem {
 		telescopeTalon.configReverseSoftLimitThreshold(Constants.kTelescopeMinPosition, 0);
 		telescopeTalon.configForwardSoftLimitEnable(true, 0);
 		telescopeTalon.configReverseSoftLimitEnable(true, 0);
+		telescopeTalon.configPeakCurrentLimit(Constants.kTelescopePeakCurrentLimit, 0);
+		telescopeTalon.configPeakCurrentDuration(Constants.kTelescopePeakCurrentDuration, 0);
 		telescopeTalon.configContinuousCurrentLimit(Constants.kTelescopeContinuousCurrentLimit, 0);
 		telescopeTalon.enableCurrentLimit(true);
+		
 		
 		armTalon = new WPI_TalonSRX(6);
 		armTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
@@ -109,11 +112,10 @@ public class Arm implements Subsystem {
 		armTalon.configReverseSoftLimitThreshold(Constants.kArmMinPosition, 0);
 		armTalon.configForwardSoftLimitEnable(true, 0);
 		armTalon.configReverseSoftLimitEnable(true, 0);
+		armTalon.configPeakCurrentLimit(Constants.kArmPeakCurrentLimit, 0);
+		armTalon.configPeakCurrentDuration(Constants.kArmPeakCurrentDuration, 0);
 		armTalon.configContinuousCurrentLimit(Constants.kArmContinuousCurrentLimit, 0);
 		armTalon.enableCurrentLimit(true);
-		
-		pdp  = new PowerDistributionPanel(0);
-		LiveWindow.disableTelemetry(pdp);
 		
 	}
 	
