@@ -1,6 +1,6 @@
 package org.usfirst.frc.team3314.robot;
 
-import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team3314.robot.autos.Autonomous;
@@ -20,7 +20,7 @@ import com.cruzsbrian.robolog.Log;
  */
 
 
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
 	
 	private Drive drive = Drive.getInstance();
 	private Intake intake = Intake.getInstance();
@@ -40,7 +40,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {	
 		Log.startServer(1099);
-		Log.setDelay(20);
+		Log.setDelay(200);
 	}
 	
 	@Override
@@ -70,10 +70,11 @@ public class Robot extends IterativeRobot {
 		arm.startUp();
 		selectedAutoMode = selector.getSelectedAutoMode();
 		drive.newFile("DriveAuto");
-		arm.newFile("ArmAuto");
+		//arm.newFile("ArmAuto");
 		timer.start();
 		camera.setLEDMode(Constants.kLEDOff);
 		camera.setCamMode(Constants.kVisionProcessorMode);
+		drive.setHighGear(true);
 		drive.setPTO(false);
 	}
 
@@ -93,14 +94,14 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopInit() {
 		pathFollower.stop();
-		drive.resetSensors();
-		arm.startUp();
 		drive.flushTalonBuffer();
 		camera.setTrackingRequest(false);
 		camera.setLEDMode(Constants.kLEDOff);
 		camera.setCamMode(Constants.kVisionProcessorMode);
 		drive.newFile("DriveTele");
-		arm.newFile("ArmTele");
+		//arm.newFile("ArmTele");
+		drive.resetSensors();
+		arm.startUp();
 		drive.setPTO(false);
 	}
 	

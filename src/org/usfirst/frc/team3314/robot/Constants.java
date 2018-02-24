@@ -8,8 +8,10 @@ public class Constants {
 	public static double kDegToTicksConvFactor = .038888888888888;
 	public static double kRevToInConvFactor = 7.90274223082;
 	
+	public static boolean practiceBot = false;
+	
 	//PIDF Values for Motion Profile 
-		public static double kMotionProfile_kP = .05;
+		public static double kMotionProfile_kP = .2;
 		public static double kMotionProfile_kI = 0;
 		public static double kMotionProfile_kD = 0;
 		public static double kMotionProfile_kF = .1204;
@@ -41,10 +43,11 @@ public class Constants {
 		public static double kArmTicksToAngle = 0.087890625; 
 		public static int kMaxArmAngularVelocity = (int) (140 / kArmTicksToAngle / 10); //radians/sec
 		public static int kMaxArmAcceleceration = (int)(70 / kArmTicksToAngle / 10); // radians/sec/sec
-		public static int kArmEncoderOffset = -3134; //Comp robot : -3134 Practice : -1411
+		public static int kArmEncoderOffset = -1411; //Comp robot : -3134 Practice : -1411
 		public static int kArmMinPosition = -765;
 		public static int kMaxArmPosition = 1162;
 		public static double kArmTargetThreshold = 2 / kArmTicksToAngle;
+		public static int kArmContinuousCurrentLimit = 30;
 		
 		//Telescope PIDF
 		public static double kTelescope_kP = 2;
@@ -57,9 +60,10 @@ public class Constants {
 		public static int kMaxTelescopeVelocity = (int)(18 / kTelescopeTicksToInches / 10); // inches/sec
 		public static int kMaxTelescopeAcceleration = (int)(30 / kTelescopeTicksToInches / 10); // inches/sec/sec
 		public static int kTelescopeMinPosition = 0;
-		public static int kTelescopeEncoderOffset = -2801; //Comp robot : -2058 Practice : TODO this shit fucked
+		public static int kTelescopeEncoderOffset = -1071; //Comp robot : -1600 Practice : TODO this shit fucked
 		public static int kMaxTelescopePosition = (int)(19 / kTelescopeTicksToInches); 
 		public static double kTelescopeTargetThreshold = 3 / kTelescopeTicksToInches;
+		public static int kTelescopeContinuousCurrentLimit = 30; //amps
 		
 		//Gears
 		public static Value kHighGear = Value.kForward ;
@@ -94,8 +98,8 @@ public class Constants {
 		public static int kArmMotionControlTrajectroyPeriod = 10; //10 ms
 		
 		//Drive Motion Profile
-		public static int kDriveMotionControlFramePeriod = 2;// 2ms
-		public static int kDriveMotionControlTrajectoryPeriod = 5; //5ms;
+		public static int kDriveMotionControlFramePeriod = 5;// 5ms
+		public static int kDriveMotionControlTrajectoryPeriod = 10; //10ms;
 		public static double kFeetToEncoderCodes = (12 *kDriveEncoderCodesPerRev) / kRevToInConvFactor;
 		
 		//Intake
@@ -120,9 +124,9 @@ public class Constants {
 		public static double kScaleLowTelescopePosition = 0;
 		public static int kScaleHighAngle =  (int)(100 / kArmTicksToAngle);
 		public static double kScaleHighTelescopePosition = 12 / kTelescopeTicksToInches;
-		public static double kHoldAngle = -65 / kArmTicksToAngle;
+		public static double kHoldAngle = -63 / kArmTicksToAngle;
 		public static double kHoldTelescopePosition = 0;
-		public static double kSwitchAngle = 0;
+		public static double kSwitchAngle = -30 / Constants.kArmTicksToAngle;
 		public static double kSwitchTelescopePosition = 0;
 		public static double kClimbRaisedAngle = 90 / kArmTicksToAngle; // 100
 		public static double kClimbRaisedTelescopePosition = kMaxTelescopePosition;

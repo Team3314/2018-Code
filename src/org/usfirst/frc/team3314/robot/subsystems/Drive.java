@@ -25,6 +25,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class Drive implements Subsystem {
@@ -164,6 +166,8 @@ public class Drive implements Subsystem {
     	mLeftMaster.setSensorPhase(true);
     	mLeftMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
     	mLeftMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
+    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic,  5, 0);
+    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0,  5, 0);
 
     	//motion profile gains
     	mLeftMaster.selectProfileSlot(Constants.kMotionProfileSlot, 0);
@@ -209,6 +213,8 @@ public class Drive implements Subsystem {
     	mRightMaster.config_kI(Constants.kMotionProfileSlot, Constants.kMotionProfile_kI, 0);
     	mRightMaster.config_kD(Constants.kMotionProfileSlot, Constants.kMotionProfile_kD, 0);
     	mRightMaster.config_kF(Constants.kMotionProfileSlot, Constants.kMotionProfile_kF, 0);
+    	mRightMaster.setStatusFramePeriod(StatusFrame.Status_10_MotionMagic,  5, 0);
+    	mRightMaster.setStatusFramePeriod(StatusFrame.Status_2_Feedback0,  5, 0);
     	
     	//vision ctrl gains
     	mRightMaster.config_kP(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kP, 0); //slot, value, timeout
@@ -258,10 +264,6 @@ public class Drive implements Subsystem {
     
     public double getAngle() {
     	return navx.getYaw();
-    }
-    
-    public boolean checkTolerance() {
-    	return gyroControl.onTarget();
     }
     
     public int getLeftPositionTicks() {
@@ -398,7 +400,6 @@ public class Drive implements Subsystem {
     	SmartDashboard.putNumber("Gyro adjustment", gyroPIDOutput.turnSpeed);
     	SmartDashboard.putNumber("Desired Left Speed", desiredLeftSpeed);
     	SmartDashboard.putNumber("Desired Right Speed", desiredRightSpeed);
-    	
     }
     
     public void log() {
@@ -436,9 +437,9 @@ public class Drive implements Subsystem {
     
     public void resetSensors() {
     	navx.reset();
+    	resetDriveEncoders();
     	mRightMaster.disable();
     	mLeftMaster.disable();
-    	resetDriveEncoders();
     }
     
     public boolean getHighGear() {

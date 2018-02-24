@@ -33,7 +33,6 @@ public class PathFollower {
 				notifier.stop();
 			}
 			drive.processMotionProfilePoints();
-			
 		}
 	}
 	Notifier notifier = new Notifier(new PeriodicRunnable());
@@ -42,7 +41,7 @@ public class PathFollower {
 		pathFinished = false;
 		drive.setDriveMode(driveMode.MOTION_PROFILE);
 		drive.setMotionProfileStatus(1);
-		notifier.startPeriodic(0.002);
+		notifier.startPeriodic(0.005);
 		running = true;
 	}
 	
