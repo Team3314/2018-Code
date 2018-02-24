@@ -19,6 +19,7 @@ public class Camera {
 	private String camString, ledString;
 	
 	private double rawDistance, adjustedDistance;
+	private double trigLin, trigExp, areaLin, areaExp;
 	private double linearHorizOffset, thetaCOR, arcLengthCOR;
 	
 	private double steeringAdjust;
@@ -31,21 +32,29 @@ public class Camera {
 		targetVertOffset = limelight.getEntry("ty").getDouble(-1337.254);
 		targetArea = limelight.getEntry("ta").getDouble(0);
 		targetSkew = limelight.getEntry("ts").getDouble(0);
-		targetLatency = 11 + limelight.getEntry("tl").getDouble(11);
+		targetLatency = 11 + limelight.getEntry("tl").getDouble(0);
 		
 		rawDistance = Constants.kTrackingHeight / Math.tan(Math.toRadians(targetVertOffset +
 				Constants.kMountingAngle));
-		//TODO Re-calibrate adjusted distance
-		adjustedDistance = //1.24126 * rawDistance - 2.92415;
-						   -1337.254;
+
+		trigLin = -1.5905 * targetArea + 58.7728;
+		trigExp = 69.5539 * Math.pow(0.949044, targetArea);
+		areaLin = 1.239 * rawDistance - 8.09891;
+		areaExp = 12.1321 * Math.pow(1.03003, rawDistance);
+		
+		if (targetArea > 15.5 || targetArea < 6.5) {
+			adjustedDistance = areaLin;
+		} else {
+			adjustedDistance = trigExp;
+		}
 		
 		//TODO Make sure calculations work
-		linearHorizOffset = adjustedDistance * Math.tan(Math.toRadians(targetHorizOffset));
+		linearHorizOffset = /*adjustedDistance * */ Math.tan(Math.toRadians(targetHorizOffset));
 		thetaCOR = Math.atan(linearHorizOffset / (rawDistance + Constants.kDistanceCOR));
 		arcLengthCOR = thetaCOR * Constants.kRadiusCOR;
 	}
 		
-	//getters
+	//Getters
 	public boolean isTargetInView() {
 		if (targetsInView == 1.0) {
 			return true;
@@ -94,7 +103,7 @@ public class Camera {
 		return camString;
 	}
 		
-	//setters
+	//Setters
 	public void setSteeringAdjust(double adjust) {
 		steeringAdjust = adjust;
 	}
@@ -122,7 +131,11 @@ public class Camera {
 		SmartDashboard.putString("Camera mode", getCamMode());
 
 		SmartDashboard.putNumber("Raw distance", rawDistance);
-		SmartDashboard.putNumber("Linear adjusted distance", getDistance());
+		SmartDashboard.putNumber("Adjusted distance", getDistance());
+		SmartDashboard.putNumber("Trig lin", trigLin);
+		SmartDashboard.putNumber("Trig exp", trigExp);
+		SmartDashboard.putNumber("Area lin", areaLin);
+		SmartDashboard.putNumber("Area exp", areaExp);
 		SmartDashboard.putNumber("Linear horiz offset", linearHorizOffset);
 		SmartDashboard.putNumber("Theta from COR", thetaCOR);
 		SmartDashboard.putNumber("Arc length from COR", getArcLength());

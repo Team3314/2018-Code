@@ -38,8 +38,7 @@ public class Arm implements Subsystem {
 	private double radiusAngle;
 	private double armEncPos;
 	private double armAngularVelocity, telescopeVelocity;
-   
-	private double targetArmAngle = 0;
+    double targetArmAngle = 0;
 	private double targetTelescopePosition = 0;
 	
 	private double armAngleLimit;

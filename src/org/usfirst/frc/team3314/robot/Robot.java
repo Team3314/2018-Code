@@ -1,6 +1,6 @@
 package org.usfirst.frc.team3314.robot;
 
-import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team3314.robot.autos.Autonomous;
@@ -23,9 +23,10 @@ import com.cruzsbrian.robolog.Log;
  */
 
 
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
 	
 	private Drive drive = Drive.getInstance();
+	
 	private Intake intake = Intake.getInstance();
 	private Arm arm = Arm.getInstance();
 	private Camera camera = Camera.getInstance();
@@ -56,7 +57,6 @@ public class Robot extends IterativeRobot {
 	public void disabledInit() {
 		pathFollower.stop();
 		camera.setLEDMode(Constants.kLEDOff);
-		camera.setCamMode(Constants.kVisionProcessorMode);
 		drive.stopLogger();
 		arm.stopLogger();
 		
@@ -78,7 +78,6 @@ public class Robot extends IterativeRobot {
 		arm.newFile("ArmAuto");
 		timer.start();
 		camera.setLEDMode(Constants.kLEDOff);
-		camera.setCamMode(Constants.kVisionProcessorMode);
 		drive.setPTO(false);
 	}
 
@@ -103,7 +102,6 @@ public class Robot extends IterativeRobot {
 		drive.flushTalonBuffer();
 		camera.setTrackingRequest(false);
 		camera.setLEDMode(Constants.kLEDOff);
-		camera.setCamMode(Constants.kVisionProcessorMode);
 		drive.newFile("DriveTele");
 		arm.newFile("ArmTele");
 		drive.setPTO(false);
@@ -215,6 +213,5 @@ public class Robot extends IterativeRobot {
 	
 	public void testInit() {
 		camera.setLEDMode(Constants.kLEDOff);
-		camera.setCamMode(Constants.kVisionProcessorMode);
 	}
 }

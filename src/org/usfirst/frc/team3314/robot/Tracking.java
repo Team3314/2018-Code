@@ -46,7 +46,6 @@ public class Tracking {
 		switch (currentState) {
 		case START:
 			if (camera.getTrackingRequest() == true && camera.isTargetInView() == true) {
-				camera.setCamMode(Constants.kVisionProcessorMode);
 				currentState = TrackingState.TRACK;
 			}
 			break;
@@ -68,7 +67,7 @@ public class Tracking {
 					Constants.kDriveEncoderCodesPerRev);*/
 			
 			//basic implement
-			if (camera.getError() > 0.25) {
+			if (camera.getError() > 0) {
 				camera.setSteeringAdjust(turn + minMotorCmd);
 			} else {
 				camera.setSteeringAdjust(turn - minMotorCmd);
@@ -100,7 +99,6 @@ public class Tracking {
 			break;
 		case DONE:
 			camera.setTrackingRequest(false);
-			camera.setCamMode(Constants.kVisionProcessorMode);
 			currentState = TrackingState.START;
 			break;
 		}

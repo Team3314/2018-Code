@@ -25,7 +25,7 @@ public class Constants {
 	public static double kMotionProfileGyro_kP = .025;
 
 	// pidf for vision control
-	public static double kVisionCtrl_kP = .04;
+	public static double kVisionCtrl_kP = .05;
 	public static double kVisionCtrl_kI = 0;
 	public static double kVisionCtrl_kD = 0;
 	public static double kVisionCtrl_kF = 0;
@@ -41,7 +41,7 @@ public class Constants {
 	public static double kArmTicksToAngle = 0.087890625;
 	public static int kMaxArmAngularVelocity = (int) (140 / kArmTicksToAngle / 10); // radians/sec
 	public static int kMaxArmAcceleceration = (int) (70 / kArmTicksToAngle / 10); // radians/sec/sec
-	public static int kArmEncoderOffset = -3134; // Comp robot : -3134 Practice : -1411
+	public static int kArmEncoderOffset = -1411; // Comp robot : -3134 Practice : -1411
 	public static int kArmMinPosition = -765;
 	public static int kMaxArmPosition = 1162;
 	public static double kArmTargetThreshold = 2 / kArmTicksToAngle;
@@ -57,7 +57,7 @@ public class Constants {
 	public static int kMaxTelescopeVelocity = (int) (18 / kTelescopeTicksToInches / 10); // inches/sec
 	public static int kMaxTelescopeAcceleration = (int) (30 / kTelescopeTicksToInches / 10); // inches/sec/sec
 	public static int kTelescopeMinPosition = 0;
-	public static int kTelescopeEncoderOffset = -2801; // Comp robot : -2058 Practice : TODO this shit fucked
+	public static int kTelescopeEncoderOffset = -2024; //-2801; // Comp robot : -2058 Practice : TODO this shit fucked
 	public static int kMaxTelescopePosition = (int) (19 / kTelescopeTicksToInches);
 	public static double kTelescopeTargetThreshold = 3 / kTelescopeTicksToInches;
 
