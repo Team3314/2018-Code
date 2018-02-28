@@ -18,15 +18,15 @@ public class PathList {
 		 paths.put("StartCSwitchL", new Path("StartCenterToSwitchLeft", Mode.FORWARD_HIGH);
 		 paths.put("StartCSwitchR", new Path("StartCenterToSwitchLeft", Mode.FORWARD_HIGH);
 		 paths.put("SwitchLScaleL", new Path("SwitchLeftToScaleLeft", Mode.BACKWARD_HIGH);
-		 paths.put("SwitchLScaleR", new Path("SwitchLeftToScaleRight",);
-		 paths.put("SwitchRScaleL", new SwitchRightToScaleLeft());
-		 paths.put("SwitchRScaleR", new SwitchRightToScaleRight());
-		 paths.put("ScaleLSwitchL", new ScaleLeftToSwitchLeft());
-		 paths.put("ScaleLSwitchR", new ScaleLeftToSwitchRight());
-		 paths.put("ScaleRSwitchL", new ScaleRightToSwitchLeft());
-		 paths.put("ScaleRSwitchR", new ScaleRightToSwitchRight());
-		 paths.put("Turn" , new PathTwo());
-		 paths.put("Drive straight", new PathOne());
+		 paths.put("SwitchLScaleR", new Path("SwitchLeftToScaleRight", Mode.BACKWARD_HIGH);
+		 paths.put("SwitchRScaleL", new Path("SwitchRightToScaleLeft", Mode.BACKWARD_HIGH);
+		 paths.put("SwitchRScaleR", new Path("SwitchRightToScaleRight", Mode.BACKWARD_HIGH);
+		 paths.put("ScaleLSwitchL", new Path("ScaleLeftToSwitchLeft", Mode.FORWARD_HIGH);
+		 paths.put("ScaleLSwitchR", new Path("ScaleLeftToSwitchRight", Mode.FORWARD_HIGH);
+		 paths.put("ScaleRSwitchL", new Path("ScaleRightToSwitchLeft", Mode.FORWARD_HIGH);
+		 paths.put("ScaleRSwitchR", new Path("ScaleRightToSwitchRight", Mode.FORWARD_HIGH);
+		 paths.put("Turn" , new "Turn", Mode.FORWARD_HIGH);
+		 paths.put("Drive straight", new Path("MotionProfileOne", Mode.FORWARD_HIGH);
 	 };
 	 public static Path getPath(String path) {
 		 return paths.get(path);
