@@ -11,14 +11,14 @@ public class PathList {
 		 */
 	 static {
 		 paths = new HashMap<String, Path>();
-		 paths.put("StartLSwitchL", new StartLeftToSwitchLeft());
-		 paths.put("StartLSwitchR", new StartLeftToSwitchRight());
-		 paths.put("StartRSwitchL", new StartRightToSwitchLeft());
-		 paths.put("StartRSwitchR", new StartRightToSwitchRight());
-		 paths.put("StartCSwitchL", new StartCenterToSwitchLeft());
-		 paths.put("StartCSwitchR", new StartCenterToSwitchRight());
-		 paths.put("SwitchLScaleL", new SwitchLeftToScaleLeft());
-		 paths.put("SwitchLScaleR", new SwitchLeftToScaleRight());
+		 paths.put("StartLSwitchL", new Path("StartLeftToSwitchLeft", Mode.BACKWARD_HIGH));
+		 paths.put("StartLSwitchR", new Path("StartLeftToSwitchRight", Mode.BACKWARD_HIGH));
+		 paths.put("StartRSwitchL", new Path("StartRightToSwitchLeft", Mode.BACKWARD_HIGH);
+		 paths.put("StartRSwitchR", new Path("StartRightToSwitchRight", Mode.BACKWARD_HIGH);
+		 paths.put("StartCSwitchL", new Path("StartCenterToSwitchLeft", Mode.FORWARD_HIGH);
+		 paths.put("StartCSwitchR", new Path("StartCenterToSwitchLeft", Mode.FORWARD_HIGH);
+		 paths.put("SwitchLScaleL", new Path("SwitchLeftToScaleLeft", Mode.BACKWARD_HIGH);
+		 paths.put("SwitchLScaleR", new Path("SwitchLeftToScaleRight",);
 		 paths.put("SwitchRScaleL", new SwitchRightToScaleLeft());
 		 paths.put("SwitchRScaleR", new SwitchRightToScaleRight());
 		 paths.put("ScaleLSwitchL", new ScaleLeftToSwitchLeft());
