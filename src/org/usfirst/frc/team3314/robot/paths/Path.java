@@ -2,7 +2,7 @@ package org.usfirst.frc.team3314.robot.paths;
 
 import java.io.File;
 
-public abstract class Path {
+public class Path {
 	
 	public enum Mode {
 		FORWARD_HIGH,
@@ -11,9 +11,15 @@ public abstract class Path {
 		BACKWARD_LOW
 	}
 	
-	protected File leftPath;
-	protected File rightPath;
-	protected Mode mode;
+	public Path(String name, Mode mode) {
+		leftPath = new File("/home/lvuser/paths/" + name + "_left_detailed.csv");
+		rightPath = new File("/home/lvuser/paths/" + name + "_right_detailed.csv");
+		this.mode = mode;
+	}
+	
+	private File leftPath;
+	private File rightPath;
+	private Mode mode;
 
 	public File getLeftPath() {
 		return leftPath;
