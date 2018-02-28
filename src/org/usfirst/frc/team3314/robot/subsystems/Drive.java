@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -36,7 +37,8 @@ public class Drive implements Subsystem {
 		OPEN_LOOP,
 		GYROLOCK,
 		VISION_CONTROL,
-		MOTION_PROFILE
+		MOTION_PROFILE,
+		TEST
 	}
 	
 	private static Drive mInstance = new Drive();
@@ -64,7 +66,6 @@ public class Drive implements Subsystem {
     
     //Data Logging
     public DataLogger logger;
-    
     public Camera camera;
     
     //PID
@@ -100,8 +101,8 @@ public class Drive implements Subsystem {
     			rawRightSpeed = 0;
     			break;
     		case OPEN_LOOP:
-    			rawLeftSpeed = leftStickInput;
-    			rawRightSpeed = rightStickInput;
+    			rawLeftSpeed = desiredLeftSpeed;
+    			rawRightSpeed = desiredRightSpeed;
     			controlMode = ControlMode.PercentOutput;
     			break;
     		case GYROLOCK:    			
@@ -167,13 +168,14 @@ public class Drive implements Subsystem {
     	mLeftMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
     	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic,  5, 0);
     	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0,  5, 0);
+    	mLeftMaster.enableVoltageCompensation(true);
+    	mLeftMaster.configOpenloopRamp(0, 0);
 
     	//motion profile gains
-    	mLeftMaster.selectProfileSlot(Constants.kMotionProfileSlot, 0);
-    	mLeftMaster.config_kP(0, Constants.kMotionProfile_kP, 0); //slot, value, timeout
-    	mLeftMaster.config_kI(0, Constants.kMotionProfile_kI, 0);
-    	mLeftMaster.config_kD(0, Constants.kMotionProfile_kD, 0);
-    	mLeftMaster.config_kF(0, Constants.kMotionProfile_kF, 0);
+    	mLeftMaster.config_kP(Constants.kMotionProfileSlot, Constants.kMotionProfile_kP, 0); //slot, value, timeout
+    	mLeftMaster.config_kI(Constants.kMotionProfileSlot, Constants.kMotionProfile_kI, 0);
+    	mLeftMaster.config_kD(Constants.kMotionProfileSlot, Constants.kMotionProfile_kD, 0);
+    	mLeftMaster.config_kF(Constants.kMotionProfileSlot, Constants.kMotionProfile_kF, 0);
     	
     	//vision ctrl gains
     	mLeftMaster.config_kP(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kP, 0); //slot, value, timeout
@@ -192,10 +194,12 @@ public class Drive implements Subsystem {
     	mLeftSlave1 = new WPI_TalonSRX(1);
     	mLeftSlave1.follow(mLeftMaster);
     	mLeftSlave1.setInverted(false);
+    	mLeftSlave1.configOpenloopRamp(0, 0);
     	
     	mLeftSlave2 = new WPI_TalonSRX(2);
     	mLeftSlave2.follow(mLeftMaster);
     	mLeftSlave2.setInverted(false);
+    	mLeftSlave2.configOpenloopRamp(0, 0);
     	
     	leftHighGearSensor = new DigitalInput(1);
     	leftLowGearSensor = new DigitalInput(0);
@@ -206,14 +210,18 @@ public class Drive implements Subsystem {
     	mRightMaster.setInverted(true);
     	mRightMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
     	mRightMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
+    	mRightMaster.setStatusFramePeriod(StatusFrame.Status_10_MotionMagic,  5, 0);
+    	mRightMaster.setStatusFramePeriod(StatusFrame.Status_2_Feedback0,  5, 0);
+    	mRightMaster.enableVoltageCompensation(true);
+    	mRightMaster.configOpenloopRamp(0, 0);
+    	
     	//Motion Profile Gains
-    	mRightMaster.selectProfileSlot(Constants.kMotionProfileSlot, 0);
     	mRightMaster.config_kP(Constants.kMotionProfileSlot, Constants.kMotionProfile_kP, 0); //slot, value, timeout
     	mRightMaster.config_kI(Constants.kMotionProfileSlot, Constants.kMotionProfile_kI, 0);
     	mRightMaster.config_kD(Constants.kMotionProfileSlot, Constants.kMotionProfile_kD, 0);
     	mRightMaster.config_kF(Constants.kMotionProfileSlot, Constants.kMotionProfile_kF, 0);
-    	mRightMaster.setStatusFramePeriod(StatusFrame.Status_10_MotionMagic,  5, 0);
-    	mRightMaster.setStatusFramePeriod(StatusFrame.Status_2_Feedback0,  5, 0);
+    	
+    	
     	
     	//vision ctrl gains
     	mRightMaster.config_kP(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kP, 0); //slot, value, timeout
@@ -233,10 +241,12 @@ public class Drive implements Subsystem {
     	mRightSlave1 = new WPI_TalonSRX(8);
     	mRightSlave1.follow(mRightMaster);
     	mRightSlave1.setInverted(true);
+    	mRightSlave1.configOpenloopRamp(0, 0);
     	
     	mRightSlave2 = new WPI_TalonSRX(9);
     	mRightSlave2.follow(mRightMaster);
     	mRightSlave2.setInverted(true);
+    	mRightSlave2.configOpenloopRamp(0, 0);
     	
     	rightHighGearSensor = new DigitalInput(3);
     	rightLowGearSensor = new DigitalInput(2);
@@ -253,8 +263,8 @@ public class Drive implements Subsystem {
     }
     
     public void setStickInputs(double leftInput, double rightInput) {
-    	leftStickInput = leftInput;
-    	rightStickInput = rightInput;
+    	desiredLeftSpeed =Math.copySign(leftInput * leftInput, leftInput);
+    	desiredRightSpeed = Math.copySign(rightInput * rightInput, rightInput);
     }
     
     public void setDesiredAngle(double angle) {
@@ -363,7 +373,16 @@ public class Drive implements Subsystem {
     			String.valueOf(mLeftSlave1.getMotorOutputVoltage()),String.valueOf(mLeftSlave2.getMotorOutputVoltage()), String.valueOf(mRightMaster.getMotorOutputVoltage()),
     			String.valueOf(mRightSlave1.getMotorOutputVoltage()), String.valueOf(mRightSlave2.getMotorOutputVoltage()),String.valueOf(pdp.getVoltage()), String.valueOf(mIsHighGear)};
     	logger.logData(names, values);
-
+    }
+    
+    public void characterizationLog() {
+    	String[] names = {"Left Encoder Speed", "Right Encoder Speed","Left Master Voltage", 
+    			"Right Master Voltage", "Battery Voltage"
+    			};
+    	String[] values = {String.valueOf(getLeftSpeedInS()), String.valueOf(getRightSpeedInS()), String.valueOf(mLeftMaster.getMotorOutputVoltage()),
+    			String.valueOf(mRightMaster.getMotorOutputVoltage()), String.valueOf(pdp.getVoltage())
+    	};
+    	logger.logData(names, values);
     }
     
     public void stopLogger() {
@@ -389,9 +408,6 @@ public class Drive implements Subsystem {
     	SmartDashboard.putBoolean("Low Gear Left", getLeftLowGear());
     	SmartDashboard.putBoolean("High Gear Right", getRightHighGear());
     	SmartDashboard.putBoolean("Low Gear Right", getRightLowGear());
-    	SmartDashboard.putBoolean("High Gear", getHighGear());
-    	SmartDashboard.putBoolean("Low Gear", getLowGear());
-    	SmartDashboard.putBoolean("Neutral", getNeutral());
     	SmartDashboard.putNumber("Raw Left Speed", rawLeftSpeed);
     	SmartDashboard.putNumber("Raw Right Speed", rawRightSpeed);
     	SmartDashboard.putNumber("Desired Angle", desiredAngle);
@@ -406,10 +422,12 @@ public class Drive implements Subsystem {
 		Log.add("Right Position Setpoint",(double) mRightMaster.getActiveTrajectoryPosition());
 		Log.add("Left Velocity Setpoint",(double) mLeftMaster.getActiveTrajectoryVelocity());
 		Log.add("Right Velocity Setpoint", (double)mRightMaster.getActiveTrajectoryVelocity());
+		Log.add("Heading setpoint", (mRightMaster.getActiveTrajectoryHeading() * 2));
 		Log.add("Left Position", (double)mLeftMaster.getSelectedSensorPosition(0));
 		Log.add("Right Position", (double)mRightMaster.getSelectedSensorPosition(0));
 		Log.add("Left Velocity",(double) mLeftMaster.getSelectedSensorVelocity(0));
 		Log.add("Right Velocity",(double) mRightMaster.getSelectedSensorVelocity(0));
+		Log.add("Heading actual",getAngle());
     }
     
     private void updateSpeedAndPosition() {
@@ -451,6 +469,15 @@ public class Drive implements Subsystem {
     	return !leftLowGearSensor.get() && !leftHighGearSensor.get() && !rightLowGearSensor.get() && !rightHighGearSensor.get();
     }
     
+    
+    
+    public double getLeftSpeedInS() {
+    	return ((double)mLeftMaster.getSelectedSensorVelocity(0) / Constants.kDriveEncoderCodesPerRev) * (Constants.kRevToInConvFactor * 10);
+    }
+    public double getRightSpeedInS() {
+    	return ((double)mRightMaster.getSelectedSensorVelocity(0) / Constants.kDriveEncoderCodesPerRev) * (Constants.kRevToInConvFactor * 10);
+    }
+    
     public void pushPoints(TrajectoryPoint leftPoint, TrajectoryPoint rightPoint) {
     	mLeftMaster.pushMotionProfileTrajectory(leftPoint);
     	mRightMaster.pushMotionProfileTrajectory(rightPoint);
@@ -476,6 +503,11 @@ public class Drive implements Subsystem {
     
     public void getLeftStatus(MotionProfileStatus status) {
     	 mLeftMaster.getMotionProfileStatus(status);
+    }
+    
+    public void setOpenLoopRampRate(double seconds) {
+    	mLeftMaster.configOpenloopRamp(seconds, 0);
+    	mRightMaster.configOpenloopRamp(seconds, 0);
     }
     
     public void setMotionProfileStatus(int status) { //0,1,2

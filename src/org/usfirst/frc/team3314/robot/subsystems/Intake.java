@@ -86,7 +86,7 @@ public class Intake {
 	}
 	
 	private Intake() {
-		mRollerLeft = new WPI_TalonSRX(4); //May be talons or victors, not decided yet
+		mRollerLeft = new WPI_TalonSRX(4); 
 		mRollerLeft.configContinuousCurrentLimit(Constants.kIntakeCurrentLimit, 0);
 		mRollerLeft.configPeakCurrentLimit(Constants.kIntakePeakCurrentLimit, 0);
 		mRollerLeft.configPeakCurrentDuration(Constants.kIntakePeakCurrentDuration, 0);
@@ -94,8 +94,10 @@ public class Intake {
 		mRollerLeft.setInverted(false);
 		mRollerLeft.configPeakOutputForward(1, 0);
 		mRollerLeft.configPeakOutputReverse(-1, 0);
+		mRollerLeft.configForwardSoftLimitEnable(false, 0);
+		mRollerLeft.configReverseSoftLimitEnable(false, 0);
 		
-		mRollerRight = new WPI_TalonSRX(5);//May be talons or victors, not decided yet
+		mRollerRight = new WPI_TalonSRX(5);
 		mRollerRight.configContinuousCurrentLimit(Constants.kIntakeCurrentLimit, 0);
 		mRollerRight.configPeakCurrentLimit(Constants.kIntakePeakCurrentLimit, 0);
 		mRollerRight.configPeakCurrentDuration(Constants.kIntakePeakCurrentDuration, 0);
@@ -103,6 +105,8 @@ public class Intake {
 		mRollerRight.setInverted(true);
 		mRollerRight.configPeakOutputForward(1, 0);
 		mRollerRight.configPeakOutputReverse(-1, 0);
+		mRollerRight.configForwardSoftLimitEnable(false, 0);
+		mRollerRight.configReverseSoftLimitEnable(false, 0);
 		
 		cubeSensor = new DigitalInput(4);
 	}
@@ -158,10 +162,6 @@ public class Intake {
 	public void outputToSmartDashboard() {
 		SmartDashboard.putNumber("Intake Roller Left Current", mRollerLeft.getOutputCurrent());
 		SmartDashboard.putNumber("Intake Roller Right Current", mRollerRight.getOutputCurrent());
-		SmartDashboard.putNumber("Intake Roller Left Voltage", mRollerLeft.getMotorOutputVoltage());
-		SmartDashboard.putNumber("Intake Roller Right Voltage", mRollerRight.getMotorOutputVoltage());
-		SmartDashboard.putNumber("Intake Roller Left Output Percent", mRollerLeft.getMotorOutputPercent());
-		SmartDashboard.putNumber("Intake Roller Right Output Percent", mRollerRight.getMotorOutputPercent());
 		SmartDashboard.putString("Intake state", currentState.toString());
 		SmartDashboard.putNumber("Intake Left Speed", leftSpeed);
 		SmartDashboard.putNumber("Intake Right Speed", rightSpeed);

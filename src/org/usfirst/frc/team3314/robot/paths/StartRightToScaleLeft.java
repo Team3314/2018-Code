@@ -2,26 +2,10 @@ package org.usfirst.frc.team3314.robot.paths;
 
 import java.io.File;
 
-public class StartRightToScaleLeft implements Path {
-	private File leftPath = new File("/home/lvuser/paths/StartRightToScaleLeft_left_detailed.csv");
-	private File rightPath = new File("/home/lvuser/paths/StartRightToScaleLeft_right_detailed.csv");
-	
-	@Override
-	public File getLeftPath() {
-		// TODO Auto-generated method stub
-		return leftPath;
+public class StartRightToScaleLeft extends Path {
+	public StartRightToScaleLeft() {
+		leftPath = new File("/home/lvuser/paths/StartRightToScaleLeft_left_detailed.csv");
+		rightPath = new File("/home/lvuser/paths/StartRightToScaleLeft_right_detailed.csv");
+		mode = Mode.BACKWARD_HIGH;
 	}
-
-	@Override
-	public File getRightPath() {
-		// TODO Auto-generated method stub
-		return rightPath;
-	}
-
-	@Override
-	public boolean getBackwards() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
 }

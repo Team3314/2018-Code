@@ -32,6 +32,7 @@ public class Robot extends TimedRobot {
 	private AutoModeSelector selector = new AutoModeSelector();
 	private PathFollower pathFollower = new PathFollower();
 	private Timer timer = new Timer();
+	private DriveTrainCharacterizer d;
 	
 	Autonomous selectedAutoMode = null;
 	
@@ -41,6 +42,7 @@ public class Robot extends TimedRobot {
 	public void robotInit() {	
 		Log.startServer(1099);
 		Log.setDelay(200);
+		
 	}
 	
 	@Override
@@ -55,7 +57,7 @@ public class Robot extends TimedRobot {
 		camera.setCamMode(Constants.kVisionProcessorMode);
 		drive.stopLogger();
 		arm.stopLogger();
-		
+		drive.setOpenLoopRampRate(0);
 	}
 	
 	@Override
@@ -116,6 +118,9 @@ public class Robot extends TimedRobot {
 		}
 		else if(hi.getOuttake()) {
 			intake.setDesiredState(IntakeState.RELEASING);
+		}
+		else if(hi.getReleaseSlow()) {
+			intake.setDesiredState(IntakeState.RELEASE_SLOW);
 		}
 		else if(hi.getUnjamPressed()) {
 			intake.setDesiredState(IntakeState.UNJAMMING);
@@ -182,6 +187,9 @@ public class Robot extends TimedRobot {
 		
 		arm.setTargetSpeed(hi.getArmSpeed());
 		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
+		if(hi.spin()) {
+			drive.setStickInputs(.4, -.4);
+		}
 		lastGyrolock = hi.getGyrolock();
 		lastScaleHigh = hi.getScaleHigh();
 		lastScaleLow = hi.getScaleLow();
@@ -209,5 +217,10 @@ public class Robot extends TimedRobot {
 	public void testInit() {
 		camera.setLEDMode(Constants.kLEDOff);
 		camera.setCamMode(Constants.kVisionProcessorMode);
+		d = new DriveTrainCharacterizer(DriveTrainCharacterizer.TestMode.STEP_VOLTAGE, DriveTrainCharacterizer.Direction.Backward, true);
+		d.initialize();
+	}
+	public void testPeriodic() {
+		d.run();
 	}
 }

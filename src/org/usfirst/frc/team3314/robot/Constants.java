@@ -11,16 +11,51 @@ public class Constants {
 	public static boolean practiceBot = false;
 	
 	//PIDF Values for Motion Profile 
-		public static double kMotionProfile_kP = .2;
+		public static double kMotionProfile_kP = .1233;// max motor output when error is 8 inchez
 		public static double kMotionProfile_kI = 0;
 		public static double kMotionProfile_kD = 0;
-		public static double kMotionProfile_kF = .1204;
+		public static double kMotionProfile_kF = 1023/12; //1023 / max voltage
 		public static int kMotionProfileSlot = 0;
+		
+		//Left Fore High
+		public static double kMotionProfileLeftForeHigh_kV = 0.632722;
+		public static double kMotionProfileLeftForeHigh_kA = 0.224626;
+		public static double kMotionProfileLeftForeHigh_Intercept = 1.963246;
+		//Right Fore High
+		public static double kMotionProfileRightForeHigh_kV = 0.615578;
+		public static double kMotionProfileRightForeHigh_kA =  0.186041;
+		public static double kMotionProfileRightForeHigh_Intercept = 1.979466;
+		//Left Back High
+		public static double kMotionProfileLeftBackHigh_kV= 0.63755;
+		public static double kMotionProfileLeftBackHigh_kA =  0.27599;
+		public static double kMotionProfileLeftBackHigh_Intercept = -1.76447;
+		//Right Back High
+		public static double kMotionProfileRightBackHigh_kV = 0.6203;
+		public static double kMotionProfileRightBackHigh_kA = 0.24050;
+		public static double kMotionProfileRightBackHigh_Intercept = -1.78987;
+		//Left Fore Low
+		public static double kMotionProfileLeftForeLow_kV = 1.825215;
+		public static double kMotionProfileLeftForeLow_kA = 0.242759;
+		public static double kMotionProfileLeftForeLow_Intercept = 1.137263;
+		//Right Fore Low
+		public static double kMotionProfileRightForeLow_kV = 1.776227;
+		public static double kMotionProfileRightForeLow_kA = 0.185059;
+		public static double kMotionProfileRightForeLow_Intercept =1.152556;
+		//Left Back Low
+		public static double kMotionProfileLeftBackLow_kV =1.875736;
+		public static double kMotionProfileLeftBackLow_kA = 0.223390;
+		public static double kMotionProfileLeftBackLow_Intercept = -0.990800;
+		//Right Back Low
+		public static double kMotionProfileRightBackLow_kV = 1.804061;
+		public static double kMotionProfileRightBackLow_kA =0.174427;
+		public static double kMotionProfileRightBackLow_Intercept = -0.988492;
+		
+		
 	
 	//PIDF values for gyro
 		public static double kGyroLock_kP = .05;
-		public static double kGyroLock_kI = 0;//.002;
-		public static double kGyroLock_kD = 0;//0.1;
+		public static double kGyroLock_kI = 0;
+		public static double kGyroLock_kD = 0;
 		public static double kGyroLock_kF = 0;
 		public static int kGyroLockSlot = 1;
 		
@@ -62,7 +97,7 @@ public class Constants {
 		public static int kMaxTelescopeVelocity = (int)(18 / kTelescopeTicksToInches / 10); // inches/sec
 		public static int kMaxTelescopeAcceleration = (int)(30 / kTelescopeTicksToInches / 10); // inches/sec/sec
 		public static int kTelescopeMinPosition = 0;
-		public static int kTelescopeEncoderOffset = -1071; //Comp robot : -1600 Practice : TODO this shit fucked
+		public static int kTelescopeEncoderOffset = -1071; //Comp robot : -1600 Practice : -1071 TODO this shit fucked
 		public static int kMaxTelescopePosition = (int)(19 / kTelescopeTicksToInches); 
 		public static double kTelescopeTargetThreshold = 3 / kTelescopeTicksToInches;
 		public static int kTelescopeContinuousCurrentLimit = 20;
