@@ -7,66 +7,84 @@ public class Constants {
 	public static int kDriveEncoderCodesPerRev = 8192;
 	public static double kDegToTicksConvFactor = .038888888888888;
 	public static double kRevToInConvFactor = 7.90274223082;
+	public static double kFeetToEncoderCodes = (12.0 *kDriveEncoderCodesPerRev) / kRevToInConvFactor;
+	public static double kFPSToTicksPer100ms = (kFeetToEncoderCodes / 10);
+	public static double kVoltageToNativeTalonUnits = 1023.0/12.0;
 	
 	public static boolean practiceBot = false;
 	
+	public static int kDriveContinuousCurrentLimit = 40;
+	public static int kDrivePeakCurrentLimit = 40;
+	public static int kDrivePeakCurrentDuration = 0;
+	
 	//PIDF Values for Motion Profile 
-		public static double kMotionProfile_kP = .1233;// max motor output when error is 8 inchez
+		public static double kMotionProfile_kP = .1223;// max motor output when error is 
 		public static double kMotionProfile_kI = 0;
 		public static double kMotionProfile_kD = 0;
-		public static double kMotionProfile_kF = 1023/12; //1023 / max voltage
+		public static double kMotionProfile_kF = 0; 
 		public static int kMotionProfileSlot = 0;
 		
 		//Left Fore High
 		public static double kMotionProfileLeftForeHigh_kV = 0.632722;
 		public static double kMotionProfileLeftForeHigh_kA = 0.224626;
 		public static double kMotionProfileLeftForeHigh_Intercept = 1.963246;
+		public static double kMotionProfileLeftForeHigh_kF = kMotionProfileLeftForeHigh_kV  / kFPSToTicksPer100ms * kVoltageToNativeTalonUnits;
 		//Right Fore High
 		public static double kMotionProfileRightForeHigh_kV = 0.615578;
 		public static double kMotionProfileRightForeHigh_kA =  0.186041;
 		public static double kMotionProfileRightForeHigh_Intercept = 1.979466;
+		public static double kMotionProfileRightForeHigh_kF = kMotionProfileRightForeHigh_kV   / kFPSToTicksPer100ms * kVoltageToNativeTalonUnits;
 		//Left Back High
 		public static double kMotionProfileLeftBackHigh_kV= 0.63755;
-		public static double kMotionProfileLeftBackHigh_kA =  0.27599;
+		public static double kMotionProfileLeftBackHigh_kA = 0.27599;
 		public static double kMotionProfileLeftBackHigh_Intercept = -1.76447;
+		public static double kMotionProfileLeftBackHigh_kF = kMotionProfileLeftBackHigh_kV  / kFPSToTicksPer100ms * kVoltageToNativeTalonUnits;;
 		//Right Back High
-		public static double kMotionProfileRightBackHigh_kV = 0.6203;
+		public static double kMotionProfileRightBackHigh_kV =0.63755;
 		public static double kMotionProfileRightBackHigh_kA = 0.24050;
 		public static double kMotionProfileRightBackHigh_Intercept = -1.78987;
+		public static double kMotionProfileRightBackHigh_kF = kMotionProfileRightBackHigh_kV  / kFPSToTicksPer100ms * kVoltageToNativeTalonUnits;
 		//Left Fore Low
 		public static double kMotionProfileLeftForeLow_kV = 1.825215;
 		public static double kMotionProfileLeftForeLow_kA = 0.242759;
 		public static double kMotionProfileLeftForeLow_Intercept = 1.137263;
+		public static double kMotionProfileLeftForeLow_kF = kMotionProfileLeftForeHigh_kV   / kFPSToTicksPer100ms  * kVoltageToNativeTalonUnits;;
 		//Right Fore Low
 		public static double kMotionProfileRightForeLow_kV = 1.776227;
 		public static double kMotionProfileRightForeLow_kA = 0.185059;
 		public static double kMotionProfileRightForeLow_Intercept =1.152556;
+		public static double kMotionProfileRightForeLow_kF = kMotionProfileRightForeLow_kV   / kFPSToTicksPer100ms  * kVoltageToNativeTalonUnits;;
 		//Left Back Low
 		public static double kMotionProfileLeftBackLow_kV =1.875736;
 		public static double kMotionProfileLeftBackLow_kA = 0.223390;
 		public static double kMotionProfileLeftBackLow_Intercept = -0.990800;
+		public static double kMotionProfileLeftBackLow_kF = kMotionProfileLeftBackLow_kV  / kFPSToTicksPer100ms * kVoltageToNativeTalonUnits;
 		//Right Back Low
 		public static double kMotionProfileRightBackLow_kV = 1.804061;
 		public static double kMotionProfileRightBackLow_kA =0.174427;
 		public static double kMotionProfileRightBackLow_Intercept = -0.988492;
+		public static double kMotionProfileRightBackLow_kF = kMotionProfileRightBackLow_kV  / kFPSToTicksPer100ms * kVoltageToNativeTalonUnits;
 		
-		
+		//PIDF values for motion profile heading following
+		public static double kMotionProfileHeading_kP = 5;
+		public static double kMotionProfileHeading_kI = 0;
+		public static double kMotionProfileHeading_kD = 0;
+		public static double kMotionProfileHeading_kF = 0;
+		public static int kMotionProfileHeadingSlot = 1;
 	
 	//PIDF values for gyro
 		public static double kGyroLock_kP = .05;
 		public static double kGyroLock_kI = 0;
 		public static double kGyroLock_kD = 0;
 		public static double kGyroLock_kF = 0;
-		public static int kGyroLockSlot = 1;
-		
-		public static double kMotionProfileGyro_kP = .025;
+		public static int kGyroLockSlot = 2;
 		
 		//pidf for vision control
 		public static double kVisionCtrl_kP = .04;
 		public static double kVisionCtrl_kI = 0;
 		public static double kVisionCtrl_kD = 0;
 		public static double kVisionCtrl_kF = 0;
-		public static int kVisionCtrlSlot = 2;
+		public static int kVisionCtrlSlot = 3;
 		
 		//Arm PIDF
 		public static double kArm_kP = 6;
@@ -77,11 +95,11 @@ public class Constants {
 		//Arm Values
 		public static double kArmTicksToAngle = 0.087890625; 
 		public static int kMaxArmAngularVelocity = (int) (140 / kArmTicksToAngle / 10); //radians/sec
-		public static int kMaxArmAcceleceration = (int)(70 / kArmTicksToAngle / 10); // radians/sec/sec
+		public static int kMaxArmAcceleceration = (int)(200 / kArmTicksToAngle / 10); // radians/sec/sec
 		public static int kArmEncoderOffset = -1411; //Comp robot : -3134 Practice : -1411
 		public static int kArmMinPosition = -765;
 		public static int kMaxArmPosition = 1162;
-		public static double kArmTargetThreshold = 2 / kArmTicksToAngle;
+		public static double kArmTargetThreshold = 3/ kArmTicksToAngle;
 		public static int kArmContinuousCurrentLimit = 20;
 		public static int kArmPeakCurrentLimit = 30;
 		public static int kArmPeakCurrentDuration = 500;
@@ -139,7 +157,7 @@ public class Constants {
 		//Drive Motion Profile
 		public static int kDriveMotionControlFramePeriod = 5;// 5ms
 		public static int kDriveMotionControlTrajectoryPeriod = 10; //10ms;
-		public static double kFeetToEncoderCodes = (12 *kDriveEncoderCodesPerRev) / kRevToInConvFactor;
+		
 		
 		//Intake
 		public static int kIntakeCurrentLimit = 15;

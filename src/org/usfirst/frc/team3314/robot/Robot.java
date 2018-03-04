@@ -38,6 +38,9 @@ public class Robot extends TimedRobot {
 	
 	private boolean lastGyrolock = false, lastScaleHigh, lastScaleLow, lastPickup, lastHold, lastStop, lastClimb, lastBar;
 	
+
+	double timestamp = 0;
+	
 	@Override
 	public void robotInit() {	
 		Log.startServer(1099);
@@ -110,7 +113,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		allPeriodic();
-		
 		// Intake Controls
 		intake.setOverride(hi.getIntakeOverride());
 		if(hi.getIntakePressed()) {
@@ -138,6 +140,7 @@ public class Robot extends TimedRobot {
 			drive.setDesiredSpeed(hi.getLeftThrottle());
 		}
 		else if(!hi.getGyrolock()) {
+			drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
 			drive.setDriveMode(driveMode.OPEN_LOOP);
 		}
 		
@@ -186,7 +189,6 @@ public class Robot extends TimedRobot {
 		arm.setTelescopeOverrideSpeed(hi.getTelescopeOverrideSpeed());
 		
 		arm.setTargetSpeed(hi.getArmSpeed());
-		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
 		if(hi.spin()) {
 			drive.setStickInputs(.4, -.4);
 		}
@@ -212,6 +214,8 @@ public class Robot extends TimedRobot {
 		drive.outputToSmartDashboard();
 		intake.outputToSmartDashboard();
 		camera.outputToSmartDashboard();
+		SmartDashboard.putNumber("Loop Time",Timer.getFPGATimestamp() - timestamp);
+		timestamp = Timer.getFPGATimestamp();
 	}
 	
 	public void testInit() {

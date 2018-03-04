@@ -24,6 +24,7 @@ public class CSVParser {
 	private Thread thread = null;
 	private boolean firstRun = true;
 	private Mode mode;
+	private double heading = 0;
 	public void parse(Path path) {
 		File leftPath = path.getLeftPath();
 		File rightPath = path.getRightPath();
@@ -50,70 +51,75 @@ public class CSVParser {
 					switch(mode) {
 					case BACKWARD_HIGH:
 						nextPointLeft.position =  -setpointsRight[3] * Constants.kFeetToEncoderCodes;
-						nextPointLeft.velocity = toVoltage(-setpointsRight[4], -setpointsRight[5], 
+						nextPointLeft.velocity = addAccelerationAndVoltageCompensation(-setpointsRight[4], -setpointsRight[5], 
 								Constants.kMotionProfileLeftBackHigh_kV, 
 								Constants.kMotionProfileLeftBackHigh_kA, 
 								Constants.kMotionProfileLeftBackHigh_Intercept);
 						nextPointRight.position = -setpointsLeft[3] * Constants.kFeetToEncoderCodes;
-						nextPointRight.velocity = toVoltage(-setpointsLeft[4], -setpointsLeft[5], 
+						nextPointRight.velocity = addAccelerationAndVoltageCompensation(-setpointsLeft[4], -setpointsLeft[5], 
 								Constants.kMotionProfileRightBackHigh_kV, 
 								Constants.kMotionProfileRightBackHigh_kA, 
 								Constants.kMotionProfileRightBackHigh_Intercept);
-						nextPointLeft.headingDeg = -Math.toDegrees(setpointsLeft[7]);
-						nextPointRight.headingDeg = -Math.toDegrees(setpointsRight[7]);
 						break;
 					case BACKWARD_LOW:
 						nextPointLeft.position =  -setpointsRight[3] * Constants.kFeetToEncoderCodes;
-						nextPointLeft.velocity = toVoltage(-setpointsRight[4], -setpointsRight[5], 
+						nextPointLeft.velocity = addAccelerationAndVoltageCompensation(-setpointsRight[4], -setpointsRight[5], 
 								Constants.kMotionProfileLeftBackLow_kV, 
 								Constants.kMotionProfileLeftBackLow_kA, 
 								Constants.kMotionProfileLeftBackLow_Intercept);
 						nextPointRight.position = -setpointsLeft[3] * Constants.kFeetToEncoderCodes;
-						nextPointRight.velocity =  toVoltage(-setpointsLeft[4], -setpointsLeft[5], 
+						nextPointRight.velocity =  addAccelerationAndVoltageCompensation(-setpointsLeft[4], -setpointsLeft[5], 
 								Constants.kMotionProfileRightBackLow_kV, 
 								Constants.kMotionProfileRightBackLow_kA, 
 								Constants.kMotionProfileRightBackLow_Intercept);
-						nextPointLeft.headingDeg = -Math.toDegrees(setpointsLeft[7]);
-						nextPointRight.headingDeg = -Math.toDegrees(setpointsRight[7]);
 						break;
 					case FORWARD_HIGH:
 						nextPointLeft.position =  setpointsLeft[3] * Constants.kFeetToEncoderCodes;
-						nextPointLeft.velocity = toVoltage(setpointsLeft[4], setpointsLeft[5], 
+						nextPointLeft.velocity = addAccelerationAndVoltageCompensation(setpointsLeft[4], setpointsLeft[5], 
 								Constants.kMotionProfileLeftForeHigh_kV, 
 								Constants.kMotionProfileLeftForeHigh_kA, 
 								Constants.kMotionProfileLeftForeHigh_Intercept);
 						nextPointRight.position = setpointsRight[3] * Constants.kFeetToEncoderCodes;
-						nextPointRight.velocity = toVoltage(setpointsRight[4], setpointsRight[5], 
+						nextPointRight.velocity = addAccelerationAndVoltageCompensation(setpointsRight[4], setpointsRight[5], 
 								Constants.kMotionProfileRightForeHigh_kV, 
 								Constants.kMotionProfileRightForeHigh_kA, 
 								Constants.kMotionProfileRightForeHigh_Intercept);
-						nextPointLeft.headingDeg = Math.toDegrees(setpointsLeft[7]);
-						nextPointRight.headingDeg = Math.toDegrees(setpointsRight[7]);
 						break;
 					case FORWARD_LOW:
 						nextPointLeft.position =  setpointsLeft[3] * Constants.kFeetToEncoderCodes;
-						nextPointLeft.velocity = toVoltage(setpointsLeft[4], setpointsLeft[5], 
+						nextPointLeft.velocity = addAccelerationAndVoltageCompensation(setpointsLeft[4], setpointsLeft[5], 
 								Constants.kMotionProfileLeftForeLow_kV, 
 								Constants.kMotionProfileLeftForeLow_kA, 
 								Constants.kMotionProfileLeftForeLow_Intercept);
 						nextPointRight.position = setpointsRight[3] * Constants.kFeetToEncoderCodes;
-						nextPointRight.velocity = toVoltage(setpointsRight[4], setpointsRight[5], 
+						nextPointRight.velocity = addAccelerationAndVoltageCompensation(setpointsRight[4], setpointsRight[5], 
 								Constants.kMotionProfileRightForeLow_kV, 
 								Constants.kMotionProfileRightForeLow_kA, 
 								Constants.kMotionProfileRightForeLow_Intercept);
-						nextPointLeft.headingDeg = Math.toDegrees(setpointsLeft[7]);
-						nextPointRight.headingDeg = Math.toDegrees(setpointsRight[7]);
 						break;
 					default:
 						break;
 					}
 					
+					heading = setpointsRight[7];
+					if(heading >= Math.PI) {
+						heading -= 2*Math.PI;
+					}
+					
+					heading = Math.toDegrees(heading);
+					
 					nextPointLeft.timeDur =  TrajectoryPoint.TrajectoryDuration.Trajectory_Duration_0ms;
-					nextPointLeft.profileSlotSelect0 = 0;
+					nextPointLeft.velocity *= Constants.kFPSToTicksPer100ms;
+					nextPointLeft.profileSlotSelect0 = Constants.kMotionProfileSlot;
+					nextPointLeft.profileSlotSelect1 = Constants.kMotionProfileHeadingSlot;
+					nextPointLeft.auxiliaryPos = heading * (8192.0/360.0);
 					nextPointLeft.isLastPoint = false;
 					
 					nextPointRight.timeDur =  TrajectoryPoint.TrajectoryDuration.Trajectory_Duration_0ms;
-					nextPointRight.profileSlotSelect0 = 0;
+					nextPointRight.velocity *= Constants.kFPSToTicksPer100ms;
+					nextPointRight.profileSlotSelect0 = Constants.kMotionProfileSlot;
+					nextPointRight.profileSlotSelect1 = Constants.kMotionProfileHeadingSlot;
+					nextPointRight.auxiliaryPos = heading * (8192.0/360.0);
 					nextPointRight.isLastPoint = false;
 
 					if(firstRun) {
@@ -158,16 +164,32 @@ public class CSVParser {
 		}
 	}
 
-	public double toVoltage(double velSetpoint, double accelSetpoint, 
+	public double addAccelerationAndVoltageCompensation(double velSetpoint, double accelSetpoint, 
 			double kV, 
 			double kA, 
 			double vIntercept) {
-		return velSetpoint * kV + accelSetpoint * kA + vIntercept;
+		return (velSetpoint + (accelSetpoint * kA + vIntercept) / kV) ; // 
 	}
 
 	public void start(Path path) {
+		mode = path.getMode();
+		switch(mode) {
+		case BACKWARD_HIGH:
+			drive.setFeedForward(Constants.kMotionProfileLeftBackHigh_kF, Constants.kMotionProfileRightBackHigh_kF);
+			break;
+		case BACKWARD_LOW:
+			drive.setFeedForward(Constants.kMotionProfileLeftBackLow_kF, Constants.kMotionProfileRightBackLow_kF);
+			break;
+		case FORWARD_HIGH:
+			drive.setFeedForward(Constants.kMotionProfileLeftForeHigh_kF, Constants.kMotionProfileRightForeHigh_kF);
+			break;
+		case FORWARD_LOW:
+			drive.setFeedForward(Constants.kMotionProfileLeftForeLow_kF, Constants.kMotionProfileRightForeLow_kF);
+			break;
+		default:
+			break;
+		}
 		thread = new Thread(() -> {
-			mode = path.getMode();
 			parse(path);
 		});
 		thread.start();

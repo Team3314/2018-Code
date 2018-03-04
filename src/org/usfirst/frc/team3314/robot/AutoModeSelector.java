@@ -41,7 +41,7 @@ public class AutoModeSelector {
 			autoModeBinary = "" + hi.getRRBinaryEight() + hi.getRRBinaryFour() + hi.getRRBinaryTwo() + hi.getRRBinaryOne();
 		}
 		autoModeDecimal = Integer.parseInt(autoModeBinary, 2);
-		autoMode = autos[3];//autoModeDecimal];
+		autoMode = autos[8];//autoModeDecimal];
 		autoMode.setGameData(gameData);
 		autoMode.reset();
  		return autoMode;
