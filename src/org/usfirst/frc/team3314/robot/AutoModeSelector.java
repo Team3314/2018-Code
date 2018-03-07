@@ -4,12 +4,11 @@ import org.usfirst.frc.team3314.robot.autos.*;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class AutoModeSelector {
-
 	private  HumanInput hi = HumanInput.getInstance();
 	private  String autoModeBinary, delayBinary;
 	private  int autoModeDecimal, delayDecimal;
 	private DriverStation fms = DriverStation.getInstance();
-	private  Autonomous autoMode;
+	private  Autonomous autoMode; 
 	private String gameData;
 	private Autonomous auto0 = new AutoNothing(), 
 			auto1 = new AutoCrossBaseline(),
