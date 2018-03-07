@@ -113,9 +113,11 @@ public class Drive implements Subsystem {
     			rawLeftSpeed = leftStickInput + camera.getSteeringAdjust();
     			rawRightSpeed = rightStickInput - camera.getSteeringAdjust();
     			controlMode = ControlMode.PercentOutput;
-    			//rawLeftSpeed = camera.getSteeringAdjust();
-    			//rawRightSpeed = -camera.getSteeringAdjust();
-    			//controlMode = ControlMode.MotionMagic;
+    			/*
+    			rawLeftSpeed = camera.getSteeringAdjust();
+    			rawRightSpeed = -camera.getSteeringAdjust();
+    			controlMode = ControlMode.MotionMagic;
+    			*/
     			break;
     		case MOTION_PROFILE:
     			log();
@@ -206,6 +208,7 @@ public class Drive implements Subsystem {
     	mRightMaster.setInverted(true);
     	mRightMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
     	mRightMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
+    	
     	//Motion Profile Gains
     	mRightMaster.selectProfileSlot(Constants.kMotionProfileSlot, 0);
     	mRightMaster.config_kP(Constants.kMotionProfileSlot, Constants.kMotionProfile_kP, 0); //slot, value, timeout
@@ -229,7 +232,6 @@ public class Drive implements Subsystem {
     	mRightMaster.config_kI(Constants.kGyroLockSlot, Constants.kGyroLock_kI, 0);
     	mRightMaster.config_kD(Constants.kGyroLockSlot, Constants.kGyroLock_kD, 0);
     	mRightMaster.config_kF(Constants.kGyroLockSlot, Constants.kGyroLock_kF, 0);
-    	
     	
     	mRightSlave1 = new WPI_TalonSRX(8);
     	mRightSlave1.follow(mRightMaster);

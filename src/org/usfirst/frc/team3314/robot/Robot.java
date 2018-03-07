@@ -39,7 +39,8 @@ public class Robot extends TimedRobot {
 	
 	Autonomous selectedAutoMode = null;
 	
-	private boolean lastGyrolock = false, lastScaleHigh, lastScaleLow, lastPickup, lastHold, lastStop, lastClimb, lastBar;
+	private boolean lastGyrolock = false, lastScaleHigh, lastScaleLow, lastPickup, lastHold, lastStop, 
+			lastClimb, lastBar;
 	
 	@Override
 	public void robotInit() {	
@@ -51,14 +52,14 @@ public class Robot extends TimedRobot {
 	public void robotPeriodic() {
 		outputToSmartDashboard();
 		camera.update();
+		camera.setLEDMode(Constants.kLEDOff);
 	}
 	@Override
 	public void disabledInit() {
 		pathFollower.stop();
 		camera.setLEDMode(Constants.kLEDOff);
 		drive.stopLogger();
-		arm.stopLogger();
-		
+		arm.stopLogger();	
 	}
 	
 	@Override
@@ -122,7 +123,7 @@ public class Robot extends TimedRobot {
 		else if(hi.getUnjamPressed()) {
 			intake.setDesiredState(IntakeState.UNJAMMING);
 		}
-		else if(!hi.getIntake() && !hi.getUnjam() && !hi.getOuttake()) {
+		else if(!hi.getVisionCtrl() && !hi.getIntake() && !hi.getUnjam() && !hi.getOuttake()) {
 			intake.setDesiredState(IntakeState.HOLDING);
 		}
 
@@ -133,16 +134,21 @@ public class Robot extends TimedRobot {
 				drive.setDriveMode(driveMode.GYROLOCK);
 			}
 			drive.setDesiredSpeed(hi.getLeftThrottle());
-		}
-		else if(!hi.getGyrolock()) {
-			drive.setDriveMode(driveMode.OPEN_LOOP);
-		}
-		
-		if (hi.getVisionCtrl()) {
+		} else if (hi.getVisionCtrl()) {
 			camera.setTrackingRequest(true);
-		} else {
+		}
+		else if(!hi.getGyrolock() && !hi.getVisionCtrl()) {
+			drive.setDriveMode(driveMode.OPEN_LOOP);
 			camera.setTrackingRequest(false);
 		}
+		
+		/*if (hi.getVisionCtrl()) {
+			camera.setTrackingRequest(true);
+			drive.setDriveMode(driveMode.VISION_CONTROL);
+		} else if(!hi.getVisionCtrl()) {
+			camera.setTrackingRequest(false);
+			drive.setDriveMode(driveMode.OPEN_LOOP);
+		}*/
 		
 		if(hi.getHighGear()) {
 			drive.setHighGear(true);
@@ -210,5 +216,10 @@ public class Robot extends TimedRobot {
 	
 	public void testInit() {
 		camera.setLEDMode(Constants.kLEDOff);
+	}
+	
+	public void testPeriodic() {
+		drive.setDriveMode(driveMode.GYROLOCK);
+		drive.setDesiredSpeed(0.095);
 	}
 }

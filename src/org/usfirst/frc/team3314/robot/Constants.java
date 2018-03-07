@@ -23,11 +23,10 @@ public class Constants {
 		public static double kGyroLock_kD = 0;//0.1;
 		public static double kGyroLock_kF = 0;
 		public static int kGyroLockSlot = 1;
-		
 		public static double kMotionProfileGyro_kP = .025;
 		
 		//pidf for vision control
-		public static double kVisionCtrl_kP = .05;
+		public static double kVisionCtrl_kP = .01;//.01
 		public static double kVisionCtrl_kI = 0;
 		public static double kVisionCtrl_kD = 0;
 		public static double kVisionCtrl_kF = 0;
@@ -57,12 +56,12 @@ public class Constants {
 		public static double kTelescope_kD = 40;
 		public static double kTelescope_kF = 3.41;
 		
-		//Telescope Characterisitcs
+		//Telescope Characteristics
 		public static double kTelescopeTicksToInches =0.005126953125; 
 		public static int kMaxTelescopeVelocity = (int)(18 / kTelescopeTicksToInches / 10); // inches/sec
 		public static int kMaxTelescopeAcceleration = (int)(30 / kTelescopeTicksToInches / 10); // inches/sec/sec
 		public static int kTelescopeMinPosition = 0;
-		public static int kTelescopeEncoderOffset = -1071; //Comp robot : -1600 Practice : -1071 TODO this shit fucked
+		public static int kTelescopeEncoderOffset = -1071; //Comp robot : -1600 Practice : -1071
 		public static int kMaxTelescopePosition = (int)(19 / kTelescopeTicksToInches); 
 		public static double kTelescopeTargetThreshold = 3 / kTelescopeTicksToInches;
 		public static int kTelescopeContinuousCurrentLimit = 20;
@@ -76,7 +75,7 @@ public class Constants {
 		//PTO
 		public static Value kPTOIn = Value.kForward;
 		public static Value kPTOOut = Value.kReverse;
-		
+
 		//camera
 		public static int kLEDOn = 0;
 		public static int kLEDOff = 1;
@@ -86,6 +85,9 @@ public class Constants {
 		
 		public static double kTrackingHeight = 11-4; //cube - camera
 		public static double kMountingAngle = 10; //degrees
+		
+		public static double kMinMotorCmd = 0.22;//0-1
+		public static double kMaxTrackingRPM = 0;
 		
 		//Robot characteristics
 		public static double kPulleyDiameter = 3.75; //inches

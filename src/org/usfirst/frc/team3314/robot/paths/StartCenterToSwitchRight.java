@@ -8,19 +8,19 @@ public class StartCenterToSwitchRight implements Path {
 	
 	@Override
 	public File getLeftPath() {
-		// TODO Auto-generated method stub
+		
 		return leftPath;
 	}
 
 	@Override
 	public File getRightPath() {
-		// TODO Auto-generated method stub
+		
 		return rightPath;
 	}
 
 	@Override
 	public boolean getBackwards() {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 

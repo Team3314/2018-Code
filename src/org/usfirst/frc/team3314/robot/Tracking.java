@@ -11,7 +11,6 @@ public class Tracking {
 		START,
 		TRACK,
 		DRIVE,
-		INTAKE,
 		DONE
 	}
 	
@@ -27,8 +26,6 @@ public class Tracking {
 	private HumanInput hi = HumanInput.getInstance();
 	
 	TrackingState currentState;
-	private double minMotorCmd = 0.095;
-	private double turn = camera.getError() * Constants.kVisionCtrl_kP;
 	
 	public Tracking() {
 		currentState = TrackingState.START;
@@ -46,6 +43,7 @@ public class Tracking {
 		switch (currentState) {
 		case START:
 			if (camera.getTrackingRequest() == true && camera.isTargetInView() == true) {
+				drive.setDriveMode(driveMode.VISION_CONTROL);
 				currentState = TrackingState.TRACK;
 			}
 			break;
@@ -55,54 +53,62 @@ public class Tracking {
 			 *
 			 *the plan is to replace this with a more accurate calculation that incorporates the robots center
 			 *of rotation to find the arc length of travel needed and puts that into a position closed loop
-			 */
+			 */			
 			
-			if (Math.abs(camera.getError()) < 0.25) {
-				currentState = TrackingState.DRIVE;
-			}
-			
-			/*//hard implement
-			drive.setDriveMode(driveMode.VISION_CONTROL);
-			camera.setSteeringAdjust(camera.getArcLength() / Constants.kRevToInConvFactor *
-					Constants.kDriveEncoderCodesPerRev);*/
+			/*
+			//hard implement
+			camera.setSteeringAdjust(camera.getError());
+			*/
 			
 			//basic implement
-			if (camera.getError() > 0) {
-				camera.setSteeringAdjust(turn + minMotorCmd);
-			} else {
-				camera.setSteeringAdjust(turn - minMotorCmd);
+			if (camera.getAvgError() > 0) {
+				camera.setSteeringAdjust(camera.getAvgError() * Constants.kVisionCtrl_kP + 
+						Constants.kMinMotorCmd);
+			} else if (camera.getAvgError() < 0) {
+				camera.setSteeringAdjust(camera.getAvgError() * Constants.kVisionCtrl_kP -
+						Constants.kMinMotorCmd);
 			}
-			break;
-		case DRIVE:
-			if (camera.getTrackingRequest() == true && !hi.getVisionCtrl()) {
+			
+			if (Math.abs(camera.getAvgError()) <= 0.75) {
+				camera.setSteeringAdjust(0);
 				drive.setDriveMode(driveMode.GYROLOCK);
 				drive.setDesiredAngle(drive.getAngle());
 				drive.setDesiredSpeed(0.5);
+				currentState = TrackingState.DRIVE;
+			}
+			break;
+		case DRIVE:
+			if (camera.getTrackingRequest() == true && hi.getVisionCtrl()) {
+				intake.setDesiredState(IntakeState.INTAKING);
 				
-				if (Math.abs(camera.getError()) > 1) {
-					currentState = TrackingState.TRACK;
-				} else if (camera.getDistance() > 23.5 && camera.getDistance() < 24.5) {
+				//FIXME Get it to unjam in worst case scenario
+				if (intake.motorsStalled()) {
+					intake.setDesiredState(IntakeState.UNJAMMING);
+				}
+				
+				if (intake.senseCube()) {
+					//drive.setDriveMode(driveMode.MOTION_PROFILE);
+					//drive.setDriveMode(driveMode.IDLE);
+					//drive.setDriveMode(driveMode.OPEN_LOOP);
 					drive.setDesiredSpeed(0);
-					currentState = TrackingState.INTAKE;
+					camera.setTrackingRequest(false);
+					currentState = TrackingState.DONE;
 				}
 			} else {
 				drive.setDriveMode(driveMode.OPEN_LOOP);
-				currentState = TrackingState.DONE;
-			}
-			break;
-		case INTAKE:
-			intake.setDesiredState(IntakeState.INTAKING);
-			if (intake.senseCube()) {
-				intake.setDesiredState(IntakeState.HOLDING);
+				camera.setTrackingRequest(false);
 				currentState = TrackingState.DONE;
 			}
 			break;
 		case DONE:
-			camera.setTrackingRequest(false);
 			currentState = TrackingState.START;
 			break;
 		}
 		
 		SmartDashboard.putString("Tracking state", currentState.toString());
+	}
+	
+	public TrackingState getState() {
+		return currentState;
 	}
 }

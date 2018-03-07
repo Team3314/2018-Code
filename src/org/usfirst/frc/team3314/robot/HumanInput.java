@@ -47,6 +47,8 @@ public class HumanInput {
 		buttonBox = new Joystick(3);
 		autoSelector = new Joystick(4);
 	}
+	
+	//drive
 	public double getLeftThrottle() {
 		return -leftStick.getRawAxis(1);
 	}
@@ -67,11 +69,13 @@ public class HumanInput {
 	}
 	public boolean getVisionCtrl() {
 		return leftStick.getRawButton(1);
+		//return gamepad.getRawButton(4);
 	}
 	public boolean getFullSpeedForward() {
 		return rightStick.getRawButton(11) && rightStick.getRawButton(10);
 	}
 	
+	//intake
 	public boolean getIntake() {
 		return gamepad.getRawButton(1);
 	}
@@ -91,7 +95,7 @@ public class HumanInput {
 		return gamepad.getRawButton(6);
 	}
 	
-	
+	//arm
 	public boolean armPowerOverride() {
 		return buttonBox.getRawButton(11);
 	}
@@ -102,10 +106,10 @@ public class HumanInput {
 		return Math.abs(gamepad.getRawAxis(1));
 	}
 	public boolean getLowerArm() {
-		return -gamepad.getRawAxis(1) < -.05;
+		return -gamepad.getRawAxis(1) < -.1;
 	}
 	public boolean getRaiseArm() {
-		return -gamepad.getRawAxis(1) > .05;
+		return -gamepad.getRawAxis(1) > .1;
 	}
 	public boolean getClimb() {
 		return gamepad.getRawButton(4) && gamepad.getRawAxis(3) > .5 && getRaiseArm();
@@ -139,6 +143,7 @@ public class HumanInput {
 		return -gamepad.getRawAxis(5);
 	}
 	
+	//auto select
 	public int getLLBinaryOne() {
 		if(autoSelector.getRawButton(1))
 			return 1;

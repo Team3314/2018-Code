@@ -22,8 +22,6 @@ public class Intake {
 
 	private static Intake mInstance = new Intake();
 	
-	//TODO add intake sensor
-	
 	private WPI_TalonSRX mRollerLeft, mRollerRight;
 	private DigitalInput cubeSensor;
 	private double leftSpeed, rightSpeed;
