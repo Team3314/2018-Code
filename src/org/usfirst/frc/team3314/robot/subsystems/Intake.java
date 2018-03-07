@@ -57,6 +57,7 @@ public class Intake {
 						currentState = IntakeState.HOLDING;
 					}
 					else if(!senseCube() && motorsStalled()) {
+						startTimer();
 						currentState = IntakeState.UNJAMMING;
 					}
 				}

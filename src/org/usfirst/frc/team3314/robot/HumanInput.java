@@ -93,6 +93,9 @@ public class HumanInput {
 	public boolean getReleaseSlow() {
 		return gamepad.getRawButton(4);
 	}
+	public boolean getRampRelease() {
+		return gamepad.getPOV() == 180 && gamepad.getRawButtonPressed(10) && gamepad.getRawButton(10);
+	}
 	
 	
 	public boolean armPowerOverride() {
@@ -144,6 +147,30 @@ public class HumanInput {
 	
 	public boolean spin() {
 		return leftStick.getRawButton(6);
+	}
+	
+	public int getDelayOne() {
+		if(buttonBox.getRawButton(13))
+			return 1;
+		return 0;
+	}
+	
+	public int getDelayTwo() {
+		if(buttonBox.getRawButton(14))
+			return 1;
+		return 0;
+	}
+	
+	public int getDelayFour() {
+		if(buttonBox.getRawButton(15))
+			return 1;
+		return 0;
+	}
+	
+	public int getDelayEight() {
+		if(buttonBox.getRawButton(16))
+			return 1;
+		return 0;
 	}
 	
 	public int getLLBinaryOne() {

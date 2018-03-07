@@ -24,7 +24,7 @@ public class CSVParser {
 	private Thread thread = null;
 	private boolean firstRun = true;
 	private Mode mode;
-	private double heading = 0;
+	private double heading = 0, lastHeading = 0;
 	public void parse(Path path) {
 		File leftPath = path.getLeftPath();
 		File rightPath = path.getRightPath();
@@ -106,7 +106,12 @@ public class CSVParser {
 						heading -= 2*Math.PI;
 					}
 					
+					
+					
 					heading = Math.toDegrees(heading);
+					
+					nextPointLeft.velocity += Constants.kMotionProfileHeading_kF * (heading - lastHeading);
+					nextPointRight.velocity -= Constants.kMotionProfile_kF * (heading - lastHeading);
 					
 					nextPointLeft.timeDur =  TrajectoryPoint.TrajectoryDuration.Trajectory_Duration_0ms;
 					nextPointLeft.velocity *= Constants.kFPSToTicksPer100ms;
@@ -121,6 +126,8 @@ public class CSVParser {
 					nextPointRight.profileSlotSelect1 = Constants.kMotionProfileHeadingSlot;
 					nextPointRight.auxiliaryPos = heading * (8192.0/360.0);
 					nextPointRight.isLastPoint = false;
+					
+					lastHeading = heading;
 
 					if(firstRun) {
 						nextPointLeft.zeroPos = true;
@@ -138,7 +145,7 @@ public class CSVParser {
 						nextPointLeft.isLastPoint = true;
 						nextPointRight.isLastPoint = true;
 					}
-
+					
 					drive.pushPoints(nextPointLeft, nextPointRight);
 
 				}

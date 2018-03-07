@@ -17,10 +17,6 @@ public class AutoCrossBaseline extends Autonomous {
 	private Drive drive = Drive.getInstance();
 	private State currentState;
 	
-	public AutoCrossBaseline() {
-		currentState = State.START;
-	}
-	
 	@Override
 	public void reset() {
 		currentState = State.START;
@@ -35,7 +31,7 @@ public class AutoCrossBaseline extends Autonomous {
 			break;
 		case DRIVE:
 			drive.setDesiredSpeed(0.25);
-			if (getTime() >= 5) { //placeholder
+			if (getTime() >= 5) {
 				currentState = State.STOP;
 			}
 			break;

@@ -35,7 +35,7 @@ public class AutoCubeToSwitchFromCenter extends Autonomous {
 			if (isPathDone() && armStopped()) {
 				currentState = State.RELEASE_CUBE;
 				startTimer();
-				releaseCube();
+				releaseCubeSlow();
 			}	
 			break;
 		case RELEASE_CUBE:

@@ -1,6 +1,5 @@
 package org.usfirst.frc.team3314.robot.autos;
 
-import org.usfirst.frc.team3314.robot.autos.AutoCubeToScale.State;
 import org.usfirst.frc.team3314.robot.paths.Path;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -14,7 +13,6 @@ public class AutoCubeToSwitch extends Autonomous {
 	}
 	
 	private State currentState = State.START;
-	private double time = 0;
 	
 	private Path selectedPath = null;
 
@@ -37,7 +35,7 @@ public class AutoCubeToSwitch extends Autonomous {
 				if(isPathDone() && armStopped()) {
 					currentState = State.RELEASE_CUBE;
 					startTimer();
-					releaseCube();
+					releaseCubeSlow();
 				}
 				break;
 			case RELEASE_CUBE:

@@ -38,8 +38,7 @@ public class Arm implements Subsystem {
 	private double radiusAngle;
 	private double armEncPos;
 	private double armAngularVelocity, telescopeVelocity;
-   
-	private double targetArmAngle = 0;
+    private double targetArmAngle = 0;
 	private double targetTelescopePosition = 0;
 	
 	private double armAngleLimit;
@@ -68,53 +67,53 @@ public class Arm implements Subsystem {
 	
 	public Arm() {
 		telescopeTalon = new WPI_TalonSRX(3);
-		telescopeTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-		telescopeTalon.getSensorCollection().setPulseWidthPosition(0, 0);
-		if(telescopeTalon.getSensorCollection().getPulseWidthPosition() >= Math.abs(Constants.kTelescopeEncoderOffset + 120)) {
-			telescopeTalon.setSelectedSensorPosition((telescopeTalon.getSensorCollection().getPulseWidthPosition() + Constants.kTelescopeEncoderOffset), 0, 0);
+		telescopeTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, Constants.kCANTimeout);
+		telescopeTalon.getSensorCollection().setPulseWidthPosition(0, Constants.kCANTimeout);
+		if(telescopeTalon.getSensorCollection().getPulseWidthPosition() >= Math.abs(Constants.kTelescopeEncoderOffset + 220)) {
+			telescopeTalon.setSelectedSensorPosition((telescopeTalon.getSensorCollection().getPulseWidthPosition() + Constants.kTelescopeEncoderOffset), 0, Constants.kCANTimeout);
 		}
 		else {
-			telescopeTalon.setSelectedSensorPosition((telescopeTalon.getSensorCollection().getPulseWidthPosition() - Constants.kTelescopeEncoderOffset), 0, 0);
+			telescopeTalon.setSelectedSensorPosition((telescopeTalon.getSensorCollection().getPulseWidthPosition() - Constants.kTelescopeEncoderOffset), 0, Constants.kCANTimeout);
 		}
 		telescopeTalon.setSensorPhase(false);
 		telescopeTalon.setInverted(false);
-		telescopeTalon.selectProfileSlot(0, 0);
-		telescopeTalon.config_kP(0, Constants.kTelescope_kP, 0);
-		telescopeTalon.config_kI(0, Constants.kTelescope_kI, 0);
-		telescopeTalon.config_kD(0, Constants.kTelescope_kD, 0);
-		telescopeTalon.config_kF(0, Constants.kTelescope_kF, 0);
-		telescopeTalon.configMotionAcceleration(Constants.kMaxTelescopeAcceleration, 0);
-		telescopeTalon.configMotionCruiseVelocity(0, 0);
-		telescopeTalon.configForwardSoftLimitThreshold(Constants.kMaxTelescopePosition, 0);
-		telescopeTalon.configReverseSoftLimitThreshold(Constants.kTelescopeMinPosition, 0);
-		telescopeTalon.configForwardSoftLimitEnable(true, 0);
-		telescopeTalon.configReverseSoftLimitEnable(true, 0);
-		telescopeTalon.configPeakCurrentLimit(Constants.kTelescopePeakCurrentLimit, 0);
-		telescopeTalon.configPeakCurrentDuration(Constants.kTelescopePeakCurrentDuration, 0);
-		telescopeTalon.configContinuousCurrentLimit(Constants.kTelescopeContinuousCurrentLimit, 0);
+		telescopeTalon.selectProfileSlot(0, Constants.kCANTimeout);
+		telescopeTalon.config_kP(0, Constants.kTelescope_kP, Constants.kCANTimeout);
+		telescopeTalon.config_kI(0, Constants.kTelescope_kI, Constants.kCANTimeout);
+		telescopeTalon.config_kD(0, Constants.kTelescope_kD, Constants.kCANTimeout);
+		telescopeTalon.config_kF(0, Constants.kTelescope_kF, Constants.kCANTimeout);
+		telescopeTalon.configMotionAcceleration(Constants.kMaxTelescopeAcceleration, Constants.kCANTimeout);
+		telescopeTalon.configMotionCruiseVelocity(0, Constants.kCANTimeout);
+		telescopeTalon.configForwardSoftLimitThreshold(Constants.kMaxTelescopePosition, Constants.kCANTimeout);
+		telescopeTalon.configReverseSoftLimitThreshold(Constants.kTelescopeMinPosition, Constants.kCANTimeout);
+		telescopeTalon.configForwardSoftLimitEnable(true, Constants.kCANTimeout);
+		telescopeTalon.configReverseSoftLimitEnable(true, Constants.kCANTimeout);
+		telescopeTalon.configPeakCurrentLimit(Constants.kTelescopePeakCurrentLimit, Constants.kCANTimeout);
+		telescopeTalon.configPeakCurrentDuration(Constants.kTelescopePeakCurrentDuration, Constants.kCANTimeout);
+		telescopeTalon.configContinuousCurrentLimit(Constants.kTelescopeContinuousCurrentLimit, Constants.kCANTimeout);
 		telescopeTalon.enableCurrentLimit(true);
 		
 		
 		armTalon = new WPI_TalonSRX(6);
-		armTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-		armTalon.getSensorCollection().setPulseWidthPosition(0, 0);
-		armTalon.setSelectedSensorPosition((armTalon.getSensorCollection().getPulseWidthPosition() + Constants.kArmEncoderOffset), 0, 0);
+		armTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, Constants.kCANTimeout);
+		armTalon.getSensorCollection().setPulseWidthPosition(0, Constants.kCANTimeout);
+		armTalon.setSelectedSensorPosition((armTalon.getSensorCollection().getPulseWidthPosition() + Constants.kArmEncoderOffset), 0, Constants.kCANTimeout);
 		armTalon.setSensorPhase(false);
 		armTalon.setInverted(true);
-		armTalon.selectProfileSlot(0, 0);
-		armTalon.config_kP(0, Constants.kArm_kP, 0); //slot, value, timeout
-		armTalon.config_kI(0, Constants.kArm_kI, 0);
-		armTalon.config_kD(0, Constants.kArm_kD, 0);
-		armTalon.config_kF(0, Constants.kArm_kF, 0);
-		armTalon.configMotionAcceleration(Constants.kMaxArmAcceleceration, 0);
-		armTalon.configMotionCruiseVelocity(0, 0);
-		armTalon.configForwardSoftLimitThreshold(Constants.kMaxArmPosition, 0);
-		armTalon.configReverseSoftLimitThreshold(Constants.kArmMinPosition, 0);
-		armTalon.configForwardSoftLimitEnable(true, 0);
-		armTalon.configReverseSoftLimitEnable(true, 0);
-		armTalon.configPeakCurrentLimit(Constants.kArmPeakCurrentLimit, 0);
-		armTalon.configPeakCurrentDuration(Constants.kArmPeakCurrentDuration, 0);
-		armTalon.configContinuousCurrentLimit(Constants.kArmContinuousCurrentLimit, 0);
+		armTalon.selectProfileSlot(0, Constants.kCANTimeout);
+		armTalon.config_kP(0, Constants.kArm_kP, Constants.kCANTimeout); //slot, value, timeout
+		armTalon.config_kI(0, Constants.kArm_kI, Constants.kCANTimeout);
+		armTalon.config_kD(0, Constants.kArm_kD, Constants.kCANTimeout);
+		armTalon.config_kF(0, Constants.kArm_kF, Constants.kCANTimeout);
+		armTalon.configMotionAcceleration(Constants.kMaxArmAcceleceration, Constants.kCANTimeout);
+		armTalon.configMotionCruiseVelocity(0, Constants.kCANTimeout);
+		armTalon.configForwardSoftLimitThreshold(Constants.kMaxArmPosition, Constants.kCANTimeout);
+		armTalon.configReverseSoftLimitThreshold(Constants.kArmMinPosition, Constants.kCANTimeout);
+		armTalon.configForwardSoftLimitEnable(true, Constants.kCANTimeout);
+		armTalon.configReverseSoftLimitEnable(true, Constants.kCANTimeout);
+		armTalon.configPeakCurrentLimit(Constants.kArmPeakCurrentLimit, Constants.kCANTimeout);
+		armTalon.configPeakCurrentDuration(Constants.kArmPeakCurrentDuration, Constants.kCANTimeout);
+		armTalon.configContinuousCurrentLimit(Constants.kArmContinuousCurrentLimit, Constants.kCANTimeout);
 		armTalon.enableCurrentLimit(true);
 		
 	}

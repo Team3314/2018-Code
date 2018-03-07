@@ -60,7 +60,7 @@ public class DriveTrainCharacterizer {
 		if(!stopped) {
 			if(mode.equals(TestMode.QUASI_STATIC))
 				driveSpeed += voltageStep;
-			drive.setStickInputs(driveSpeed, driveSpeed);
+			drive.setDesiredSpeed(driveSpeed, driveSpeed);
 			drive.update();
 			drive.characterizationLog();
 		}

@@ -2,13 +2,12 @@ package org.usfirst.frc.team3314.robot;
 
 import org.usfirst.frc.team3314.robot.autos.*;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
 
 public class AutoModeSelector {
 
 	private  HumanInput hi = HumanInput.getInstance();
-	private  String autoModeBinary;
-	private  int autoModeDecimal;
+	private  String autoModeBinary, delayBinary;
+	private  int autoModeDecimal, delayDecimal;
 	private DriverStation fms = DriverStation.getInstance();
 	private  Autonomous autoMode;
 	private String gameData;
@@ -20,8 +19,9 @@ public class AutoModeSelector {
 			auto5 = new AutoScaleThenSwitch(),
 			auto6 = new AutoSwitchThenScale(),
 			auto7 = new AutoTwoCubeScale(),
-			auto8 = new MotionProfile();
-	private  Autonomous[] autos = {auto0, auto1, auto2, auto3, auto4, auto5, auto6, auto7, auto8};
+			auto8 = new MotionProfile(),
+			auto9 = new AutoVisionCubeFuckery();
+	private  Autonomous[] autos = {auto0, auto1, auto2, auto3, auto4, auto5, auto6, auto7, auto8, auto9};
 	
 	public Autonomous getSelectedAutoMode() {
 		pollFMS();
@@ -41,7 +41,7 @@ public class AutoModeSelector {
 			autoModeBinary = "" + hi.getRRBinaryEight() + hi.getRRBinaryFour() + hi.getRRBinaryTwo() + hi.getRRBinaryOne();
 		}
 		autoModeDecimal = Integer.parseInt(autoModeBinary, 2);
-		autoMode = autos[8];//autoModeDecimal];
+		autoMode = autos[2];//autoModeDecimal];
 		autoMode.setGameData(gameData);
 		autoMode.reset();
  		return autoMode;
@@ -51,5 +51,10 @@ public class AutoModeSelector {
 	}
 	public String getGameData() {
 		return gameData;
+	}
+	public double getDelay() {
+		delayBinary = "" +  hi.getDelayEight() + hi.getDelayFour() + hi.getDelayTwo() + hi.getDelayOne();
+		delayDecimal = Integer.parseInt(delayBinary);
+		return delayDecimal;
 	}
 }

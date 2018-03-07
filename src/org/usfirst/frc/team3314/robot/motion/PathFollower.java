@@ -57,6 +57,8 @@ public class PathFollower {
 	public boolean isDone() {
 		drive.getLeftStatus(leftStatus);
 		drive.getRightStatus(rightStatus);
+		Log.add("Left Count", (double)leftStatus.btmBufferCnt);
+		Log.add("Right Count",(double) rightStatus.btmBufferCnt);
 		if(leftStatus.isLast == true && rightStatus.isLast == true) {
 			stop();
 			pathFinished = true;

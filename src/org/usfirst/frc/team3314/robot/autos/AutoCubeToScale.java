@@ -7,6 +7,7 @@ public class AutoCubeToScale extends Autonomous {
 
 	enum State {
 		START,
+		RAISE_ARM,
 		DRIVE,
 		RELEASE_CUBE,
 		DONE
@@ -18,6 +19,7 @@ public class AutoCubeToScale extends Autonomous {
 	
 	@Override
 	public void reset() {
+		resetTimer();
 		currentState = State.START;
 	}
 
@@ -28,14 +30,21 @@ public class AutoCubeToScale extends Autonomous {
 			selectedPath = getPath(getStart() + getScale());
 			loadPath(selectedPath);
 			startPathFollower();
-			armToScaleLow();
-			currentState = State.DRIVE;
+			startTimer();
+			currentState = State.RAISE_ARM;
+			break;
+		case RAISE_ARM:
+			if(getTime() > 1) {
+				armToScaleLow();
+				resetTimer();
+				currentState = State.DRIVE;
+			}
 			break;
 		case DRIVE:
 			if (isPathDone() && armStopped()) {
 				currentState = State.RELEASE_CUBE;
 				startTimer();
-				releaseCube();
+				releaseCubeFast();
 			}
 			break;
 		case RELEASE_CUBE:

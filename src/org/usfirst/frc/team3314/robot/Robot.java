@@ -28,6 +28,7 @@ public class Robot extends TimedRobot {
 	private Camera camera = Camera.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
 	private Tracking tracking = Tracking.getInstance();
+	private Superstructure superstructure = Superstructure.getInstance();
 	
 	private AutoModeSelector selector = new AutoModeSelector();
 	private PathFollower pathFollower = new PathFollower();
@@ -52,12 +53,12 @@ public class Robot extends TimedRobot {
 	public void robotPeriodic() {
 		outputToSmartDashboard();
 		camera.update();
+		camera.setLEDMode(Constants.kLEDOff);
 	}
 	@Override
 	public void disabledInit() {
 		pathFollower.stop();
 		camera.setLEDMode(Constants.kLEDOff);
-		camera.setCamMode(Constants.kVisionProcessorMode);
 		drive.stopLogger();
 		arm.stopLogger();
 		drive.setOpenLoopRampRate(0);
@@ -78,7 +79,6 @@ public class Robot extends TimedRobot {
 		//arm.newFile("ArmAuto");
 		timer.start();
 		camera.setLEDMode(Constants.kLEDOff);
-		camera.setCamMode(Constants.kVisionProcessorMode);
 		drive.setHighGear(true);
 		drive.setPTO(false);
 	}
@@ -88,7 +88,7 @@ public class Robot extends TimedRobot {
 		if(selector.getGameData().length() == 0 && timer.get() < 5) {
 			selectedAutoMode = selector.getSelectedAutoMode();
 		}
-		else {
+		else if(timer.get() >= selector.getDelay()) {
 			allPeriodic();
 			selectedAutoMode.update();
 			timer.stop();
@@ -102,7 +102,6 @@ public class Robot extends TimedRobot {
 		drive.flushTalonBuffer();
 		camera.setTrackingRequest(false);
 		camera.setLEDMode(Constants.kLEDOff);
-		camera.setCamMode(Constants.kVisionProcessorMode);
 		//drive.newFile("DriveTele");
 		//arm.newFile("ArmTele");
 		drive.resetSensors();
@@ -127,7 +126,7 @@ public class Robot extends TimedRobot {
 		else if(hi.getUnjamPressed()) {
 			intake.setDesiredState(IntakeState.UNJAMMING);
 		}
-		else if(!hi.getIntake() && !hi.getUnjam() && !hi.getOuttake()) {
+		else if(!hi.getVisionCtrl() && !hi.getIntake() && !hi.getUnjam() && !hi.getOuttake()) {
 			intake.setDesiredState(IntakeState.HOLDING);
 		}
 
@@ -139,14 +138,12 @@ public class Robot extends TimedRobot {
 			}
 			drive.setDesiredSpeed(hi.getLeftThrottle());
 		}
-		else if(!hi.getGyrolock()) {
+		else if (hi.getVisionCtrl()) {
+			camera.setTrackingRequest(true);
+		}
+		else if(!hi.getGyrolock() && !hi.getVisionCtrl()) {
 			drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
 			drive.setDriveMode(driveMode.OPEN_LOOP);
-		}
-		
-		if (hi.getVisionCtrl()) {
-			camera.setTrackingRequest(true);
-		} else {
 			camera.setTrackingRequest(false);
 		}
 		
@@ -190,7 +187,10 @@ public class Robot extends TimedRobot {
 		
 		arm.setTargetSpeed(hi.getArmSpeed());
 		if(hi.spin()) {
-			drive.setStickInputs(.4, -.4);
+			drive.setStickInputs(.5, -.5);
+		}
+		if(hi.getRampRelease()) {
+			superstructure.releaseRamp(!superstructure.getRamp());
 		}
 		lastGyrolock = hi.getGyrolock();
 		lastScaleHigh = hi.getScaleHigh();
@@ -207,6 +207,7 @@ public class Robot extends TimedRobot {
 		arm.update();
 		intake.update();
 		tracking.update();
+		superstructure.update();
 	}
 	
 	public void outputToSmartDashboard() {
@@ -220,7 +221,6 @@ public class Robot extends TimedRobot {
 	
 	public void testInit() {
 		camera.setLEDMode(Constants.kLEDOff);
-		camera.setCamMode(Constants.kVisionProcessorMode);
 		d = new DriveTrainCharacterizer(DriveTrainCharacterizer.TestMode.STEP_VOLTAGE, DriveTrainCharacterizer.Direction.Backward, true);
 		d.initialize();
 	}

@@ -18,8 +18,6 @@ public class AutoScaleThenSwitch extends Autonomous {
 	
 	private State currentState = State.START;
 	
-	private int time = 0;
-	
 	private Path firstPath = null;
 	private Path secondPath = null;
 	
@@ -43,7 +41,7 @@ public class AutoScaleThenSwitch extends Autonomous {
 			if(isPathDone()) {
 				currentState = State.RELEASE_CUBE;
 				startTimer();
-				releaseCube();
+				releaseCubeSlow();
 			}
 			break;
 		case RELEASE_CUBE:
@@ -62,9 +60,9 @@ public class AutoScaleThenSwitch extends Autonomous {
 			}
 			break;
 		case PICKUP_CUBE:
-			//TODO Add cube tracking
-			intakeCube();
+			startTracking();
 			if(hasCube()) {
+				endTracking();
 				currentState = State.RAISE_ARM_TO_SWITCH;
 				armToSwitch();
 			}
@@ -72,7 +70,7 @@ public class AutoScaleThenSwitch extends Autonomous {
 		case RAISE_ARM_TO_SWITCH:
 			if(armStopped()) {
 				currentState  = State.RELEASE_CUBE2;
-				releaseCube();
+				releaseCubeSlow();
 			}
 			break;
 		case RELEASE_CUBE2:

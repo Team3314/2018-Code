@@ -97,7 +97,10 @@ public abstract class Autonomous {
 	public void intakeCube() {
 		intake.setDesiredState(IntakeState.INTAKING);
 	}
-	public void releaseCube() {
+	public void releaseCubeFast() {
+		intake.setDesiredState(IntakeState.RELEASING);
+	}
+	public void releaseCubeSlow() {
 		intake.setDesiredState(IntakeState.RELEASE_SLOW);
 	}
 	public void stopIntake()  {

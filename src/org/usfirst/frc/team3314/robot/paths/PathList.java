@@ -19,6 +19,10 @@ public class PathList {
 		 paths.put("StartRSwitchR", new Path("StartRightToSwitchRight", Mode.BACKWARD_HIGH));
 		 paths.put("StartCSwitchL", new Path("StartCenterToSwitchLeft", Mode.FORWARD_HIGH));
 		 paths.put("StartCSwitchR", new Path("StartCenterToSwitchRight", Mode.FORWARD_HIGH));
+		 paths.put("StartRScaleR", new Path("StartRightToScaleRight", Mode.BACKWARD_HIGH));
+		 paths.put("StartRScaleL", new Path("StartRightToScaleLeft", Mode.BACKWARD_HIGH));
+		 paths.put("StartLScaleR", new Path("StartLeftToScaleRight", Mode.BACKWARD_HIGH));
+		 paths.put("StartLScaleL", new Path("StartLeftToScaleLeft", Mode.BACKWARD_HIGH));
 		 paths.put("SwitchLScaleL", new Path("SwitchLeftToScaleLeft", Mode.BACKWARD_HIGH));
 		 paths.put("SwitchLScaleR", new Path("SwitchLeftToScaleRight", Mode.BACKWARD_HIGH));
 		 paths.put("SwitchRScaleL", new Path("SwitchRightToScaleLeft", Mode.BACKWARD_HIGH));

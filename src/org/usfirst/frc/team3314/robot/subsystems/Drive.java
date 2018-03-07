@@ -16,12 +16,9 @@ import com.cruzsbrian.robolog.Log;
 import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
@@ -99,7 +96,7 @@ public class Drive implements Subsystem {
     		case OPEN_LOOP:
     			rawLeftSpeed = desiredLeftSpeed;
     			rawRightSpeed = desiredRightSpeed;
-    			if(Math.abs(desiredLeftSpeed) >= .1 || Math.abs(desiredRightSpeed) >= .1) {
+    			if(Math.abs(desiredLeftSpeed) >= Constants.kDriveDeadband || Math.abs(desiredRightSpeed) >= Constants.kDriveDeadband) {
     				setNeutralMode(NeutralMode.Coast);
     			}
     			else {
@@ -111,7 +108,7 @@ public class Drive implements Subsystem {
     			rawLeftSpeed = desiredLeftSpeed + gyroPIDOutput.turnSpeed;
     			rawRightSpeed = desiredRightSpeed - gyroPIDOutput.turnSpeed;
     			gyroControl.setSetpoint(desiredAngle);
-    			if(Math.abs(rawLeftSpeed) >= .1 || Math.abs(rawLeftSpeed) >= .1) {
+    			if(Math.abs(rawLeftSpeed) >= Constants.kDriveDeadband || Math.abs(rawLeftSpeed) >= Constants.kDriveDeadband) {
     				setNeutralMode(NeutralMode.Coast);
     			}
     			else {
@@ -124,13 +121,15 @@ public class Drive implements Subsystem {
     			rawRightSpeed = rightStickInput - camera.getSteeringAdjust();
     			setNeutralMode(NeutralMode.Brake);
     			controlMode = ControlMode.PercentOutput;
-    			//rawLeftSpeed = camera.getSteeringAdjust();
-    			//rawRightSpeed = -camera.getSteeringAdjust();
-    			//controlMode = ControlMode.MotionMagic;
+    			/*
+    			rawLeftSpeed = camera.getSteeringAdjust();
+    			rawRightSpeed = -camera.getSteeringAdjust();
+    			controlMode = ControlMode.MotionMagic;
+    			*/
     			break;
     		case MOTION_PROFILE:
     			log();
-    			setNeutralMode(NeutralMode.Brake);
+    			setNeutralMode(NeutralMode.Coast);
     			controlMode = ControlMode.MotionProfileArc;
     			rawLeftSpeed = motionProfileMode;
     			rawRightSpeed = motionProfileMode;
@@ -166,7 +165,6 @@ public class Drive implements Subsystem {
 	    gyroControl.setContinuous(); 
 		gyroControl.setOutputRange(-.7, .7);		// Limits speed of turn to prevent overshoot
     	
-
 		//Talons
     	mRightMaster = new WPI_TalonSRX(7);
     	mRightMaster.configRemoteFeedbackFilter(0x00,
@@ -177,64 +175,69 @@ public class Drive implements Subsystem {
 				RemoteSensorSource.GadgeteerPigeon_Yaw,
 				1,
 				0);
-    	mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-    	mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor1, 1, 0);
-    	mRightMaster.configAuxPIDPolarity(false, 0);
+    	mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kCANTimeout);
+    	mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor1, 1, Constants.kCANTimeout);
+    	mRightMaster.configAuxPIDPolarity(false, Constants.kCANTimeout);
     	mRightMaster.setSensorPhase(true);
     	mRightMaster.setInverted(true);
-    	mRightMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
+    	mRightMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, Constants.kCANTimeout);
     	mRightMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
-    	mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic,  5, 0);
-    	mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0,  5, 0);
-    	mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1,  5, 0);
-    	mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5, 0);
-    	mRightMaster.configVoltageCompSaturation(12.0, 0);
+    	mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 20, Constants.kCANTimeout);
+    	//mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0,  5, Constants.kCANTimeout);
+    	//mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1,  5, Constants.kCANTimeout);
+    	//mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5, Constants.kCANTimeout);
+    	mRightMaster.configVoltageCompSaturation(Constants.kDriveVoltageScale, Constants.kCANTimeout);
     	mRightMaster.enableVoltageCompensation(true);
-    	mRightMaster.configOpenloopRamp(0, 0);
-    	mRightMaster.configNeutralDeadband(.1, 0);
-    	mRightMaster.configContinuousCurrentLimit(Constants.kDriveContinuousCurrentLimit, 0);
-    	mRightMaster.configPeakCurrentLimit(Constants.kDrivePeakCurrentLimit, 0);
-    	mRightMaster.configPeakCurrentDuration(Constants.kDrivePeakCurrentDuration, 0);
+    	mRightMaster.configOpenloopRamp(Constants.kDriveOpenLoopRampRate, Constants.kCANTimeout);
+    	mRightMaster.configNeutralDeadband(Constants.kDriveDeadband, Constants.kCANTimeout);
+    	mRightMaster.configContinuousCurrentLimit(Constants.kDriveContinuousCurrentLimit, Constants.kCANTimeout);
+    	mRightMaster.configPeakCurrentLimit(Constants.kDrivePeakCurrentLimit, Constants.kCANTimeout);
+    	mRightMaster.configPeakCurrentDuration(Constants.kDrivePeakCurrentDuration, Constants.kCANTimeout);
     	mRightMaster.enableCurrentLimit(true);
+    	mRightMaster.configClosedloopRamp(Constants.kDriveClosedLoopRampTime, Constants.kCANTimeout);
     	
     	//Motion Profile Gains
 
-    	mRightMaster.config_kP(Constants.kMotionProfileSlot, Constants.kMotionProfile_kP, 0); //slot, value, timeout
-    	mRightMaster.config_kI(Constants.kMotionProfileSlot, Constants.kMotionProfile_kI, 0);
-    	mRightMaster.config_kD(Constants.kMotionProfileSlot, Constants.kMotionProfile_kD, 0);
-    	mRightMaster.config_kF(Constants.kMotionProfileSlot, Constants.kMotionProfile_kF, 0);
+    	mRightMaster.config_kP(Constants.kMotionProfileSlot, Constants.kMotionProfile_kP, Constants.kCANTimeout); //slot, value, timeout
+    	mRightMaster.config_kI(Constants.kMotionProfileSlot, Constants.kMotionProfile_kI, Constants.kCANTimeout);
+    	mRightMaster.config_kD(Constants.kMotionProfileSlot, Constants.kMotionProfile_kD, Constants.kCANTimeout);
+    	mRightMaster.config_kF(Constants.kMotionProfileSlot, Constants.kMotionProfile_kF, Constants.kCANTimeout);
     	
 
-    	mRightMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kP, 0);
-    	mRightMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kI, 0);
-    	mRightMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kD, 0);
-    	mRightMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kF, 0);
+    	mRightMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kP, Constants.kCANTimeout);
+    	mRightMaster.config_kI(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kI, Constants.kCANTimeout);
+    	mRightMaster.config_kD(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kD, Constants.kCANTimeout);
+    	mRightMaster.config_kF(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kF, Constants.kCANTimeout);
+    	
+    	
     	
     	//vision ctrl gains
-    	mRightMaster.config_kP(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kP, 0); //slot, value, timeout
-    	mRightMaster.config_kI(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kI, 0);
-    	mRightMaster.config_kD(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kD, 0);
-    	mRightMaster.config_kF(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kF, 0);
-    	mRightMaster.configMotionCruiseVelocity(Constants.kDrivetrainCruiseVelocity, 0);
-    	mRightMaster.configMotionAcceleration(Constants.kDrivetrainAcceleration, 0);
+    	mRightMaster.config_kP(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kP, Constants.kCANTimeout); //slot, value, timeout
+    	mRightMaster.config_kI(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kI, Constants.kCANTimeout);
+    	mRightMaster.config_kD(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kD, Constants.kCANTimeout);
+    	mRightMaster.config_kF(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kF, Constants.kCANTimeout);
+    	mRightMaster.configMotionCruiseVelocity(Constants.kDrivetrainCruiseVelocity, Constants.kCANTimeout);
+    	mRightMaster.configMotionAcceleration(Constants.kDrivetrainAcceleration, Constants.kCANTimeout);
     	
     	//Gyrolock gains
-    	mRightMaster.config_kP(Constants.kGyroLockSlot, Constants.kGyroLock_kP, 0); //slot, value, timeout
-    	mRightMaster.config_kI(Constants.kGyroLockSlot, Constants.kGyroLock_kI, 0);
-    	mRightMaster.config_kD(Constants.kGyroLockSlot, Constants.kGyroLock_kD, 0);
-    	mRightMaster.config_kF(Constants.kGyroLockSlot, Constants.kGyroLock_kF, 0);
+    	mRightMaster.config_kP(Constants.kGyroLockSlot, Constants.kGyroLock_kP, Constants.kCANTimeout); //slot, value, timeout
+    	mRightMaster.config_kI(Constants.kGyroLockSlot, Constants.kGyroLock_kI, Constants.kCANTimeout);
+    	mRightMaster.config_kD(Constants.kGyroLockSlot, Constants.kGyroLock_kD, Constants.kCANTimeout);
+    	mRightMaster.config_kF(Constants.kGyroLockSlot, Constants.kGyroLock_kF, Constants.kCANTimeout);
     	
     	
     	mRightSlave1 = new WPI_TalonSRX(8);
     	mRightSlave1.follow(mRightMaster);
     	mRightSlave1.setInverted(true);
-    	mRightSlave1.configOpenloopRamp(0, 0);
+    	mRightSlave1.configOpenloopRamp(Constants.kDriveOpenLoopRampRate, Constants.kCANTimeout);
+    	mRightSlave1.configNeutralDeadband(Constants.kDriveDeadband, Constants.kCANTimeout);
     	pigeon = new PigeonIMU(mRightSlave1);
     	
     	mRightSlave2 = new WPI_TalonSRX(9);
     	mRightSlave2.follow(mRightMaster);
     	mRightSlave2.setInverted(true);
-    	mRightSlave2.configOpenloopRamp(0, 0);
+    	mRightSlave2.configOpenloopRamp(Constants.kDriveOpenLoopRampRate, Constants.kCANTimeout);
+    	mRightSlave2.configNeutralDeadband(Constants.kDriveDeadband, Constants.kCANTimeout);
     	
     	rightHighGearSensor = new DigitalInput(3);
     	rightLowGearSensor = new DigitalInput(2);
@@ -248,60 +251,63 @@ public class Drive implements Subsystem {
 				RemoteSensorSource.GadgeteerPigeon_Yaw,
 				1,
 				0);
-    	mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-    	mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor1, 1, 0);
-    	mLeftMaster.configAuxPIDPolarity(true, 0);
+    	mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kCANTimeout);
+    	mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor1, 1, Constants.kCANTimeout);
+    	mLeftMaster.configAuxPIDPolarity(true, Constants.kCANTimeout);
     	mLeftMaster.setInverted(false);
     	mLeftMaster.setSensorPhase(true);
-    	mLeftMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
+    	mLeftMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, Constants.kCANTimeout);
     	mLeftMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
-    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic,  5, 0);
-    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0,  5, 0);
-    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1,  5, 0);
-    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5, 0);
-    	mLeftMaster.configVoltageCompSaturation(12.0, 0);
+    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic,  20, Constants.kCANTimeout);
+    	//mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0,  5, Constants.kCANTimeout);
+    	//mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1,  5, Constants.kCANTimeout);
+    	//mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5, Constants.kCANTimeout);
+    	mLeftMaster.configVoltageCompSaturation(Constants.kDriveVoltageScale, Constants.kCANTimeout);
     	mLeftMaster.enableVoltageCompensation(true);
-    	mLeftMaster.configOpenloopRamp(0, 0);
-    	mLeftMaster.configNeutralDeadband(.1, 0);
-    	mLeftMaster.configContinuousCurrentLimit(Constants.kDriveContinuousCurrentLimit, 0);
-    	mLeftMaster.configPeakCurrentLimit(Constants.kDrivePeakCurrentLimit, 0);
-    	mLeftMaster.configPeakCurrentDuration(Constants.kDrivePeakCurrentDuration, 0);
+    	mLeftMaster.configOpenloopRamp(Constants.kDriveOpenLoopRampRate, Constants.kCANTimeout);
+    	mLeftMaster.configNeutralDeadband(Constants.kDriveDeadband, Constants.kCANTimeout);
+    	mLeftMaster.configContinuousCurrentLimit(Constants.kDriveContinuousCurrentLimit, Constants.kCANTimeout);
+    	mLeftMaster.configPeakCurrentLimit(Constants.kDrivePeakCurrentLimit, Constants.kCANTimeout);
+    	mLeftMaster.configPeakCurrentDuration(Constants.kDrivePeakCurrentDuration, Constants.kCANTimeout);
     	mLeftMaster.enableCurrentLimit(true);
+    	mLeftMaster.configClosedloopRamp(Constants.kDriveClosedLoopRampTime, Constants.kCANTimeout);
 
     	//motion profile gains
-    	mLeftMaster.config_kP(Constants.kMotionProfileSlot, Constants.kMotionProfile_kP, 0); //slot, value, timeout
-    	mLeftMaster.config_kI(Constants.kMotionProfileSlot, Constants.kMotionProfile_kI, 0);
-    	mLeftMaster.config_kD(Constants.kMotionProfileSlot, Constants.kMotionProfile_kD, 0);
-    	mLeftMaster.config_kF(Constants.kMotionProfileSlot, Constants.kMotionProfile_kF, 0);
+    	mLeftMaster.config_kP(Constants.kMotionProfileSlot, Constants.kMotionProfile_kP, Constants.kCANTimeout); //slot, value, timeout
+    	mLeftMaster.config_kI(Constants.kMotionProfileSlot, Constants.kMotionProfile_kI, Constants.kCANTimeout);
+    	mLeftMaster.config_kD(Constants.kMotionProfileSlot, Constants.kMotionProfile_kD, Constants.kCANTimeout);
+    	mLeftMaster.config_kF(Constants.kMotionProfileSlot, Constants.kMotionProfile_kF, Constants.kCANTimeout);
     	
-    	mLeftMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kP, 0);
-    	mLeftMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kI, 0);
-    	mLeftMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kD, 0);
-    	mLeftMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kF, 0);
+    	mLeftMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kP, Constants.kCANTimeout);
+    	mLeftMaster.config_kI(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kI, Constants.kCANTimeout);
+    	mLeftMaster.config_kD(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kD, Constants.kCANTimeout);
+    	mLeftMaster.config_kF(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kF, Constants.kCANTimeout);
     	
     	//vision ctrl gains
-    	mLeftMaster.config_kP(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kP, 0); //slot, value, timeout
-    	mLeftMaster.config_kI(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kI, 0);
-    	mLeftMaster.config_kD(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kD, 0);
-    	mLeftMaster.config_kF(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kF, 0);
-    	mLeftMaster.configMotionCruiseVelocity(Constants.kDrivetrainCruiseVelocity, 0);
-    	mLeftMaster.configMotionAcceleration(Constants.kDrivetrainAcceleration, 0);
+    	mLeftMaster.config_kP(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kP, Constants.kCANTimeout); //slot, value, timeout
+    	mLeftMaster.config_kI(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kI, Constants.kCANTimeout);
+    	mLeftMaster.config_kD(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kD, Constants.kCANTimeout);
+    	mLeftMaster.config_kF(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kF, Constants.kCANTimeout);
+    	mLeftMaster.configMotionCruiseVelocity(Constants.kDrivetrainCruiseVelocity, Constants.kCANTimeout);
+    	mLeftMaster.configMotionAcceleration(Constants.kDrivetrainAcceleration, Constants.kCANTimeout);
     	
     	//Gyrolock gains
-    	mLeftMaster.config_kP(Constants.kGyroLockSlot, Constants.kGyroLock_kP, 0); //slot, value, timeout
-    	mLeftMaster.config_kI(Constants.kGyroLockSlot, Constants.kGyroLock_kI, 0);
-    	mLeftMaster.config_kD(Constants.kGyroLockSlot, Constants.kGyroLock_kD, 0);
-    	mLeftMaster.config_kF(Constants.kGyroLockSlot, Constants.kGyroLock_kF, 0);
+    	mLeftMaster.config_kP(Constants.kGyroLockSlot, Constants.kGyroLock_kP, Constants.kCANTimeout); //slot, value, timeout
+    	mLeftMaster.config_kI(Constants.kGyroLockSlot, Constants.kGyroLock_kI, Constants.kCANTimeout);
+    	mLeftMaster.config_kD(Constants.kGyroLockSlot, Constants.kGyroLock_kD, Constants.kCANTimeout);
+    	mLeftMaster.config_kF(Constants.kGyroLockSlot, Constants.kGyroLock_kF, Constants.kCANTimeout);
     	
     	mLeftSlave1 = new WPI_TalonSRX(1);
     	mLeftSlave1.follow(mLeftMaster);
     	mLeftSlave1.setInverted(false);
-    	mLeftSlave1.configOpenloopRamp(0, 0);
+    	mLeftSlave1.configOpenloopRamp(Constants.kDriveOpenLoopRampRate, Constants.kCANTimeout);
+    	mLeftSlave1.configNeutralDeadband(Constants.kDriveDeadband, Constants.kCANTimeout);
     	
     	mLeftSlave2 = new WPI_TalonSRX(2);
     	mLeftSlave2.follow(mLeftMaster);
     	mLeftSlave2.setInverted(false);
-    	mLeftSlave2.configOpenloopRamp(0, 0);
+    	mLeftSlave2.configOpenloopRamp(Constants.kDriveOpenLoopRampRate, Constants.kCANTimeout);
+    	mLeftSlave2.configNeutralDeadband(Constants.kDriveDeadband, Constants.kCANTimeout);
     	
     	leftHighGearSensor = new DigitalInput(1);
     	leftLowGearSensor = new DigitalInput(0);
@@ -369,8 +375,8 @@ public class Drive implements Subsystem {
     }
     
     public void setDesiredSpeed(double leftSpeed, double rightSpeed) {
-    	rawLeftSpeed = leftSpeed;
-    	rawRightSpeed = rightSpeed;
+    	desiredLeftSpeed = leftSpeed;
+    	desiredRightSpeed = rightSpeed;
     }
     
     public void setDriveMode(driveMode mode) {
@@ -476,8 +482,8 @@ public class Drive implements Subsystem {
     }
     
     public void log() {
+    	Log.add("Right Position Setpoint",(double) mRightMaster.getActiveTrajectoryPosition()/ Constants.kFeetToEncoderCodes);
 		Log.add("Left Position Setpoint", (double)mLeftMaster.getActiveTrajectoryPosition()/ Constants.kFeetToEncoderCodes);
-		Log.add("Right Position Setpoint",(double) mRightMaster.getActiveTrajectoryPosition()/ Constants.kFeetToEncoderCodes);
 		Log.add("Left Velocity Setpoint",(double) mLeftMaster.getActiveTrajectoryVelocity()/ Constants.kFeetToEncoderCodes);
 		Log.add("Right Velocity Setpoint", (double)mRightMaster.getActiveTrajectoryVelocity()/ Constants.kFeetToEncoderCodes);
 		Log.add("Heading setpoint", ((double)mRightMaster.getActiveTrajectoryHeading()) * (360.0/8192));
@@ -507,18 +513,18 @@ public class Drive implements Subsystem {
 		mRightMaster.set(ControlMode.Position, 0);
 		mLeftMaster.set(ControlMode.Velocity, 0);
 		mRightMaster.set(ControlMode.Velocity, 0);
-		mLeftMaster.set(ControlMode.MotionProfile,0);
+		mLeftMaster.set(ControlMode.MotionProfile, 0);
 		mRightMaster.set(ControlMode.MotionProfile, 0);
-		mLeftMaster.setSelectedSensorPosition(0, 0, 0);
-		mRightMaster.setSelectedSensorPosition(0, 0, 0);
+		mLeftMaster.setSelectedSensorPosition(0, 0, Constants.kCANTimeout);
+		mRightMaster.setSelectedSensorPosition(0, 0, Constants.kCANTimeout);
 	}
     
     public void resetSensors() {
     	navx.reset();
     	resetDriveEncoders();
-    	pigeon.setYaw(0, 0);
-    	pigeon.setAccumZAngle(0, 0);
-    	pigeon.setFusedHeading(0, 0);
+    	pigeon.setYaw(0, Constants.kCANTimeout);
+    	pigeon.setAccumZAngle(0, Constants.kCANTimeout);
+    	pigeon.setFusedHeading(0, Constants.kCANTimeout);
     	mRightMaster.disable();
     	mLeftMaster.disable();
     }
@@ -541,8 +547,8 @@ public class Drive implements Subsystem {
     }
     
     public void pushPoints(TrajectoryPoint leftPoint, TrajectoryPoint rightPoint) {
-    	mLeftMaster.pushMotionProfileTrajectory(leftPoint);
     	mRightMaster.pushMotionProfileTrajectory(rightPoint);
+    	mLeftMaster.pushMotionProfileTrajectory(leftPoint);
     }
     
     public void flushTalonBuffer() {
@@ -551,13 +557,13 @@ public class Drive implements Subsystem {
     }
     
     public void setFeedForward(double leftF, double rightF) {
-    	mLeftMaster.config_kF(0, leftF, 0);
-    	mRightMaster.config_kF(0, rightF, 0);
+    	mLeftMaster.config_kF(0, leftF, Constants.kCANTimeout);
+    	mRightMaster.config_kF(0, rightF, Constants.kCANTimeout);
     }
     
     public void processMotionProfilePoints() {
-    	mLeftMaster.processMotionProfileBuffer();
     	mRightMaster.processMotionProfileBuffer();
+    	mLeftMaster.processMotionProfileBuffer();
     }
     
     public int checkLeftBuffer() {
