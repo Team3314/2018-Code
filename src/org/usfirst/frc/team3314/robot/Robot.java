@@ -2,6 +2,8 @@ package org.usfirst.frc.team3314.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import org.usfirst.frc.team3314.robot.autos.Autonomous;
 import org.usfirst.frc.team3314.robot.motion.PathFollower;
 import org.usfirst.frc.team3314.robot.subsystems.*;
@@ -36,16 +38,21 @@ public class Robot extends TimedRobot {
 	private AutoModeSelector selector = new AutoModeSelector();
 	private PathFollower pathFollower = new PathFollower();
 	private Timer timer = new Timer();
+	private DriveTrainCharacterizer d;
 	
 	Autonomous selectedAutoMode = null;
 	
 	private boolean lastGyrolock = false, lastScaleHigh, lastScaleLow, lastPickup, lastHold, lastStop, 
 			lastClimb, lastBar;
 	
+
+	double timestamp = 0;
+	
 	@Override
 	public void robotInit() {	
 		Log.startServer(1099);
 		Log.setDelay(200);
+		
 	}
 	
 	@Override
@@ -59,7 +66,8 @@ public class Robot extends TimedRobot {
 		pathFollower.stop();
 		camera.setLEDMode(Constants.kLEDOff);
 		drive.stopLogger();
-		arm.stopLogger();	
+		arm.stopLogger();
+		drive.setOpenLoopRampRate(0);
 	}
 	
 	@Override
@@ -111,7 +119,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		allPeriodic();
-		
 		// Intake Controls
 		intake.setOverride(hi.getIntakeOverride());
 		if(hi.getIntakePressed()) {
@@ -119,6 +126,9 @@ public class Robot extends TimedRobot {
 		}
 		else if(hi.getOuttake()) {
 			intake.setDesiredState(IntakeState.RELEASING);
+		}
+		else if(hi.getReleaseSlow()) {
+			intake.setDesiredState(IntakeState.RELEASE_SLOW);
 		}
 		else if(hi.getUnjamPressed()) {
 			intake.setDesiredState(IntakeState.UNJAMMING);
@@ -134,7 +144,13 @@ public class Robot extends TimedRobot {
 				drive.setDriveMode(driveMode.GYROLOCK);
 			}
 			drive.setDesiredSpeed(hi.getLeftThrottle());
-		} else if (hi.getVisionCtrl()) {
+		}
+		else if(!hi.getGyrolock()) {
+			drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
+			drive.setDriveMode(driveMode.OPEN_LOOP);
+		}
+		
+		if (hi.getVisionCtrl()) {
 			camera.setTrackingRequest(true);
 		}
 		else if(!hi.getGyrolock() && !hi.getVisionCtrl()) {
@@ -189,7 +205,9 @@ public class Robot extends TimedRobot {
 		arm.setTelescopeOverrideSpeed(hi.getTelescopeOverrideSpeed());
 		
 		arm.setTargetSpeed(hi.getArmSpeed());
-		drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
+		if(hi.spin()) {
+			drive.setStickInputs(.4, -.4);
+		}
 		lastGyrolock = hi.getGyrolock();
 		lastScaleHigh = hi.getScaleHigh();
 		lastScaleLow = hi.getScaleLow();
@@ -212,14 +230,16 @@ public class Robot extends TimedRobot {
 		drive.outputToSmartDashboard();
 		intake.outputToSmartDashboard();
 		camera.outputToSmartDashboard();
+		SmartDashboard.putNumber("Loop Time",Timer.getFPGATimestamp() - timestamp);
+		timestamp = Timer.getFPGATimestamp();
 	}
 	
 	public void testInit() {
 		camera.setLEDMode(Constants.kLEDOff);
+		d = new DriveTrainCharacterizer(DriveTrainCharacterizer.TestMode.STEP_VOLTAGE, DriveTrainCharacterizer.Direction.Backward, true);
+		d.initialize();
 	}
-	
 	public void testPeriodic() {
-		drive.setDriveMode(driveMode.GYROLOCK);
-		drive.setDesiredSpeed(0.095);
+		d.run();
 	}
 }

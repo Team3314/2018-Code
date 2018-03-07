@@ -3,6 +3,8 @@ package org.usfirst.frc.team3314.robot.paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.usfirst.frc.team3314.robot.paths.Path.Mode;
+
 public class PathList {
 	
 	 private static Map<String, Path> paths;
@@ -11,24 +13,22 @@ public class PathList {
 		 */
 	 static {
 		 paths = new HashMap<String, Path>();
-		 paths.put("StartLSwitchL", new StartLeftToSwitchLeft());
-		 paths.put("StartLSwitchR", new StartLeftToSwitchRight());
-		 paths.put("StartRSwitchL", new StartRightToSwitchLeft());
-		 paths.put("StartRSwitchL2", new StartRightToSwitchRight2());
-		 paths.put("StartRSwitchR", new StartRightToSwitchRight());
-		 paths.put("StartRSwitchR2", new StartRightToSwitchRight2());
-		 paths.put("StartCSwitchL", new StartCenterToSwitchLeft());
-		 paths.put("StartCSwitchR", new StartCenterToSwitchRight());
-		 paths.put("SwitchLScaleL", new SwitchLeftToScaleLeft());
-		 paths.put("SwitchLScaleR", new SwitchLeftToScaleRight());
-		 paths.put("SwitchRScaleL", new SwitchRightToScaleLeft());
-		 paths.put("SwitchRScaleR", new SwitchRightToScaleRight());
-		 paths.put("ScaleLSwitchL", new ScaleLeftToSwitchLeft());
-		 paths.put("ScaleLSwitchR", new ScaleLeftToSwitchRight());
-		 paths.put("ScaleRSwitchL", new ScaleRightToSwitchLeft());
-		 paths.put("ScaleRSwitchR", new ScaleRightToSwitchRight());
-		 paths.put("Turn" , new PathTwo());
-		 paths.put("Drive straight", new PathOne());
+		 paths.put("StartLSwitchL", new Path("StartLeftToSwitchLeft", Mode.BACKWARD_HIGH));
+		 paths.put("StartLSwitchR", new Path("StartLeftToSwitchRight", Mode.BACKWARD_HIGH));
+		 paths.put("StartRSwitchL", new Path("StartRightToSwitchLeft", Mode.BACKWARD_HIGH));
+		 paths.put("StartRSwitchR", new Path("StartRightToSwitchRight", Mode.BACKWARD_HIGH));
+		 paths.put("StartCSwitchL", new Path("StartCenterToSwitchLeft", Mode.FORWARD_HIGH));
+		 paths.put("StartCSwitchR", new Path("StartCenterToSwitchRight", Mode.FORWARD_HIGH));
+		 paths.put("SwitchLScaleL", new Path("SwitchLeftToScaleLeft", Mode.BACKWARD_HIGH));
+		 paths.put("SwitchLScaleR", new Path("SwitchLeftToScaleRight", Mode.BACKWARD_HIGH));
+		 paths.put("SwitchRScaleL", new Path("SwitchRightToScaleLeft", Mode.BACKWARD_HIGH));
+		 paths.put("SwitchRScaleR", new Path("SwitchRightToScaleRight", Mode.BACKWARD_HIGH));
+		 paths.put("ScaleLSwitchL", new Path("ScaleLeftToSwitchLeft", Mode.FORWARD_HIGH));
+		 paths.put("ScaleLSwitchR", new Path("ScaleLeftToSwitchRight", Mode.FORWARD_HIGH));
+		 paths.put("ScaleRSwitchL", new Path("ScaleRightToSwitchLeft", Mode.FORWARD_HIGH));
+		 paths.put("ScaleRSwitchR", new Path("ScaleRightToSwitchRight", Mode.FORWARD_HIGH));
+		 paths.put("Turn" , new Path("Turn", Mode.FORWARD_HIGH));
+		 paths.put("Drive straight", new Path("MotionProfileOne", Mode.FORWARD_HIGH));
 	 };
 	 public static Path getPath(String path) {
 		 return paths.get(path);

@@ -1,7 +1,6 @@
 package org.usfirst.frc.team3314.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -10,23 +9,23 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import org.usfirst.frc.team3314.robot.Constants;
 import org.usfirst.frc.team3314.robot.DataLogger;
 import org.usfirst.frc.team3314.robot.GyroPIDOutput;
-
-
 import com.cruzsbrian.robolog.Log;
+
 import com.ctre.phoenix.motion.MotionProfileStatus;
-//import com.ctre.phoenix.motion.SetValueMotionProfile;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-
+import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.sensors.PigeonIMU;
 
 public class Drive implements Subsystem {
 	
@@ -53,6 +52,7 @@ public class Drive implements Subsystem {
 	private DoubleSolenoid shifter ,pto;
 	private PowerDistributionPanel pdp;
 	private AHRS navx;
+	private PigeonIMU pigeon;
 	
 	private DigitalInput leftHighGearSensor, leftLowGearSensor, rightHighGearSensor, rightLowGearSensor;
 	
@@ -63,7 +63,6 @@ public class Drive implements Subsystem {
     
     //Data Logging
     public DataLogger logger;
-    
     public Camera camera;
     
     //PID
@@ -99,19 +98,32 @@ public class Drive implements Subsystem {
     			rawRightSpeed = 0;
     			break;
     		case OPEN_LOOP:
-    			rawLeftSpeed = leftStickInput;
-    			rawRightSpeed = rightStickInput;
+    			rawLeftSpeed = desiredLeftSpeed;
+    			rawRightSpeed = desiredRightSpeed;
+    			if(Math.abs(desiredLeftSpeed) >= .1 || Math.abs(desiredRightSpeed) >= .1) {
+    				setNeutralMode(NeutralMode.Coast);
+    			}
+    			else {
+    				setNeutralMode(NeutralMode.Brake);
+    			}
     			controlMode = ControlMode.PercentOutput;
     			break;
-    		case GYROLOCK:    			
+    		case GYROLOCK:
     			rawLeftSpeed = desiredLeftSpeed + gyroPIDOutput.turnSpeed;
     			rawRightSpeed = desiredRightSpeed - gyroPIDOutput.turnSpeed;
     			gyroControl.setSetpoint(desiredAngle);
+    			if(Math.abs(rawLeftSpeed) >= .1 || Math.abs(rawLeftSpeed) >= .1) {
+    				setNeutralMode(NeutralMode.Coast);
+    			}
+    			else {
+    				setNeutralMode(NeutralMode.Brake);
+    			}
     			controlMode = ControlMode.PercentOutput;
     			break;
     		case VISION_CONTROL:
     			rawLeftSpeed = leftStickInput + camera.getSteeringAdjust();
     			rawRightSpeed = rightStickInput - camera.getSteeringAdjust();
+    			setNeutralMode(NeutralMode.Brake);
     			controlMode = ControlMode.PercentOutput;
     			/*
     			rawLeftSpeed = camera.getSteeringAdjust();
@@ -121,7 +133,8 @@ public class Drive implements Subsystem {
     			break;
     		case MOTION_PROFILE:
     			log();
-    			controlMode = ControlMode.MotionProfile;
+    			setNeutralMode(NeutralMode.Brake);
+    			controlMode = ControlMode.MotionProfileArc;
     			rawLeftSpeed = motionProfileMode;
     			rawRightSpeed = motionProfileMode;
     			break;
@@ -134,13 +147,11 @@ public class Drive implements Subsystem {
     
     }
 
-	
-
     private Drive() {
     	// Logger
     	 logger = new DataLogger();
     	 camera = Camera.getInstance();
-    	
+    	 
 		//Hardware
     	pdp  = new PowerDistributionPanel(0);
     	shifter = new DoubleSolenoid(0, 1);
@@ -158,65 +169,48 @@ public class Drive implements Subsystem {
 	    gyroControl.setContinuous(); 
 		gyroControl.setOutputRange(-.7, .7);		// Limits speed of turn to prevent overshoot
     	
-		
 		//Talons
-    	mLeftMaster = new WPI_TalonSRX(0);
-    	mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-    	mLeftMaster.setInverted(false);
-    	mLeftMaster.setSensorPhase(true);
-    	mLeftMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
-    	mLeftMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
-    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic,  5, 0);
-    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0,  5, 0);
-
-    	//motion profile gains
-    	mLeftMaster.selectProfileSlot(Constants.kMotionProfileSlot, 0);
-    	mLeftMaster.config_kP(0, Constants.kMotionProfile_kP, 0); //slot, value, timeout
-    	mLeftMaster.config_kI(0, Constants.kMotionProfile_kI, 0);
-    	mLeftMaster.config_kD(0, Constants.kMotionProfile_kD, 0);
-    	mLeftMaster.config_kF(0, Constants.kMotionProfile_kF, 0);
-    	
-    	//vision ctrl gains
-    	mLeftMaster.config_kP(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kP, 0); //slot, value, timeout
-    	mLeftMaster.config_kI(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kI, 0);
-    	mLeftMaster.config_kD(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kD, 0);
-    	mLeftMaster.config_kF(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kF, 0);
-    	mLeftMaster.configMotionCruiseVelocity(Constants.kDrivetrainCruiseVelocity, 0);
-    	mLeftMaster.configMotionAcceleration(Constants.kDrivetrainAcceleration, 0);
-    	
-    	//Gyrolock gains
-    	mLeftMaster.selectProfileSlot(Constants.kGyroLockSlot, 0);
-    	mLeftMaster.config_kP(Constants.kGyroLockSlot, Constants.kGyroLock_kP, 0); //slot, value, timeout
-    	mLeftMaster.config_kI(Constants.kGyroLockSlot, Constants.kGyroLock_kI, 0);
-    	mLeftMaster.config_kD(Constants.kGyroLockSlot, Constants.kGyroLock_kD, 0);
-    	mLeftMaster.config_kF(Constants.kGyroLockSlot, Constants.kGyroLock_kF, 0);
-    	
-    	mLeftSlave1 = new WPI_TalonSRX(1);
-    	mLeftSlave1.follow(mLeftMaster);
-    	mLeftSlave1.setInverted(false);
-    	
-    	mLeftSlave2 = new WPI_TalonSRX(2);
-    	mLeftSlave2.follow(mLeftMaster);
-    	mLeftSlave2.setInverted(false);
-    	
-    	leftHighGearSensor = new DigitalInput(1);
-    	leftLowGearSensor = new DigitalInput(0);
-    	
     	mRightMaster = new WPI_TalonSRX(7);
+    	mRightMaster.configRemoteFeedbackFilter(0x00,
+				RemoteSensorSource.Off,
+				0,
+				0);
+    	mRightMaster.configRemoteFeedbackFilter(8,
+				RemoteSensorSource.GadgeteerPigeon_Yaw,
+				1,
+				0);
     	mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    	mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor1, 1, 0);
+    	mRightMaster.configAuxPIDPolarity(false, 0);
     	mRightMaster.setSensorPhase(true);
     	mRightMaster.setInverted(true);
     	mRightMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
     	mRightMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
+    	mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic,  5, 0);
+    	mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0,  5, 0);
+    	mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1,  5, 0);
+    	mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5, 0);
+    	mRightMaster.configVoltageCompSaturation(12.0, 0);
+    	mRightMaster.enableVoltageCompensation(true);
+    	mRightMaster.configOpenloopRamp(0, 0);
+    	mRightMaster.configNeutralDeadband(.1, 0);
+    	mRightMaster.configContinuousCurrentLimit(Constants.kDriveContinuousCurrentLimit, 0);
+    	mRightMaster.configPeakCurrentLimit(Constants.kDrivePeakCurrentLimit, 0);
+    	mRightMaster.configPeakCurrentDuration(Constants.kDrivePeakCurrentDuration, 0);
+    	mRightMaster.enableCurrentLimit(true);
     	
     	//Motion Profile Gains
-    	mRightMaster.selectProfileSlot(Constants.kMotionProfileSlot, 0);
+
     	mRightMaster.config_kP(Constants.kMotionProfileSlot, Constants.kMotionProfile_kP, 0); //slot, value, timeout
     	mRightMaster.config_kI(Constants.kMotionProfileSlot, Constants.kMotionProfile_kI, 0);
     	mRightMaster.config_kD(Constants.kMotionProfileSlot, Constants.kMotionProfile_kD, 0);
     	mRightMaster.config_kF(Constants.kMotionProfileSlot, Constants.kMotionProfile_kF, 0);
-    	mRightMaster.setStatusFramePeriod(StatusFrame.Status_10_MotionMagic,  5, 0);
-    	mRightMaster.setStatusFramePeriod(StatusFrame.Status_2_Feedback0,  5, 0);
+    	
+
+    	mRightMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kP, 0);
+    	mRightMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kI, 0);
+    	mRightMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kD, 0);
+    	mRightMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kF, 0);
     	
     	//vision ctrl gains
     	mRightMaster.config_kP(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kP, 0); //slot, value, timeout
@@ -236,28 +230,98 @@ public class Drive implements Subsystem {
     	mRightSlave1 = new WPI_TalonSRX(8);
     	mRightSlave1.follow(mRightMaster);
     	mRightSlave1.setInverted(true);
+    	mRightSlave1.configOpenloopRamp(0, 0);
+    	pigeon = new PigeonIMU(mRightSlave1);
     	
     	mRightSlave2 = new WPI_TalonSRX(9);
     	mRightSlave2.follow(mRightMaster);
     	mRightSlave2.setInverted(true);
+    	mRightSlave2.configOpenloopRamp(0, 0);
     	
     	rightHighGearSensor = new DigitalInput(3);
     	rightLowGearSensor = new DigitalInput(2);
+    
+    	mLeftMaster = new WPI_TalonSRX(0);
+    	mLeftMaster.configRemoteFeedbackFilter(0x00,
+				RemoteSensorSource.Off,
+				0,
+				0);
+    	mLeftMaster.configRemoteFeedbackFilter(8,
+				RemoteSensorSource.GadgeteerPigeon_Yaw,
+				1,
+				0);
+    	mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    	mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor1, 1, 0);
+    	mLeftMaster.configAuxPIDPolarity(true, 0);
+    	mLeftMaster.setInverted(false);
+    	mLeftMaster.setSensorPhase(true);
+    	mLeftMaster.configMotionProfileTrajectoryPeriod(Constants.kDriveMotionControlTrajectoryPeriod, 0);
+    	mLeftMaster.changeMotionControlFramePeriod(Constants.kDriveMotionControlFramePeriod);
+    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic,  5, 0);
+    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0,  5, 0);
+    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1,  5, 0);
+    	mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5, 0);
+    	mLeftMaster.configVoltageCompSaturation(12.0, 0);
+    	mLeftMaster.enableVoltageCompensation(true);
+    	mLeftMaster.configOpenloopRamp(0, 0);
+    	mLeftMaster.configNeutralDeadband(.1, 0);
+    	mLeftMaster.configContinuousCurrentLimit(Constants.kDriveContinuousCurrentLimit, 0);
+    	mLeftMaster.configPeakCurrentLimit(Constants.kDrivePeakCurrentLimit, 0);
+    	mLeftMaster.configPeakCurrentDuration(Constants.kDrivePeakCurrentDuration, 0);
+    	mLeftMaster.enableCurrentLimit(true);
+
+    	//motion profile gains
+    	mLeftMaster.config_kP(Constants.kMotionProfileSlot, Constants.kMotionProfile_kP, 0); //slot, value, timeout
+    	mLeftMaster.config_kI(Constants.kMotionProfileSlot, Constants.kMotionProfile_kI, 0);
+    	mLeftMaster.config_kD(Constants.kMotionProfileSlot, Constants.kMotionProfile_kD, 0);
+    	mLeftMaster.config_kF(Constants.kMotionProfileSlot, Constants.kMotionProfile_kF, 0);
+    	
+    	mLeftMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kP, 0);
+    	mLeftMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kI, 0);
+    	mLeftMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kD, 0);
+    	mLeftMaster.config_kP(Constants.kMotionProfileHeadingSlot, Constants.kMotionProfileHeading_kF, 0);
+    	
+    	//vision ctrl gains
+    	mLeftMaster.config_kP(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kP, 0); //slot, value, timeout
+    	mLeftMaster.config_kI(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kI, 0);
+    	mLeftMaster.config_kD(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kD, 0);
+    	mLeftMaster.config_kF(Constants.kVisionCtrlSlot, Constants.kVisionCtrl_kF, 0);
+    	mLeftMaster.configMotionCruiseVelocity(Constants.kDrivetrainCruiseVelocity, 0);
+    	mLeftMaster.configMotionAcceleration(Constants.kDrivetrainAcceleration, 0);
+    	
+    	//Gyrolock gains
+    	mLeftMaster.config_kP(Constants.kGyroLockSlot, Constants.kGyroLock_kP, 0); //slot, value, timeout
+    	mLeftMaster.config_kI(Constants.kGyroLockSlot, Constants.kGyroLock_kI, 0);
+    	mLeftMaster.config_kD(Constants.kGyroLockSlot, Constants.kGyroLock_kD, 0);
+    	mLeftMaster.config_kF(Constants.kGyroLockSlot, Constants.kGyroLock_kF, 0);
+    	
+    	mLeftSlave1 = new WPI_TalonSRX(1);
+    	mLeftSlave1.follow(mLeftMaster);
+    	mLeftSlave1.setInverted(false);
+    	mLeftSlave1.configOpenloopRamp(0, 0);
+    	
+    	mLeftSlave2 = new WPI_TalonSRX(2);
+    	mLeftSlave2.follow(mLeftMaster);
+    	mLeftSlave2.setInverted(false);
+    	mLeftSlave2.configOpenloopRamp(0, 0);
+    	
+    	leftHighGearSensor = new DigitalInput(1);
+    	leftLowGearSensor = new DigitalInput(0);
     	
     	pcm1 = new Compressor();
     	pcm1.setClosedLoopControl(true);
     	
     	resetSensors();
     	LiveWindow.disableTelemetry(pdp);
-    	setNeutralMode(NeutralMode.Brake);
+    	setNeutralMode(NeutralMode.Coast);
     	
     	mIsHighGear = false;
     	mIsPTO = false;
     }
     
     public void setStickInputs(double leftInput, double rightInput) {
-    	leftStickInput = leftInput;
-    	rightStickInput = rightInput;
+    	desiredLeftSpeed =Math.copySign(leftInput * leftInput, leftInput);
+    	desiredRightSpeed = Math.copySign(rightInput * rightInput, rightInput);
     }
     
     public void setDesiredAngle(double angle) {
@@ -366,7 +430,16 @@ public class Drive implements Subsystem {
     			String.valueOf(mLeftSlave1.getMotorOutputVoltage()),String.valueOf(mLeftSlave2.getMotorOutputVoltage()), String.valueOf(mRightMaster.getMotorOutputVoltage()),
     			String.valueOf(mRightSlave1.getMotorOutputVoltage()), String.valueOf(mRightSlave2.getMotorOutputVoltage()),String.valueOf(pdp.getVoltage()), String.valueOf(mIsHighGear)};
     	logger.logData(names, values);
-
+    }
+    
+    public void characterizationLog() {
+    	String[] names = {"Left Encoder Speed", "Right Encoder Speed","Left Master Voltage", 
+    			"Right Master Voltage", "Battery Voltage"
+    			};
+    	String[] values = {String.valueOf(getLeftSpeedInS()), String.valueOf(getRightSpeedInS()), String.valueOf(mLeftMaster.getMotorOutputVoltage()),
+    			String.valueOf(mRightMaster.getMotorOutputVoltage()), String.valueOf(pdp.getVoltage())
+    	};
+    	logger.logData(names, values);
     }
     
     public void stopLogger() {
@@ -392,9 +465,6 @@ public class Drive implements Subsystem {
     	SmartDashboard.putBoolean("Low Gear Left", getLeftLowGear());
     	SmartDashboard.putBoolean("High Gear Right", getRightHighGear());
     	SmartDashboard.putBoolean("Low Gear Right", getRightLowGear());
-    	SmartDashboard.putBoolean("High Gear", getHighGear());
-    	SmartDashboard.putBoolean("Low Gear", getLowGear());
-    	SmartDashboard.putBoolean("Neutral", getNeutral());
     	SmartDashboard.putNumber("Raw Left Speed", rawLeftSpeed);
     	SmartDashboard.putNumber("Raw Right Speed", rawRightSpeed);
     	SmartDashboard.putNumber("Desired Angle", desiredAngle);
@@ -402,17 +472,25 @@ public class Drive implements Subsystem {
     	SmartDashboard.putNumber("Gyro adjustment", gyroPIDOutput.turnSpeed);
     	SmartDashboard.putNumber("Desired Left Speed", desiredLeftSpeed);
     	SmartDashboard.putNumber("Desired Right Speed", desiredRightSpeed);
+    	SmartDashboard.putNumber("Left Voltage", mLeftMaster.getMotorOutputVoltage());
+    	SmartDashboard.putNumber("Right Voltage", mLeftMaster.getMotorOutputVoltage());
+    	SmartDashboard.putNumber("Pigeon heading", pigeon.getFusedHeading());
     }
     
     public void log() {
-		Log.add("Left Position Setpoint", (double)mLeftMaster.getActiveTrajectoryPosition());
-		Log.add("Right Position Setpoint",(double) mRightMaster.getActiveTrajectoryPosition());
-		Log.add("Left Velocity Setpoint",(double) mLeftMaster.getActiveTrajectoryVelocity());
-		Log.add("Right Velocity Setpoint", (double)mRightMaster.getActiveTrajectoryVelocity());
-		Log.add("Left Position", (double)mLeftMaster.getSelectedSensorPosition(0));
-		Log.add("Right Position", (double)mRightMaster.getSelectedSensorPosition(0));
-		Log.add("Left Velocity",(double) mLeftMaster.getSelectedSensorVelocity(0));
-		Log.add("Right Velocity",(double) mRightMaster.getSelectedSensorVelocity(0));
+		Log.add("Left Position Setpoint", (double)mLeftMaster.getActiveTrajectoryPosition()/ Constants.kFeetToEncoderCodes);
+		Log.add("Right Position Setpoint",(double) mRightMaster.getActiveTrajectoryPosition()/ Constants.kFeetToEncoderCodes);
+		Log.add("Left Velocity Setpoint",(double) mLeftMaster.getActiveTrajectoryVelocity()/ Constants.kFeetToEncoderCodes);
+		Log.add("Right Velocity Setpoint", (double)mRightMaster.getActiveTrajectoryVelocity()/ Constants.kFeetToEncoderCodes);
+		Log.add("Heading setpoint", ((double)mRightMaster.getActiveTrajectoryHeading()) * (360.0/8192));
+		Log.add("Left Position", (double)mLeftMaster.getSelectedSensorPosition(0) / Constants.kFeetToEncoderCodes);
+		Log.add("Right Position", (double)mRightMaster.getSelectedSensorPosition(0)/ Constants.kFeetToEncoderCodes);
+		Log.add("Left Velocity",(double) mLeftMaster.getSelectedSensorVelocity(0)/ Constants.kFeetToEncoderCodes);
+		Log.add("Right Velocity",(double) mRightMaster.getSelectedSensorVelocity(0)/ Constants.kFeetToEncoderCodes);
+		Log.add("Heading actual", mRightMaster.getSelectedSensorPosition(1) * (360.0 / 8192));
+		Log.add("Left Voltage", mLeftMaster.getMotorOutputVoltage());
+		Log.add("Right Voltage", mRightMaster.getMotorOutputVoltage());
+		Log.add("Error", (double)mRightMaster.getClosedLoopError(1) * (360.0 / 8192));
     }
     
     private void updateSpeedAndPosition() {
@@ -440,6 +518,9 @@ public class Drive implements Subsystem {
     public void resetSensors() {
     	navx.reset();
     	resetDriveEncoders();
+    	pigeon.setYaw(0, 0);
+    	pigeon.setAccumZAngle(0, 0);
+    	pigeon.setFusedHeading(0, 0);
     	mRightMaster.disable();
     	mLeftMaster.disable();
     }
@@ -454,6 +535,13 @@ public class Drive implements Subsystem {
     	return !leftLowGearSensor.get() && !leftHighGearSensor.get() && !rightLowGearSensor.get() && !rightHighGearSensor.get();
     }
     
+    public double getLeftSpeedInS() {
+    	return ((double)mLeftMaster.getSelectedSensorVelocity(0) / Constants.kDriveEncoderCodesPerRev) * (Constants.kRevToInConvFactor * 10);
+    }
+    public double getRightSpeedInS() {
+    	return ((double)mRightMaster.getSelectedSensorVelocity(0) / Constants.kDriveEncoderCodesPerRev) * (Constants.kRevToInConvFactor * 10);
+    }
+    
     public void pushPoints(TrajectoryPoint leftPoint, TrajectoryPoint rightPoint) {
     	mLeftMaster.pushMotionProfileTrajectory(leftPoint);
     	mRightMaster.pushMotionProfileTrajectory(rightPoint);
@@ -462,6 +550,11 @@ public class Drive implements Subsystem {
     public void flushTalonBuffer() {
     	mLeftMaster.clearMotionProfileTrajectories();
     	mRightMaster.clearMotionProfileTrajectories();
+    }
+    
+    public void setFeedForward(double leftF, double rightF) {
+    	mLeftMaster.config_kF(0, leftF, 0);
+    	mRightMaster.config_kF(0, rightF, 0);
     }
     
     public void processMotionProfilePoints() {
@@ -479,6 +572,11 @@ public class Drive implements Subsystem {
     
     public void getLeftStatus(MotionProfileStatus status) {
     	 mLeftMaster.getMotionProfileStatus(status);
+    }
+    
+    public void setOpenLoopRampRate(double seconds) {
+    	mLeftMaster.configOpenloopRamp(seconds, 0);
+    	mRightMaster.configOpenloopRamp(seconds, 0);
     }
     
     public void setMotionProfileStatus(int status) { //0,1,2

@@ -1,11 +1,6 @@
 package org.usfirst.frc.team3314.robot.autos;
 
-import org.usfirst.frc.team3314.robot.motion.CSVParser;
-import org.usfirst.frc.team3314.robot.motion.PathFollower;
 import org.usfirst.frc.team3314.robot.paths.Path;
-import org.usfirst.frc.team3314.robot.paths.PathOne;
-import org.usfirst.frc.team3314.robot.paths.PathTwo;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MotionProfile extends Autonomous {
@@ -15,8 +10,6 @@ public class MotionProfile extends Autonomous {
 		RUNPROFILE,
 		DONE
 	}
-	 Path pathOne = new PathOne();
-	 Path pathTwo = new PathTwo();
 	
 	 private Path selectedPath = null;
      
@@ -27,7 +20,7 @@ public class MotionProfile extends Autonomous {
     	 public void update() {
      		switch (currentState) {
 			case START:
-				selectedPath = getPath("Turn");
+				selectedPath = getPath("Drive straight");
 				loadPath(selectedPath);
 				setHighGear(true);
 				startPathFollower();

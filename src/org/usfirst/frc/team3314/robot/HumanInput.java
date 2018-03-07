@@ -94,6 +94,9 @@ public class HumanInput {
 	public boolean getIntakeOverride() {
 		return gamepad.getRawButton(6);
 	}
+	public boolean getReleaseSlow() {
+		return gamepad.getRawButton(4);
+	}
 	
 	//arm
 	public boolean armPowerOverride() {
@@ -143,7 +146,10 @@ public class HumanInput {
 		return -gamepad.getRawAxis(5);
 	}
 	
-	//auto select
+	public boolean spin() {
+		return leftStick.getRawButton(6);
+	}
+
 	public int getLLBinaryOne() {
 		if(autoSelector.getRawButton(1))
 			return 1;
