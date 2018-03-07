@@ -10,6 +10,7 @@ public class Tracking {
 	public enum TrackingState {
 		START,
 		TRACK,
+		SETUP,
 		DRIVE,
 		DONE
 	}
@@ -42,7 +43,8 @@ public class Tracking {
 		
 		switch (currentState) {
 		case START:
-			if (camera.getTrackingRequest() == true && camera.isTargetInView() == true) {
+			if (camera.getTrackingRequest() == true && camera.isTargetInView() == true &&
+					!intake.senseCube()) {
 				drive.setDriveMode(driveMode.VISION_CONTROL);
 				currentState = TrackingState.TRACK;
 			}
@@ -61,41 +63,38 @@ public class Tracking {
 			*/
 			
 			//basic implement
-			if (camera.getAvgError() > 0) {
-				camera.setSteeringAdjust(camera.getAvgError() * Constants.kVisionCtrl_kP + 
+			if (camera.getError() > 0) {
+				camera.setSteeringAdjust(camera.getError() * Constants.kVisionCtrl_kP + 
 						Constants.kMinMotorCmd);
-			} else if (camera.getAvgError() < 0) {
-				camera.setSteeringAdjust(camera.getAvgError() * Constants.kVisionCtrl_kP -
+			} else if (camera.getError() < 0) {
+				camera.setSteeringAdjust(camera.getError() * Constants.kVisionCtrl_kP -
 						Constants.kMinMotorCmd);
 			}
 			
-			if (Math.abs(camera.getAvgError()) <= 0.75) {
+			if (Math.abs(camera.getError()) <= 0.75) {
 				camera.setSteeringAdjust(0);
+				currentState = TrackingState.SETUP;
+			}
+			break;
+		case SETUP:
+			if (camera.getTrackingRequest() == true && !hi.getVisionCtrl()) {
 				drive.setDriveMode(driveMode.GYROLOCK);
 				drive.setDesiredAngle(drive.getAngle());
 				drive.setDesiredSpeed(0.5);
+				intake.setDesiredState(IntakeState.INTAKING);
 				currentState = TrackingState.DRIVE;
+			} else {
+				drive.setDriveMode(driveMode.OPEN_LOOP);
+				camera.setTrackingRequest(false);
+				currentState = TrackingState.DONE;
 			}
 			break;
 		case DRIVE:
-			if (camera.getTrackingRequest() == true && hi.getVisionCtrl()) {
-				intake.setDesiredState(IntakeState.INTAKING);
-				
-				//FIXME Get it to unjam in worst case scenario
-				if (intake.motorsStalled()) {
-					intake.setDesiredState(IntakeState.UNJAMMING);
-				}
-				
-				if (intake.senseCube()) {
-					//drive.setDriveMode(driveMode.MOTION_PROFILE);
-					//drive.setDriveMode(driveMode.IDLE);
-					//drive.setDriveMode(driveMode.OPEN_LOOP);
-					drive.setDesiredSpeed(0);
-					camera.setTrackingRequest(false);
-					currentState = TrackingState.DONE;
-				}
-			} else {
-				drive.setDriveMode(driveMode.OPEN_LOOP);
+			if (intake.getState() == IntakeState.UNJAMMING || intake.senseCube()) {
+				//drive.setDriveMode(driveMode.MOTION_PROFILE);
+				//drive.setDriveMode(driveMode.IDLE);
+				//drive.setDriveMode(driveMode.OPEN_LOOP);
+				drive.setDesiredSpeed(0);
 				camera.setTrackingRequest(false);
 				currentState = TrackingState.DONE;
 			}

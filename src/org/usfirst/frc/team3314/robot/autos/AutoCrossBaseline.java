@@ -17,10 +17,6 @@ public class AutoCrossBaseline extends Autonomous {
 	private Drive drive = Drive.getInstance();
 	private State currentState;
 	
-	public AutoCrossBaseline() {
-		currentState = State.START;
-	}
-	
 	@Override
 	public void reset() {
 		currentState = State.START;

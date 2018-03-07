@@ -18,7 +18,7 @@ public class Camera {
 	
 	private double targetsInView, targetHorizOffset, averageTargetHoriz, targetVertOffset, 
 		targetArea, targetSkew, targetLatency;
-	private List<Double> targetHorizList = new ArrayList<Double>(20);
+	//private List<Double> targetHorizList = new ArrayList<Double>();
 	private double ledMode, camMode;
 	private String camString, ledString;
 	
@@ -35,11 +35,12 @@ public class Camera {
 		targetsInView = limelight.getEntry("tv").getDouble(0);
 
 		targetHorizOffset = limelight.getEntry("tx").getDouble(-1337.254);
-		if (targetHorizList.size() >= 20) {
-			targetHorizList.remove(0);
-		}
-		targetHorizList.add(targetHorizOffset);
-		averageTargetHoriz = targetHorizList.stream().mapToDouble(val->val).average().getAsDouble();
+		//FIXME Messy ArrayList
+		//if (targetHorizList.size() >= 10) {
+		//	targetHorizList.remove(0);
+		//}
+		//targetHorizList.add(targetHorizOffset);
+		//averageTargetHoriz = targetHorizList.stream().mapToDouble(val->val).average().getAsDouble();
 		
 		targetVertOffset = limelight.getEntry("ty").getDouble(-1337.254);
 		targetArea = limelight.getEntry("ta").getDouble(0);
@@ -198,7 +199,7 @@ public class Camera {
 		SmartDashboard.putString("LED mode", getLEDMode());
 		SmartDashboard.putString("Camera mode", getCamMode());
 		
-		SmartDashboard.putNumber("Avg target horiz", getAvgError());
+		/*SmartDashboard.putNumber("Avg target horiz", getAvgError());
 		SmartDashboard.putNumber("1", targetHorizList.get(0));
 		SmartDashboard.putNumber("2", targetHorizList.get(1));
 		SmartDashboard.putNumber("3", targetHorizList.get(2));
@@ -208,17 +209,7 @@ public class Camera {
 		SmartDashboard.putNumber("7", targetHorizList.get(6));
 		SmartDashboard.putNumber("8", targetHorizList.get(7));
 		SmartDashboard.putNumber("9", targetHorizList.get(8));
-		SmartDashboard.putNumber("10", targetHorizList.get(9));
-		SmartDashboard.putNumber("11", targetHorizList.get(10));
-		SmartDashboard.putNumber("12", targetHorizList.get(11));
-		SmartDashboard.putNumber("13", targetHorizList.get(12));
-		SmartDashboard.putNumber("14", targetHorizList.get(13));
-		SmartDashboard.putNumber("15", targetHorizList.get(14));
-		SmartDashboard.putNumber("16", targetHorizList.get(15));
-		SmartDashboard.putNumber("17", targetHorizList.get(16));
-		SmartDashboard.putNumber("18", targetHorizList.get(17));
-		SmartDashboard.putNumber("19", targetHorizList.get(18));
-		SmartDashboard.putNumber("20", targetHorizList.get(19));
+		SmartDashboard.putNumber("10", targetHorizList.get(9));*/
 
 		SmartDashboard.putNumber("Raw distance", rawDistance);
 		//SmartDashboard.putNumber("Adjusted distance", getDistance());

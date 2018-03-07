@@ -52,7 +52,6 @@ public class Robot extends TimedRobot {
 	public void robotInit() {	
 		Log.startServer(1099);
 		Log.setDelay(200);
-		
 	}
 	
 	@Override
@@ -86,6 +85,7 @@ public class Robot extends TimedRobot {
 		//arm.newFile("ArmAuto");
 		timer.start();
 		camera.setLEDMode(Constants.kLEDOff);
+		tracking.reset();
 		drive.setHighGear(true);
 		drive.setPTO(false);
 	}
@@ -114,6 +114,7 @@ public class Robot extends TimedRobot {
 		drive.resetSensors();
 		arm.startUp();
 		drive.setPTO(false);
+		drive.setDriveMode(driveMode.OPEN_LOOP);
 	}
 	
 	@Override
@@ -145,26 +146,14 @@ public class Robot extends TimedRobot {
 			}
 			drive.setDesiredSpeed(hi.getLeftThrottle());
 		}
-		else if(!hi.getGyrolock()) {
-			drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
-			drive.setDriveMode(driveMode.OPEN_LOOP);
-		}
-		
-		if (hi.getVisionCtrl()) {
+		else if (hi.getVisionCtrl()) {
 			camera.setTrackingRequest(true);
 		}
 		else if(!hi.getGyrolock() && !hi.getVisionCtrl()) {
+			drive.setStickInputs(hi.getLeftThrottle(), hi.getRightThrottle());
 			drive.setDriveMode(driveMode.OPEN_LOOP);
 			camera.setTrackingRequest(false);
 		}
-		
-		/*if (hi.getVisionCtrl()) {
-			camera.setTrackingRequest(true);
-			drive.setDriveMode(driveMode.VISION_CONTROL);
-		} else if(!hi.getVisionCtrl()) {
-			camera.setTrackingRequest(false);
-			drive.setDriveMode(driveMode.OPEN_LOOP);
-		}*/
 		
 		if(hi.getHighGear()) {
 			drive.setHighGear(true);

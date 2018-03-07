@@ -1,50 +1,44 @@
 package org.usfirst.frc.team3314.robot.autos;
 
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
+import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoVisionCubeFuckery extends Autonomous {
 	
 	enum State {
-		START,
-		DRIVE,
+		START_TEST,
 		PICKUP_CUBE,
 		DONE
 	}
 	
-	private Drive drive = Drive.getInstance();
 	private State currentState;
-	
-	public AutoVisionCubeFuckery() {
-		currentState = State.START;
-	}
+	private Drive drive = Drive.getInstance();
 	
 	@Override
 	public void reset() {
-		currentState = State.START;
+		currentState = State.START_TEST;
 	}
 	
 	@Override
 	public void update() {
 		switch (currentState) {
-		case START:
+		case START_TEST:
+			drive.setDriveMode(driveMode.GYROLOCK);
+			setHighGear(false);
 			armToPickUp();
-			currentState = State.DRIVE;
-			startTimer();
-			break;
-		case DRIVE:
-			drive.setDesiredSpeed(0.25);
-			if (getTime() >= 2.5) {
-				drive.setDesiredSpeed(0);
-				resetTimer();
-				currentState = State.PICKUP_CUBE;
-			}
+			currentState = State.PICKUP_CUBE;
 			break;
 		case PICKUP_CUBE:
-			startTracking();
+			if (armStopped()) {
+				startTracking();
+			}
+			
 			if (hasCube()) {
 				endTracking();
-				armToScaleHigh();
+				setHighGear(true);
+				armToSwitch();
 				currentState = State.DONE;
 			}
 			break;

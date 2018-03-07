@@ -140,7 +140,7 @@ public class Constants {
 		public static double kTrackingHeight = 11-4; //cube - camera
 		public static double kMountingAngle = 10; //degrees
 		
-		public static double kMinMotorCmd = 0.22;//0-1
+		public static double kMinMotorCmd = 0.175;//0-1
 		public static double kMaxTrackingRPM = 0;
 		
 		//Robot characteristics
