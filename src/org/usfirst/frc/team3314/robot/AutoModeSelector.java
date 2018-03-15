@@ -17,9 +17,8 @@ public class AutoModeSelector {
 			auto4 = new AutoScaleThenSwitch(),
 			auto5 = new AutoSwitchThenScale(),
 			auto6 = new AutoTwoCubeScale(),
-			auto7 = new MotionProfile(),
-			auto8 = new AutoVisionCubeFuckery();
-	private  Autonomous[] autos = {auto0, auto1, auto2, auto3, auto4, auto5, auto6, auto7, auto8};
+			auto7 = new MotionProfile();
+	private  Autonomous[] autos = {auto0, auto1, auto2, auto3, auto4, auto5, auto6, auto7};
 	
 	public Autonomous getSelectedAutoMode() {
 		pollFMS();
