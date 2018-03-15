@@ -18,7 +18,7 @@ public class Camera {
 	
 	private double targetsInView, targetHorizOffset, averageTargetHoriz, targetVertOffset, 
 		targetArea, targetSkew, targetLatency;
-	//private List<Double> targetHorizList = new ArrayList<Double>();
+	private List<Double> targetHorizList = new ArrayList<Double>();
 	private double ledMode, camMode;
 	private String camString, ledString;
 	
@@ -36,11 +36,11 @@ public class Camera {
 
 		targetHorizOffset = limelight.getEntry("tx").getDouble(-1337.254);
 		//FIXME Messy ArrayList
-		//if (targetHorizList.size() >= 10) {
-		//	targetHorizList.remove(0);
-		//}
-		//targetHorizList.add(targetHorizOffset);
-		//averageTargetHoriz = targetHorizList.stream().mapToDouble(val->val).average().getAsDouble();
+		if (targetHorizList.size() >= 10) {
+			targetHorizList.remove(0);
+		}
+		targetHorizList.add(targetHorizOffset);
+		averageTargetHoriz = targetHorizList.stream().mapToDouble(val->val).average().getAsDouble();
 		
 		targetVertOffset = limelight.getEntry("ty").getDouble(-1337.254);
 		targetArea = limelight.getEntry("ta").getDouble(0);
@@ -199,8 +199,8 @@ public class Camera {
 		SmartDashboard.putString("LED mode", getLEDMode());
 		SmartDashboard.putString("Camera mode", getCamMode());
 		
-		/*SmartDashboard.putNumber("Avg target horiz", getAvgError());
-		SmartDashboard.putNumber("1", targetHorizList.get(0));
+		SmartDashboard.putNumber("Avg target horiz", getAvgError());
+		/*SmartDashboard.putNumber("1", targetHorizList.get(0));
 		SmartDashboard.putNumber("2", targetHorizList.get(1));
 		SmartDashboard.putNumber("3", targetHorizList.get(2));
 		SmartDashboard.putNumber("4", targetHorizList.get(3));
