@@ -14,13 +14,12 @@ public class AutoModeSelector {
 			auto1 = new AutoCrossBaseline(),
 			auto2 = new AutoCubeToScale(),
 			auto3 = new AutoCubeToSwitch(),
-			auto4 = new AutoCubeToSwitchFromCenter(),
-			auto5 = new AutoScaleThenSwitch(),
-			auto6 = new AutoSwitchThenScale(),
-			auto7 = new AutoTwoCubeScale(),
-			auto8 = new MotionProfile(),
-			auto9 = new AutoVisionCubeFuckery();
-	private  Autonomous[] autos = {auto0, auto1, auto2, auto3, auto4, auto5, auto6, auto7, auto8, auto9};
+			auto4 = new AutoScaleThenSwitch(),
+			auto5 = new AutoSwitchThenScale(),
+			auto6 = new AutoTwoCubeScale(),
+			auto7 = new MotionProfile(),
+			auto8 = new AutoVisionCubeFuckery();
+	private  Autonomous[] autos = {auto0, auto1, auto2, auto3, auto4, auto5, auto6, auto7, auto8};
 	
 	public Autonomous getSelectedAutoMode() {
 		pollFMS();
@@ -28,19 +27,19 @@ public class AutoModeSelector {
 			return auto1;
 		}
 		if((gameData.charAt(0) == 'L') && gameData.charAt(1) == 'L') {
-			autoModeBinary = "" + hi.getLLBinaryEight() + hi.getLLBinaryFour() + hi.getLLBinaryTwo() + hi.getLLBinaryOne();
+			autoModeBinary = ""  + hi.getLLBinaryFour() + hi.getLLBinaryTwo() + hi.getLLBinaryOne();
 		}
 		else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R') {
-			autoModeBinary = "" + hi.getLRBinaryEight() + hi.getLRBinaryFour() + hi.getLRBinaryTwo() + hi.getLRBinaryOne();
+			autoModeBinary = ""  + hi.getLRBinaryFour() + hi.getLRBinaryTwo() + hi.getLRBinaryOne();
 		}
 		else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L' ) {
-			autoModeBinary = "" + hi.getRLBinaryEight() + hi.getRLBinaryFour() + hi.getRLBinaryTwo() + hi.getRLBinaryOne();
+			autoModeBinary = ""  + hi.getRLBinaryFour() + hi.getRLBinaryTwo() + hi.getRLBinaryOne();
 		}
 		else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R') {
-			autoModeBinary = "" + hi.getRRBinaryEight() + hi.getRRBinaryFour() + hi.getRRBinaryTwo() + hi.getRRBinaryOne();
+			autoModeBinary = "" + hi.getRRBinaryFour() + hi.getRRBinaryTwo() + hi.getRRBinaryOne();
 		}
 		autoModeDecimal = Integer.parseInt(autoModeBinary, 2);
-		autoMode = autos[2];//autoModeDecimal];
+		autoMode = autos[autoModeDecimal];
 		autoMode.setGameData(gameData);
 		autoMode.reset();
  		return autoMode;
@@ -53,7 +52,7 @@ public class AutoModeSelector {
 	}
 	public double getDelay() {
 		delayBinary = "" +  hi.getDelayEight() + hi.getDelayFour() + hi.getDelayTwo() + hi.getDelayOne();
-		delayDecimal = Integer.parseInt(delayBinary);
+		delayDecimal = Integer.parseInt(delayBinary, 2);
 		return delayDecimal;
 	}
 }

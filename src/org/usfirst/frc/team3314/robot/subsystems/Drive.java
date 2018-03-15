@@ -16,7 +16,9 @@ import com.cruzsbrian.robolog.Log;
 import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
@@ -29,8 +31,12 @@ public class Drive implements Subsystem {
 		IDLE,
 		OPEN_LOOP,
 		GYROLOCK,
+		GYROLOCK_LEFT,
+		GYROLOCK_RIGHT,
 		VISION_CONTROL,
-		MOTION_PROFILE
+		MOTION_PROFILE,
+		MOTION_MAGIC,
+		MOTION_MAGIC_TURN
 	}
 	
 	private static Drive mInstance = new Drive();
@@ -65,11 +71,13 @@ public class Drive implements Subsystem {
 	private GyroPIDOutput gyroPIDOutput;
 	private PIDController gyroControl;
 
-    private double rawLeftSpeed, rawRightSpeed, leftStickInput, rightStickInput, desiredLeftSpeed, desiredRightSpeed, desiredAngle;
+    private double rawLeftSpeed, rawRightSpeed, leftStickInput, rightStickInput, desiredLeftSpeed, desiredRightSpeed, desiredAngle, desiredPosition, desiredMotionMagicAngle;
     
     private int leftDrivePositionTicks, rightDrivePositionTicks, leftDriveSpeedTicks, rightDriveSpeedTicks, motionProfileMode = 0;
     
     private double leftDrivePositionInches, rightDrivePositionInches, leftDriveSpeedRPM, rightDriveSpeedRPM;
+    
+    private DemandType auxDemandType;
     
     Compressor pcm1;
     
@@ -102,6 +110,7 @@ public class Drive implements Subsystem {
     			else {
     				setNeutralMode(NeutralMode.Brake);
     			}
+    			auxDemandType = DemandType.Neutral;
     			controlMode = ControlMode.PercentOutput;
     			break;
     		case GYROLOCK:
@@ -115,12 +124,14 @@ public class Drive implements Subsystem {
     				setNeutralMode(NeutralMode.Brake);
     			}
     			controlMode = ControlMode.PercentOutput;
+    			auxDemandType = DemandType.Neutral;
     			break;
     		case VISION_CONTROL:
     			rawLeftSpeed = leftStickInput + camera.getSteeringAdjust();
     			rawRightSpeed = rightStickInput - camera.getSteeringAdjust();
     			setNeutralMode(NeutralMode.Brake);
     			controlMode = ControlMode.PercentOutput;
+    			auxDemandType = DemandType.Neutral;
     			/*
     			rawLeftSpeed = camera.getSteeringAdjust();
     			rawRightSpeed = -camera.getSteeringAdjust();
@@ -133,14 +144,49 @@ public class Drive implements Subsystem {
     			controlMode = ControlMode.MotionProfileArc;
     			rawLeftSpeed = motionProfileMode;
     			rawRightSpeed = motionProfileMode;
+    			auxDemandType = DemandType.Neutral;
     			break;
+			case GYROLOCK_LEFT:
+				setNeutralMode(NeutralMode.Brake);
+				rawLeftSpeed = desiredLeftSpeed + gyroPIDOutput.turnSpeed;
+				rawRightSpeed = 0;
+				gyroControl.setSetpoint(desiredAngle);
+    			auxDemandType = DemandType.Neutral;
+				controlMode = ControlMode.PercentOutput;
+				break;
+			case GYROLOCK_RIGHT:
+				setNeutralMode(NeutralMode.Brake);
+				rawLeftSpeed = 0;
+				rawRightSpeed = desiredRightSpeed - gyroPIDOutput.turnSpeed;
+				gyroControl.setSetpoint(desiredAngle);
+    			auxDemandType = DemandType.Neutral;
+				controlMode = ControlMode.PercentOutput;
+				break;
+			case 	MOTION_MAGIC:
+				setNeutralMode(NeutralMode.Brake);
+    			controlMode = ControlMode.MotionMagic;
+    			rawLeftSpeed = desiredPosition;
+    			rawRightSpeed = desiredPosition;
+    			auxDemandType = DemandType.AuxPID;
+    			log();
+				break;
+			case MOTION_MAGIC_TURN:
+				setNeutralMode(NeutralMode.Brake);
+    			controlMode = ControlMode.MotionMagic;
+				break;
+		default:
+			break;
     	}
     	if(mIsPTO) {
 			rawRightSpeed = rawLeftSpeed;
 		}
     	mLeftMaster.set(controlMode, rawLeftSpeed);
     	mRightMaster.set(controlMode, rawRightSpeed);
-    
+    	if(currentDriveMode == driveMode.MOTION_MAGIC) {
+    		mRightMaster.follow(mLeftMaster, FollowerType.AuxOutput1);
+        	mLeftMaster.set(controlMode, rawLeftSpeed, auxDemandType, desiredMotionMagicAngle);
+    	}
+  
     }
 
     private Drive() {
@@ -164,6 +210,7 @@ public class Drive implements Subsystem {
 		gyroControl.setInputRange(-180, 180);
 	    gyroControl.setContinuous(); 
 		gyroControl.setOutputRange(-.7, .7);		// Limits speed of turn to prevent overshoot
+		gyroControl.setAbsoluteTolerance(3);
     	
 		//Talons
     	mRightMaster = new WPI_TalonSRX(7);
@@ -270,7 +317,6 @@ public class Drive implements Subsystem {
     	mLeftMaster.configPeakCurrentLimit(Constants.kDrivePeakCurrentLimit, Constants.kCANTimeout);
     	mLeftMaster.configPeakCurrentDuration(Constants.kDrivePeakCurrentDuration, Constants.kCANTimeout);
     	mLeftMaster.enableCurrentLimit(true);
-    	mLeftMaster.configClosedloopRamp(Constants.kDriveClosedLoopRampTime, Constants.kCANTimeout);
 
     	//motion profile gains
     	mLeftMaster.config_kP(Constants.kMotionProfileSlot, Constants.kMotionProfile_kP, Constants.kCANTimeout); //slot, value, timeout
@@ -332,6 +378,26 @@ public class Drive implements Subsystem {
     	desiredAngle = angle;
     }
     
+    public void setDesiredMotionProfileAngle(double angle) {
+    	desiredMotionMagicAngle = angle;
+    }
+    
+    public void setDesiredPosition(double d) {
+    	desiredPosition = d * Constants.kFeetToEncoderCodes;
+    }
+    
+    public double getDesiredPosition() {
+    	return desiredPosition;
+    }
+    
+    public double getDesiredAngle() {
+    	return desiredAngle;
+    }
+    
+    public double getAveragePositionTicks() {
+    	return (leftDrivePositionTicks + rightDrivePositionTicks) / 2;
+    }
+    
     public double getAngle() {
     	return navx.getYaw();
     }
@@ -383,6 +449,9 @@ public class Drive implements Subsystem {
     	if(mode == driveMode.GYROLOCK) {
     		gyroControl.enable();
 			setDesiredAngle(getAngle());
+    	}
+    	else if(mode == driveMode.GYROLOCK_LEFT || mode == driveMode.GYROLOCK_RIGHT) {
+    		gyroControl.enable();
     	}
     	else {
     		gyroControl.disable();
@@ -479,6 +548,7 @@ public class Drive implements Subsystem {
     	SmartDashboard.putNumber("Left Voltage", mLeftMaster.getMotorOutputVoltage());
     	SmartDashboard.putNumber("Right Voltage", mLeftMaster.getMotorOutputVoltage());
     	SmartDashboard.putNumber("Pigeon heading", pigeon.getFusedHeading());
+    	SmartDashboard.putBoolean("PTO", mIsPTO);
     }
     
     public void log() {
@@ -492,6 +562,7 @@ public class Drive implements Subsystem {
 		Log.add("Left Velocity",(double) mLeftMaster.getSelectedSensorVelocity(0)/ Constants.kFeetToEncoderCodes);
 		Log.add("Right Velocity",(double) mRightMaster.getSelectedSensorVelocity(0)/ Constants.kFeetToEncoderCodes);
 		Log.add("Heading actual", mRightMaster.getSelectedSensorPosition(1) * (360.0 / 8192));
+		Log.add("Navx Heading", getAngle());
 		Log.add("Left Voltage", mLeftMaster.getMotorOutputVoltage());
 		Log.add("Right Voltage", mRightMaster.getMotorOutputVoltage());
 		Log.add("Error", (double)mRightMaster.getClosedLoopError(1) * (360.0 / 8192));
@@ -554,6 +625,8 @@ public class Drive implements Subsystem {
     public void flushTalonBuffer() {
     	mLeftMaster.clearMotionProfileTrajectories();
     	mRightMaster.clearMotionProfileTrajectories();
+    	mLeftMaster.clearMotionProfileHasUnderrun(0);
+    	mRightMaster.clearMotionProfileHasUnderrun(0);
     }
     
     public void setFeedForward(double leftF, double rightF) {
@@ -578,6 +651,12 @@ public class Drive implements Subsystem {
     	 mLeftMaster.getMotionProfileStatus(status);
     }
     
+    public void configCruiseVelocity(double vel) {
+    	int v = (int)(vel * Constants.kFPSToTicksPer100ms);
+    	mLeftMaster.configMotionCruiseVelocity(v, 0);
+    	mRightMaster.configMotionCruiseVelocity(v, 0);
+    }
+    
     public void setOpenLoopRampRate(double seconds) {
     	mLeftMaster.configOpenloopRamp(seconds, 0);
     	mRightMaster.configOpenloopRamp(seconds, 0);
@@ -586,4 +665,8 @@ public class Drive implements Subsystem {
     public void setMotionProfileStatus(int status) { //0,1,2
 		motionProfileMode = status;
 	}
+    
+    public boolean gyroInPosition() {
+    	return gyroControl.onTarget();
+    }
 }

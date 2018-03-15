@@ -40,7 +40,7 @@ public class Superstructure implements Subsystem {
 	@Override
 	public void outputToSmartDashboard() {
 		SmartDashboard.putBoolean("Pressure Switch", pcm1.getPressureSwitchValue());
-		SmartDashboard.putString("Ramp Piston", rampPiston.get().toString());
+		SmartDashboard.putBoolean("Ramp Piston", mRampReleased);
 	}
 
 

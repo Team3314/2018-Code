@@ -8,7 +8,6 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Arm implements Subsystem {
@@ -18,6 +17,7 @@ public class Arm implements Subsystem {
 		TELESCOPE_IN,
 		TO_HORIZONTAL,
 		TO_SCALE_HIGH ,
+		TO_SCALE_AUTO,
 		TO_SCALE_LOW,
 		TO_SWITCH,
 		TO_PICKUP,
@@ -25,6 +25,7 @@ public class Arm implements Subsystem {
 		RAISE_CUBE,
 		TO_CLIMB,
 		LOWER_TO_BAR,
+		FLIP_CUBE,
 		STOP,
 		STOPPED
 	}
@@ -190,9 +191,10 @@ public class Arm implements Subsystem {
 			break;
 		case RAISE_CUBE:
 			targetTelescopePosition = 0;
+			targetArmVelocity *= .25;
 			targetArmAngle = Constants.raiseCubeAngle;
 			if(armAngle > -49) {
-				if(desiredState == ArmState.TO_HOLDING || desiredState == ArmState.TO_PICKUP ) {
+				if(desiredState == ArmState.TO_HOLDING || desiredState == ArmState.TO_PICKUP || desiredState == ArmState.TO_SWITCH || desiredState == ArmState.FLIP_CUBE) {
 					currentState = desiredState;
 				}
 				else{
@@ -230,6 +232,17 @@ public class Arm implements Subsystem {
 				currentState = ArmState.STOPPED;
 			}
 			break;
+		case TO_SCALE_AUTO:
+			targetArmAngle = Constants.kScaleHighAngle;
+			targetTelescopePosition = Constants.kScaleAutoTelescopePosition;
+			if(armAngle < 10) {
+				targetTelescopeVelocity = 0;
+			}
+			if(inPosition()) {
+				targetArmAngle =armEncPos;
+				currentState = ArmState.STOPPED;
+			}
+			break;
 		case TO_CLIMB:
 			targetArmAngle = Constants.kClimbRaisedAngle;
 			targetTelescopePosition = Constants.kClimbRaisedTelescopePosition;
@@ -240,6 +253,10 @@ public class Arm implements Subsystem {
 		case LOWER_TO_BAR:
 			targetArmAngle = Constants.kBarAngle;
 			targetTelescopePosition = Constants.kBarTelescopePosition;
+			break;
+		case FLIP_CUBE:
+			targetArmAngle = Constants.kPickUpAngle;
+			targetTelescopePosition = Constants.kFlipCubeTelescopePosition;
 			break;
 		case STOP:
 			targetArmVelocity = 0;
@@ -279,7 +296,7 @@ public class Arm implements Subsystem {
 			}
 		}
 		else if(desiredState == ArmState.TO_PICKUP) {
-			if(armAngle < ((Constants.kPickUpAngle * Constants.kArmTicksToAngle) - 2) || armAngle > ((Constants.kPickUpAngle * Constants.kArmTicksToAngle) + 3)) {
+			if(armAngle < ((Constants.kPickUpAngle * Constants.kArmTicksToAngle) - 3) || armAngle > ((Constants.kPickUpAngle * Constants.kArmTicksToAngle) + 3)) {
 				currentState = ArmState.TO_INTERMEDIATE_LOW;
 			}
 			else {
@@ -287,7 +304,7 @@ public class Arm implements Subsystem {
 			}
 				
 		}
-		else if(desiredState == ArmState.TO_SCALE_HIGH || desiredState == ArmState.TO_SCALE_LOW) {
+		else if(desiredState == ArmState.TO_SCALE_HIGH || desiredState == ArmState.TO_SCALE_LOW || desiredState == ArmState.TO_SCALE_AUTO) {
 			if(radiusAngle < -20) {
 				targetArmAngle = armEncPos;
 				currentState = ArmState.TELESCOPE_IN;
@@ -299,13 +316,21 @@ public class Arm implements Subsystem {
 		else if(desiredState  == ArmState.TO_SWITCH) {
 			currentState = ArmState.TO_SWITCH;
 		}
+		else if(desiredState == ArmState.FLIP_CUBE) {
+			if(armAngle > -40) {
+				currentState = ArmState.TO_INTERMEDIATE_LOW;
+			}
+			else {
+				currentState = ArmState.FLIP_CUBE;
+			}
+		}
 		else if(desiredState == ArmState.TO_CLIMB || desiredState == ArmState.LOWER_TO_BAR) {
-			if(radiusAngle <-20) {
+			if(radiusAngle < -20) {
 				targetArmAngle = armEncPos;
 				currentState = ArmState.TELESCOPE_IN;
 			}
 			else {
-				currentState = ArmState.TO_CLIMB;
+				currentState = desiredState;
 			}
 		}
 		else if (desiredState == ArmState.STOP) {
@@ -318,14 +343,14 @@ public class Arm implements Subsystem {
 				targetArmAngle = armEncPos;
 			}
 		}
-		if(currentState == ArmState.TELESCOPE_IN || currentState == ArmState.TO_INTERMEDIATE_LOW) {
+		if(currentState == ArmState.TELESCOPE_IN || currentState == ArmState.TO_INTERMEDIATE_LOW || currentState == ArmState.TO_SWITCH) {
 			if(radiusAngle < 0 && telescopePosition > 10) {
 				currentState = ArmState.RAISE_CUBE;
 			}
 		}
 	}
 	public void setTargetSpeed(double targSpeed) {
-		targetSpeed = targSpeed;
+		targetSpeed = targSpeed * targSpeed;
 	}
 	
 	public void setArmOverrideSpeed(double armSpeed) {

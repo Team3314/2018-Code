@@ -100,18 +100,14 @@ public class CSVParser {
 					default:
 						break;
 					}
-					
 					heading = setpointsRight[7];
-					if(heading >= Math.PI) {
+					if(heading >= Math.PI)
 						heading -= 2*Math.PI;
-					}
-					
-					
 					
 					heading = Math.toDegrees(heading);
 					
-					nextPointLeft.velocity += Constants.kMotionProfileHeading_kF * (heading - lastHeading);
-					nextPointRight.velocity -= Constants.kMotionProfile_kF * (heading - lastHeading);
+					nextPointLeft.velocity -= Constants.kMotionProfileHeading_kF * (heading - lastHeading);
+					nextPointRight.velocity += Constants.kMotionProfileHeading_kF* (heading - lastHeading);
 					
 					nextPointLeft.timeDur =  TrajectoryPoint.TrajectoryDuration.Trajectory_Duration_0ms;
 					nextPointLeft.velocity *= Constants.kFPSToTicksPer100ms;

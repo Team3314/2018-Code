@@ -1,20 +1,10 @@
 package org.usfirst.frc.team3314.robot.motion;
 
-import java.util.List;
-
-import org.usfirst.frc.team3314.robot.Constants;
 import org.usfirst.frc.team3314.robot.paths.Path;
-
-import jaci.pathfinder.Pathfinder;
-import jaci.pathfinder.followers.EncoderFollower;
-
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
 import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
-
 import com.cruzsbrian.robolog.Log;
 import com.ctre.phoenix.motion.MotionProfileStatus;
-import com.ctre.phoenix.motion.TrajectoryPoint;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.Notifier;
 
@@ -32,7 +22,12 @@ public class PathFollower {
 			if(!running) {
 				notifier.stop();
 			}
+			drive.getLeftStatus(leftStatus);
+			drive.getRightStatus(rightStatus);
 			drive.processMotionProfilePoints();
+			if(leftStatus.btmBufferCnt >= 5 && rightStatus.btmBufferCnt >= 5) {
+				drive.setMotionProfileStatus(1);
+			}
 		}
 	}
 	Notifier notifier = new Notifier(new PeriodicRunnable());
@@ -40,7 +35,7 @@ public class PathFollower {
 	public void start() {
 		pathFinished = false;
 		drive.setDriveMode(driveMode.MOTION_PROFILE);
-		drive.setMotionProfileStatus(1);
+		drive.resetSensors();
 		notifier.startPeriodic(0.005);
 		running = true;
 	}

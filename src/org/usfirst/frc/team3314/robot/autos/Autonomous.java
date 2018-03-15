@@ -8,6 +8,7 @@ import org.usfirst.frc.team3314.robot.paths.PathList;
 import org.usfirst.frc.team3314.robot.subsystems.Arm;
 import org.usfirst.frc.team3314.robot.subsystems.Arm.ArmState;
 import org.usfirst.frc.team3314.robot.subsystems.Drive;
+import org.usfirst.frc.team3314.robot.subsystems.Drive.driveMode;
 import org.usfirst.frc.team3314.robot.subsystems.Intake;
 import org.usfirst.frc.team3314.robot.subsystems.Intake.IntakeState;
 import edu.wpi.first.wpilibj.Timer;
@@ -40,6 +41,51 @@ public abstract class Autonomous {
 		drive.setHighGear(highGear);
 	}
 	
+	protected void drivePower(double speed) {
+		drive.setDriveMode(driveMode.OPEN_LOOP);
+		drive.setDesiredSpeed(speed);
+	}
+	
+	protected void drivePower(double leftSpeed, double rightSpeed) {
+		drive.setDriveMode(driveMode.OPEN_LOOP);
+		drive.setDesiredSpeed(leftSpeed, rightSpeed);
+	}
+	
+	protected void driveMotionMagic(double desiredPos, double desiredAngle, double desiredSpeed) {
+		drive.setDesiredPosition(desiredPos);
+		drive.setDesiredAngle(desiredAngle);
+		drive.configCruiseVelocity(desiredSpeed);
+		drive.setDriveMode(driveMode.MOTION_MAGIC);
+	}
+	
+	protected void turnMotionMagic(double desiredAngle) {
+		drive.setDesiredAngle(desiredAngle);
+	}
+	
+	protected double getDesiredAngle() {
+		return drive.getDesiredAngle();
+	}
+	
+	protected boolean isMotionMagicDone() {
+		return (drive.getAveragePositionTicks() > drive.getDesiredPosition() - 50) || (drive.getAveragePositionTicks() < drive.getDesiredPosition() + 50);
+	}
+	
+	protected double getAngle() {
+		return drive.getAngle();
+	}
+	
+	protected void driveGyrolock(double desiredSpeed, double desiredAngle, driveMode mode) {
+		drive.setDriveMode(mode);
+		drive.setDesiredSpeed(desiredSpeed);
+		drive.setDesiredAngle(desiredAngle);
+	}
+	
+	protected boolean gyroTurnDone() {
+		return drive.gyroInPosition();
+	}
+	protected boolean targetInView() {
+		return camera.isTargetInView();
+	}
 	//motion profiling
 	
 	protected void loadPath(Path path) {
@@ -50,9 +96,6 @@ public abstract class Autonomous {
 	}
 	protected boolean isPathDone() {
 		return pathFollower.isDone();
-	}
-	protected String startPosition() {
-		return hi.getLeftRight();
 	}
 	protected Path getPath(String path) {
 		return PathList.getPath(path);
@@ -67,7 +110,7 @@ public abstract class Autonomous {
 		return "Scale" + scaleSide;
 	}
 	protected String getStart() {
-		return "StartR";
+		return hi.getLeftRightCenter();
 	}
 	public void setGameData(String data) {
 		if(data.length() >= 2) {
@@ -123,7 +166,7 @@ public abstract class Autonomous {
 		arm.setTargetSpeed(1);
 	}
 	public void armToScaleLow() {
-		arm.setDesiredState(ArmState.TO_SCALE_LOW);
+		arm.setDesiredState(ArmState.TO_SCALE_AUTO);
 		arm.setTargetSpeed(1);
 	}
 	public void armToSwitch() {
