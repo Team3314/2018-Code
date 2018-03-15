@@ -1,5 +1,6 @@
 package org.usfirst.frc.team3314.robot.autos;
 
+import org.usfirst.frc.team3314.robot.autos.AutoCubeToScale.State;
 import org.usfirst.frc.team3314.robot.paths.Path;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -7,12 +8,14 @@ public class AutoScaleThenSwitch extends Autonomous {
 
 	enum State {
 		START,
+		RAISE_ARM,
 		DRIVE_TO_SCALE,
-		RELEASE_CUBE,
-		DRIVE_TO_SWITCH,
+		RELEASE_CUBE_SCALE,
+		DRIVE_TO_PICKUP,
 		PICKUP_CUBE,
 		RAISE_ARM_TO_SWITCH,
-		RELEASE_CUBE2,
+		DRIVE_TO_SWITCH,
+		RELEASE_CUBE_SWITCH,
 		DONE
 	}
 	
@@ -34,29 +37,40 @@ public class AutoScaleThenSwitch extends Autonomous {
 			secondPath = getPath(getScale() + getSwitch());
 			loadPath(firstPath);
 			startPathFollower();
-			armToScaleHigh();
-			currentState = State.DRIVE_TO_SCALE;
+			startTimer();
+			currentState = State.RAISE_ARM;
+			break;
+		case RAISE_ARM:
+			if(getTime() > 1) {
+				armToScaleLow();
+				resetTimer();
+				currentState = State.DRIVE_TO_SCALE;
+			}
 			break;
 		case DRIVE_TO_SCALE:
 			if(isPathDone()) {
-				currentState = State.RELEASE_CUBE;
+				currentState = State.RELEASE_CUBE_SCALE;
 				startTimer();
-				releaseCube();
+				releaseCubeSlow();
 			}
 			break;
-		case RELEASE_CUBE:
+		case RELEASE_CUBE_SCALE:
 			if(getTime() >= .5) {
+				resetSensors();
 				stopIntake();
 				resetTimer();
-				currentState = State.DRIVE_TO_SWITCH;
+				currentState = State.DRIVE_TO_PICKUP;
 				loadPath(secondPath);
 				startPathFollower();
 				armToPickUp();
+				startTimer();
 			}
 			break;
-		case DRIVE_TO_SWITCH:
-			if(isPathDone()) {
+		case DRIVE_TO_PICKUP:
+			if(isPathDone() && getTime() >= 1) {
+				resetTimer();
 				currentState = State.PICKUP_CUBE;
+				setHighGear(false);
 			}
 			break;
 		case PICKUP_CUBE:
@@ -69,11 +83,21 @@ public class AutoScaleThenSwitch extends Autonomous {
 			break;
 		case RAISE_ARM_TO_SWITCH:
 			if(armStopped()) {
-				currentState  = State.RELEASE_CUBE2;
-				releaseCube();
+				currentState  = State.DRIVE_TO_SWITCH;
+				startTimer();
 			}
 			break;
-		case RELEASE_CUBE2:
+		case DRIVE_TO_SWITCH:
+			drivePower(.2);
+			if(getTime() > .5) {
+				resetTimer();
+				drivePower(0);
+				currentState = State.RELEASE_CUBE_SWITCH;
+				startTimer();
+				releaseCubeSlow();
+			}
+			break;
+		case RELEASE_CUBE_SWITCH:
 			if(getTime() >= .5) {
 				stopIntake();
 				resetTimer();

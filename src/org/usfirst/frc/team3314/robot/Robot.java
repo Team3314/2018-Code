@@ -34,6 +34,7 @@ public class Robot extends TimedRobot {
 	
 	private Tracking tracking = Tracking.getInstance();
 	private HumanInput hi = HumanInput.getInstance();
+	private Superstructure superstructure = Superstructure.getInstance();
 	
 	private AutoModeSelector selector = new AutoModeSelector();
 	private PathFollower pathFollower = new PathFollower();
@@ -42,15 +43,14 @@ public class Robot extends TimedRobot {
 	
 	Autonomous selectedAutoMode = null;
 	
-	private boolean lastGyrolock = false, lastScaleHigh, lastScaleLow, lastPickup, lastHold, lastStop, 
-			lastClimb, lastBar;
-	
+	private boolean lastGyrolock = false, lastScaleHigh, lastScaleLow, lastPickup, lastHold, lastStop, lastClimb, lastBar,
+							lastRamp, lastPTO, lastSwitch, lastFlip;	
 
 	double timestamp = 0;
 	
 	@Override
 	public void robotInit() {	
-		Log.startServer(1099);
+		Log.startServer(5802);
 		Log.setDelay(200);
 	}
 	
@@ -85,7 +85,6 @@ public class Robot extends TimedRobot {
 		//arm.newFile("ArmAuto");
 		timer.start();
 		camera.setLEDMode(Constants.kLEDOff);
-		tracking.reset();
 		drive.setHighGear(true);
 		drive.setPTO(false);
 	}
@@ -95,10 +94,11 @@ public class Robot extends TimedRobot {
 		if(selector.getGameData().length() == 0 && timer.get() < 5) {
 			selectedAutoMode = selector.getSelectedAutoMode();
 		}
-		else {
+		else if(timer.get() >= selector.getDelay()) {
 			allPeriodic();
 			selectedAutoMode.update();
 			timer.stop();
+			timer.reset();
 		}
 	}
 
@@ -161,9 +161,13 @@ public class Robot extends TimedRobot {
 		else if(hi.getLowGear()) {
 			drive.setHighGear(false);
 		}	
-		if(hi.getPTO()) {
-			drive.setPTO(!drive.getPTO());
+		if(hi.getEngagePTO()) {
+			drive.setPTO(true);
 		}
+		else if(hi.disengagePTO()) {
+			drive.setPTO(false);
+		}
+		
 		
 		//Arm Controls
 		if(hi.getClimb() && !lastClimb) {
@@ -172,16 +176,22 @@ public class Robot extends TimedRobot {
 		else if(hi.getBar() && !lastBar) {
 			arm.setDesiredState(ArmState.LOWER_TO_BAR);
 		}
-		else if(hi.getScaleHigh() && !lastScaleHigh && !hi.getClimb()) {
+		else if(hi.getScaleHigh() && !lastScaleHigh && !hi.getClimb() && !hi.getSwitch()) {
 			arm.setDesiredState(ArmState.TO_SCALE_HIGH);
 		}
-		else if(hi.getScaleLow() && !lastScaleLow && !hi.getClimb()) {
+		else if(hi.getScaleLow() && !lastScaleLow && !hi.getClimb() && !hi.getSwitch()) {
 			arm.setDesiredState(ArmState.TO_SCALE_LOW);
 		}
-		else if(hi.getPickup() && !lastPickup && !hi.getClimb()) {
+		else if(hi.getPickup() && !lastPickup && !hi.getClimb() && !hi.getSwitch()) {
 			arm.setDesiredState(ArmState.TO_PICKUP);
 		}
-		else if(hi.getHold() && !lastHold && !hi.getClimb()) {
+		else if(hi.getSwitch() && !lastSwitch && !hi.getClimb()) {
+			arm.setDesiredState(ArmState.TO_SWITCH);
+		}
+		else if (hi.getFlipCube() && !lastFlip && !hi.getClimb()) {
+			arm.setDesiredState(ArmState.FLIP_CUBE);
+		}
+		else if(hi.getHold() && !lastHold && !hi.getClimb() && !hi.getSwitch()) {
 			arm.setDesiredState(ArmState.TO_HOLDING);
 		}
 		else if(hi.getStop() && !lastStop && !hi.getClimb()) {
@@ -194,8 +204,11 @@ public class Robot extends TimedRobot {
 		arm.setTelescopeOverrideSpeed(hi.getTelescopeOverrideSpeed());
 		
 		arm.setTargetSpeed(hi.getArmSpeed());
-		if(hi.spin()) {
-			drive.setStickInputs(.4, -.4);
+		if(hi.getRampRelease()) {
+			superstructure.releaseRamp(true);
+		}
+		else if(hi.getRampClose()) {
+			superstructure.releaseRamp(false);
 		}
 		lastGyrolock = hi.getGyrolock();
 		lastScaleHigh = hi.getScaleHigh();
@@ -205,6 +218,8 @@ public class Robot extends TimedRobot {
 		lastStop = hi.getStop();
 		lastClimb = hi.getClimb();
 		lastBar = hi.getBar();
+		lastFlip = hi.getFlipCube();
+		lastSwitch = hi.getSwitch();
 	}
 
 	public void allPeriodic() {
@@ -212,6 +227,7 @@ public class Robot extends TimedRobot {
 		arm.update();
 		intake.update();
 		tracking.update();
+		superstructure.update();
 	}
 	
 	public void outputToSmartDashboard() {
@@ -219,16 +235,15 @@ public class Robot extends TimedRobot {
 		drive.outputToSmartDashboard();
 		intake.outputToSmartDashboard();
 		camera.outputToSmartDashboard();
+		superstructure.outputToSmartDashboard();
 		SmartDashboard.putNumber("Loop Time",Timer.getFPGATimestamp() - timestamp);
+		
 		timestamp = Timer.getFPGATimestamp();
 	}
 	
 	public void testInit() {
 		camera.setLEDMode(Constants.kLEDOff);
-		d = new DriveTrainCharacterizer(DriveTrainCharacterizer.TestMode.STEP_VOLTAGE, DriveTrainCharacterizer.Direction.Backward, true);
-		d.initialize();
 	}
 	public void testPeriodic() {
-		d.run();
 	}
 }

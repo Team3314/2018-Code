@@ -27,16 +27,17 @@ public class AutoCrossBaseline extends Autonomous {
 		switch (currentState) {
 		case START:
 			currentState = State.DRIVE;
+			setHighGear(false);
 			startTimer();
 			break;
 		case DRIVE:
-			drive.setDesiredSpeed(0.25);
-			if (getTime() >= 5) {
+			drivePower(-0.4);
+			if (getTime() >= 4) {
 				currentState = State.STOP;
 			}
 			break;
 		case STOP:
-			drive.setDesiredSpeed(0);
+			drivePower(0);
 			currentState = State.DONE;
 			break;
 		case DONE:

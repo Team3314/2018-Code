@@ -64,8 +64,11 @@ public class HumanInput {
 	public boolean getGyrolock() {
 		return rightStick.getRawButton(1);
 	}
-	public boolean getPTO() {
-		return gamepad.getRawButtonPressed(8) && gamepad.getRawButton(7);
+	public boolean getEngagePTO() {
+		return gamepad.getRawButton(8) && gamepad.getRawButton(7) || leftStick.getRawButton(6) && leftStick.getRawButton(7);
+	}
+	public boolean disengagePTO() {
+		return leftStick.getRawButton(10) && leftStick.getRawButton(11);
 	}
 	public boolean getVisionCtrl() {
 		return leftStick.getRawButton(1);
@@ -97,6 +100,12 @@ public class HumanInput {
 	public boolean getReleaseSlow() {
 		return gamepad.getRawButton(4);
 	}
+	public boolean getRampRelease() {
+		return gamepad.getPOV() == 180 && gamepad.getRawButton(10) || rightStick.getRawButton(10) && rightStick.getRawButton(11);
+	}
+	public boolean getRampClose() {
+		return rightStick.getRawButton(6) && rightStick.getRawButton(7);
+	}
 	
 	//arm
 	public boolean armPowerOverride() {
@@ -115,16 +124,22 @@ public class HumanInput {
 		return -gamepad.getRawAxis(1) > .1;
 	}
 	public boolean getClimb() {
-		return gamepad.getRawButton(4) && gamepad.getRawAxis(3) > .5 && getRaiseArm();
+		return gamepad.getRawAxis(3) > .5 && getRaiseArm();
 	}
 	public boolean getBar() {
-		return gamepad.getRawButton(4) && gamepad.getRawAxis(3) > .5 && getLowerArm();
+		return gamepad.getRawAxis(3) > .5 && getLowerArm();
+	}
+	public boolean getSwitch() {
+		return gamepad.getRawAxis(2) > .5 && getRaiseArm();
+	}
+	public boolean getFlipCube() {
+		return gamepad.getRawAxis(2) > .5 && getLowerArm();
 	}
 	public boolean getScaleHigh() {
-		return getRaiseArm() && getArmOuterPosition();
+		return getRaiseArm() && getArmOuterPosition() && !getSwitch();
 	}
 	public boolean getScaleLow() {
-		return getRaiseArm() && !getArmOuterPosition();
+		return getRaiseArm() && !getArmOuterPosition() && !getSwitch();
 	}
 	public boolean getPickup() {
 		return getLowerArm() && getArmOuterPosition();
@@ -150,90 +165,96 @@ public class HumanInput {
 		return leftStick.getRawButton(6);
 	}
 
+	public int getDelayOne() {
+		if(buttonBox.getRawButton(13))
+			return 1;
+		return 0;
+	}
+	
+	public int getDelayTwo() {
+		if(buttonBox.getRawButton(14))
+			return 1;
+		return 0;
+	}
+	
+	public int getDelayFour() {
+		if(buttonBox.getRawButton(15))
+			return 1;
+		return 0;
+	}
+	
+	public int getDelayEight() {
+		if(buttonBox.getRawButton(16))
+			return 1;
+		return 0;
+	}
+	
 	public int getLLBinaryOne() {
-		if(autoSelector.getRawButton(1))
-			return 1;
-		return 0;
-	}
-	public int getLLBinaryTwo() {
-		if(autoSelector.getRawButton(2))
-			return 1;
-		return 0;
-	}
-	public int getLLBinaryFour() {
-		if(autoSelector.getRawButton(3))
-			return 1;
-		return 0;
-	}
-	public int getLLBinaryEight() {
-		if(autoSelector.getRawButton(4))
-			return 1;
-		return 0;
-	}
-	public int getLRBinaryOne() {
-		if(autoSelector.getRawButton(5))
-			return 1;
-		return 0;
-	}
-	public int getLRBinaryTwo() {
-		if(autoSelector.getRawButton(6))
-			return 1;
-		return 0;
-	}
-	public int getLRBinaryFour() {
-		if(autoSelector.getRawButton(7))
-			return 1;
-		return 0;
-	}
-	public int getLRBinaryEight() {
-		if(autoSelector.getRawButton(8))
-			return 1;
-		return 0;
-	}
-	public int getRLBinaryOne() {
-		if(autoSelector.getRawButton(9))
-			return 1;
-		return 0;
-	}
-	public int getRLBinaryTwo() {
 		if(autoSelector.getRawButton(10))
 			return 1;
 		return 0;
 	}
-	public int getRLBinaryFour() {
+	public int getLLBinaryTwo() {
 		if(autoSelector.getRawButton(11))
 			return 1;
 		return 0;
 	}
-	public int getRLBinaryEight() {
+	public int getLLBinaryFour() {
 		if(autoSelector.getRawButton(12))
 			return 1;
 		return 0;
 	}
+	
+	public int getLRBinaryOne() {
+		if(autoSelector.getRawButton(7))
+			return 1;
+		return 0;
+	}
+	public int getLRBinaryTwo() {
+		if(autoSelector.getRawButton(8))
+			return 1;
+		return 0;
+	}
+	public int getLRBinaryFour() {
+		if(autoSelector.getRawButton(9))
+			return 1;
+		return 0;
+	}
+	public int getRLBinaryOne() {
+		if(autoSelector.getRawButton(4))
+			return 1;
+		return 0;
+	}
+	public int getRLBinaryTwo() {
+		if(autoSelector.getRawButton(5))
+			return 1;
+		return 0;
+	}
+	public int getRLBinaryFour() {
+		if(autoSelector.getRawButton(6))
+			return 1;
+		return 0;
+	}
 	public int getRRBinaryOne() {
-		if(autoSelector.getRawButton(13))
+		if(autoSelector.getRawButton(1))
 			return 1;
 		return 0;
 	}
 	public int getRRBinaryTwo() {
-		if(autoSelector.getRawButton(14))
+		if(autoSelector.getRawButton(2))
 			return 1;
 		return 0;
 	}
 	public int getRRBinaryFour() {
-		if(autoSelector.getRawButton(15))
+		if(autoSelector.getRawButton(3))
 			return 1;
 		return 0;
 	}
-	public int getRRBinaryEight() {
-		if(autoSelector.getRawButton(16))
-			return 1;
-		return 0;
-	}
-	public String getLeftRight() {
-		if(buttonBox.getRawButton(12)) {
+	public String getLeftRightCenter() {
+		if(autoSelector.getRawButton(13)) {
 			return "StartL"; // Start Left
-		}
-		return "StartR"; // Start Right
+		} else if(autoSelector.getRawButton(14)) 
+			return "StartR";
+		return "StartC"; // Start Right
 	}
 }

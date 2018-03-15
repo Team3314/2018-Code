@@ -39,7 +39,7 @@ public class AutoSwitchThenScale extends Autonomous {
 			if(isPathDone()) {
 				currentState = State.RELEASE_CUBE;
 				startTimer();
-				releaseCube();
+				releaseCubeSlow();
 			}
 			break;
 		case RELEASE_CUBE:
@@ -64,7 +64,7 @@ public class AutoSwitchThenScale extends Autonomous {
 			if(isPathDone() && armStopped()) {
 				currentState = State.RELEASE_CUBE2;
 				startTimer();
-				releaseCube();
+				releaseCubeSlow();
 			}
 			break;
 		case RELEASE_CUBE2:

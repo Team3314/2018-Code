@@ -28,14 +28,18 @@ public class AutoCubeToSwitch extends Autonomous {
 				selectedPath = getPath(getStart() + getSwitch());
 				loadPath(selectedPath);
 				startPathFollower();
-				armToScaleLow();
+				if(getStart() == "StartC")
+					armToSwitch();
+				else {
+					armToScaleLow();
+				}
 				currentState = State.DRIVE;
 				break;
 			case DRIVE:
 				if(isPathDone() && armStopped()) {
 					currentState = State.RELEASE_CUBE;
 					startTimer();
-					releaseCube();
+					releaseCubeSlow();
 				}
 				break;
 			case RELEASE_CUBE:

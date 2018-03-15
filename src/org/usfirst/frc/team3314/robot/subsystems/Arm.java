@@ -8,7 +8,6 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Arm implements Subsystem {
@@ -18,6 +17,7 @@ public class Arm implements Subsystem {
 		TELESCOPE_IN,
 		TO_HORIZONTAL,
 		TO_SCALE_HIGH ,
+		TO_SCALE_AUTO,
 		TO_SCALE_LOW,
 		TO_SWITCH,
 		TO_PICKUP,
@@ -25,6 +25,7 @@ public class Arm implements Subsystem {
 		RAISE_CUBE,
 		TO_CLIMB,
 		LOWER_TO_BAR,
+		FLIP_CUBE,
 		STOP,
 		STOPPED
 	}
@@ -38,7 +39,7 @@ public class Arm implements Subsystem {
 	private double radiusAngle;
 	private double armEncPos;
 	private double armAngularVelocity, telescopeVelocity;
-    double targetArmAngle = 0;
+    private double targetArmAngle = 0;
 	private double targetTelescopePosition = 0;
 	
 	private double armAngleLimit;
@@ -67,53 +68,53 @@ public class Arm implements Subsystem {
 	
 	public Arm() {
 		telescopeTalon = new WPI_TalonSRX(3);
-		telescopeTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-		telescopeTalon.getSensorCollection().setPulseWidthPosition(0, 0);
-		if(telescopeTalon.getSensorCollection().getPulseWidthPosition() >= Math.abs(Constants.kTelescopeEncoderOffset + 120)) {
-			telescopeTalon.setSelectedSensorPosition((telescopeTalon.getSensorCollection().getPulseWidthPosition() + Constants.kTelescopeEncoderOffset), 0, 0);
+		telescopeTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, Constants.kCANTimeout);
+		telescopeTalon.getSensorCollection().setPulseWidthPosition(0, Constants.kCANTimeout);
+		if(telescopeTalon.getSensorCollection().getPulseWidthPosition() >= Math.abs(Constants.kTelescopeEncoderOffset + 220)) {
+			telescopeTalon.setSelectedSensorPosition((telescopeTalon.getSensorCollection().getPulseWidthPosition() + Constants.kTelescopeEncoderOffset), 0, Constants.kCANTimeout);
 		}
 		else {
-			telescopeTalon.setSelectedSensorPosition((telescopeTalon.getSensorCollection().getPulseWidthPosition() - Constants.kTelescopeEncoderOffset), 0, 0);
+			telescopeTalon.setSelectedSensorPosition((telescopeTalon.getSensorCollection().getPulseWidthPosition() - Constants.kTelescopeEncoderOffset), 0, Constants.kCANTimeout);
 		}
 		telescopeTalon.setSensorPhase(false);
 		telescopeTalon.setInverted(false);
-		telescopeTalon.selectProfileSlot(0, 0);
-		telescopeTalon.config_kP(0, Constants.kTelescope_kP, 0);
-		telescopeTalon.config_kI(0, Constants.kTelescope_kI, 0);
-		telescopeTalon.config_kD(0, Constants.kTelescope_kD, 0);
-		telescopeTalon.config_kF(0, Constants.kTelescope_kF, 0);
-		telescopeTalon.configMotionAcceleration(Constants.kMaxTelescopeAcceleration, 0);
-		telescopeTalon.configMotionCruiseVelocity(0, 0);
-		telescopeTalon.configForwardSoftLimitThreshold(Constants.kMaxTelescopePosition, 0);
-		telescopeTalon.configReverseSoftLimitThreshold(Constants.kTelescopeMinPosition, 0);
-		telescopeTalon.configForwardSoftLimitEnable(true, 0);
-		telescopeTalon.configReverseSoftLimitEnable(true, 0);
-		telescopeTalon.configPeakCurrentLimit(Constants.kTelescopePeakCurrentLimit, 0);
-		telescopeTalon.configPeakCurrentDuration(Constants.kTelescopePeakCurrentDuration, 0);
-		telescopeTalon.configContinuousCurrentLimit(Constants.kTelescopeContinuousCurrentLimit, 0);
+		telescopeTalon.selectProfileSlot(0, Constants.kCANTimeout);
+		telescopeTalon.config_kP(0, Constants.kTelescope_kP, Constants.kCANTimeout);
+		telescopeTalon.config_kI(0, Constants.kTelescope_kI, Constants.kCANTimeout);
+		telescopeTalon.config_kD(0, Constants.kTelescope_kD, Constants.kCANTimeout);
+		telescopeTalon.config_kF(0, Constants.kTelescope_kF, Constants.kCANTimeout);
+		telescopeTalon.configMotionAcceleration(Constants.kMaxTelescopeAcceleration, Constants.kCANTimeout);
+		telescopeTalon.configMotionCruiseVelocity(0, Constants.kCANTimeout);
+		telescopeTalon.configForwardSoftLimitThreshold(Constants.kMaxTelescopePosition, Constants.kCANTimeout);
+		telescopeTalon.configReverseSoftLimitThreshold(Constants.kTelescopeMinPosition, Constants.kCANTimeout);
+		telescopeTalon.configForwardSoftLimitEnable(true, Constants.kCANTimeout);
+		telescopeTalon.configReverseSoftLimitEnable(true, Constants.kCANTimeout);
+		telescopeTalon.configPeakCurrentLimit(Constants.kTelescopePeakCurrentLimit, Constants.kCANTimeout);
+		telescopeTalon.configPeakCurrentDuration(Constants.kTelescopePeakCurrentDuration, Constants.kCANTimeout);
+		telescopeTalon.configContinuousCurrentLimit(Constants.kTelescopeContinuousCurrentLimit, Constants.kCANTimeout);
 		telescopeTalon.enableCurrentLimit(true);
 		
 		
 		armTalon = new WPI_TalonSRX(6);
-		armTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
-		armTalon.getSensorCollection().setPulseWidthPosition(0, 0);
-		armTalon.setSelectedSensorPosition((armTalon.getSensorCollection().getPulseWidthPosition() + Constants.kArmEncoderOffset), 0, 0);
+		armTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, Constants.kCANTimeout);
+		armTalon.getSensorCollection().setPulseWidthPosition(0, Constants.kCANTimeout);
+		armTalon.setSelectedSensorPosition((armTalon.getSensorCollection().getPulseWidthPosition() + Constants.kArmEncoderOffset), 0, Constants.kCANTimeout);
 		armTalon.setSensorPhase(false);
 		armTalon.setInverted(true);
-		armTalon.selectProfileSlot(0, 0);
-		armTalon.config_kP(0, Constants.kArm_kP, 0); //slot, value, timeout
-		armTalon.config_kI(0, Constants.kArm_kI, 0);
-		armTalon.config_kD(0, Constants.kArm_kD, 0);
-		armTalon.config_kF(0, Constants.kArm_kF, 0);
-		armTalon.configMotionAcceleration(Constants.kMaxArmAcceleceration, 0);
-		armTalon.configMotionCruiseVelocity(0, 0);
-		armTalon.configForwardSoftLimitThreshold(Constants.kMaxArmPosition, 0);
-		armTalon.configReverseSoftLimitThreshold(Constants.kArmMinPosition, 0);
-		armTalon.configForwardSoftLimitEnable(true, 0);
-		armTalon.configReverseSoftLimitEnable(true, 0);
-		armTalon.configPeakCurrentLimit(Constants.kArmPeakCurrentLimit, 0);
-		armTalon.configPeakCurrentDuration(Constants.kArmPeakCurrentDuration, 0);
-		armTalon.configContinuousCurrentLimit(Constants.kArmContinuousCurrentLimit, 0);
+		armTalon.selectProfileSlot(0, Constants.kCANTimeout);
+		armTalon.config_kP(0, Constants.kArm_kP, Constants.kCANTimeout); //slot, value, timeout
+		armTalon.config_kI(0, Constants.kArm_kI, Constants.kCANTimeout);
+		armTalon.config_kD(0, Constants.kArm_kD, Constants.kCANTimeout);
+		armTalon.config_kF(0, Constants.kArm_kF, Constants.kCANTimeout);
+		armTalon.configMotionAcceleration(Constants.kMaxArmAcceleceration, Constants.kCANTimeout);
+		armTalon.configMotionCruiseVelocity(0, Constants.kCANTimeout);
+		armTalon.configForwardSoftLimitThreshold(Constants.kMaxArmPosition, Constants.kCANTimeout);
+		armTalon.configReverseSoftLimitThreshold(Constants.kArmMinPosition, Constants.kCANTimeout);
+		armTalon.configForwardSoftLimitEnable(true, Constants.kCANTimeout);
+		armTalon.configReverseSoftLimitEnable(true, Constants.kCANTimeout);
+		armTalon.configPeakCurrentLimit(Constants.kArmPeakCurrentLimit, Constants.kCANTimeout);
+		armTalon.configPeakCurrentDuration(Constants.kArmPeakCurrentDuration, Constants.kCANTimeout);
+		armTalon.configContinuousCurrentLimit(Constants.kArmContinuousCurrentLimit, Constants.kCANTimeout);
 		armTalon.enableCurrentLimit(true);
 		
 	}
@@ -190,9 +191,10 @@ public class Arm implements Subsystem {
 			break;
 		case RAISE_CUBE:
 			targetTelescopePosition = 0;
+			targetArmVelocity *= .25;
 			targetArmAngle = Constants.raiseCubeAngle;
 			if(armAngle > -49) {
-				if(desiredState == ArmState.TO_HOLDING || desiredState == ArmState.TO_PICKUP ) {
+				if(desiredState == ArmState.TO_HOLDING || desiredState == ArmState.TO_PICKUP || desiredState == ArmState.TO_SWITCH || desiredState == ArmState.FLIP_CUBE) {
 					currentState = desiredState;
 				}
 				else{
@@ -230,6 +232,17 @@ public class Arm implements Subsystem {
 				currentState = ArmState.STOPPED;
 			}
 			break;
+		case TO_SCALE_AUTO:
+			targetArmAngle = Constants.kScaleHighAngle;
+			targetTelescopePosition = Constants.kScaleAutoTelescopePosition;
+			if(armAngle < 10) {
+				targetTelescopeVelocity = 0;
+			}
+			if(inPosition()) {
+				targetArmAngle =armEncPos;
+				currentState = ArmState.STOPPED;
+			}
+			break;
 		case TO_CLIMB:
 			targetArmAngle = Constants.kClimbRaisedAngle;
 			targetTelescopePosition = Constants.kClimbRaisedTelescopePosition;
@@ -240,6 +253,10 @@ public class Arm implements Subsystem {
 		case LOWER_TO_BAR:
 			targetArmAngle = Constants.kBarAngle;
 			targetTelescopePosition = Constants.kBarTelescopePosition;
+			break;
+		case FLIP_CUBE:
+			targetArmAngle = Constants.kPickUpAngle;
+			targetTelescopePosition = Constants.kFlipCubeTelescopePosition;
 			break;
 		case STOP:
 			targetArmVelocity = 0;
@@ -280,7 +297,7 @@ public class Arm implements Subsystem {
 			}
 		}
 		else if(desiredState == ArmState.TO_PICKUP) {
-			if(armAngle < ((Constants.kPickUpAngle * Constants.kArmTicksToAngle) - 2) || armAngle > ((Constants.kPickUpAngle * Constants.kArmTicksToAngle) + 3)) {
+			if(armAngle < ((Constants.kPickUpAngle * Constants.kArmTicksToAngle) - 3) || armAngle > ((Constants.kPickUpAngle * Constants.kArmTicksToAngle) + 3)) {
 				currentState = ArmState.TO_INTERMEDIATE_LOW;
 			}
 			else {
@@ -288,7 +305,7 @@ public class Arm implements Subsystem {
 			}
 				
 		}
-		else if(desiredState == ArmState.TO_SCALE_HIGH || desiredState == ArmState.TO_SCALE_LOW) {
+		else if(desiredState == ArmState.TO_SCALE_HIGH || desiredState == ArmState.TO_SCALE_LOW || desiredState == ArmState.TO_SCALE_AUTO) {
 			if(radiusAngle < -20) {
 				targetArmAngle = armEncPos;
 				currentState = ArmState.TELESCOPE_IN;
@@ -300,13 +317,21 @@ public class Arm implements Subsystem {
 		else if(desiredState  == ArmState.TO_SWITCH) {
 			currentState = ArmState.TO_SWITCH;
 		}
+		else if(desiredState == ArmState.FLIP_CUBE) {
+			if(armAngle > -40) {
+				currentState = ArmState.TO_INTERMEDIATE_LOW;
+			}
+			else {
+				currentState = ArmState.FLIP_CUBE;
+			}
+		}
 		else if(desiredState == ArmState.TO_CLIMB || desiredState == ArmState.LOWER_TO_BAR) {
-			if(radiusAngle <-20) {
+			if(radiusAngle < -20) {
 				targetArmAngle = armEncPos;
 				currentState = ArmState.TELESCOPE_IN;
 			}
 			else {
-				currentState = ArmState.TO_CLIMB;
+				currentState = desiredState;
 			}
 		}
 		else if (desiredState == ArmState.STOP) {
@@ -319,14 +344,14 @@ public class Arm implements Subsystem {
 				targetArmAngle = armEncPos;
 			}
 		}
-		if(currentState == ArmState.TELESCOPE_IN || currentState == ArmState.TO_INTERMEDIATE_LOW) {
+		if(currentState == ArmState.TELESCOPE_IN || currentState == ArmState.TO_INTERMEDIATE_LOW || currentState == ArmState.TO_SWITCH) {
 			if(radiusAngle < 0 && telescopePosition > 10) {
 				currentState = ArmState.RAISE_CUBE;
 			}
 		}
 	}
 	public void setTargetSpeed(double targSpeed) {
-		targetSpeed = targSpeed;
+		targetSpeed = targSpeed * targSpeed;
 	}
 	
 	public void setArmOverrideSpeed(double armSpeed) {
