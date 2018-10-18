@@ -14,7 +14,6 @@ public class AutoCrossBaseline extends Autonomous {
 		DONE
 	}
 	
-	private Drive drive = Drive.getInstance();
 	private State currentState;
 	
 	@Override
